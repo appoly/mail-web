@@ -1,0 +1,46 @@
+{
+    "name": "appoly/mail-web",
+    "description": "Catch your outgoing emails within your project making it easier to test and share",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Calum Chamberlain",
+            "email": "calum@appoly.co.uk"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Appoly\\MailWeb\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Appoly\\MailWeb\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "php": "^7.1",
+        "illuminate/support": "^6.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^4.0",
+        "phpunit/phpunit": "^8.0"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Appoly\\MailWeb\\MailWebServiceProvider"
+            ],
+            "aliases": {
+                "MailWeb": "Appoly\\MailWeb\\Facades\\MailWeb"
+            }
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
