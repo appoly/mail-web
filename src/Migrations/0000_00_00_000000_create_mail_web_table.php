@@ -15,10 +15,10 @@ class CreateMailWebTable extends Migration
     {
         Schema::create('mailweb_emails', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('subject');
-            $table->longText('body');
-            $table->string('to_email');
-            $table->string('from_email');
+            $table->string('subject')->nullable();
+            $table->longText('body')->nullable();
+            $table->string('to_email')->nullable();
+            $table->string('from_email')->nullable();
             $table->timestamps();
         });
     }
