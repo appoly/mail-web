@@ -33,7 +33,7 @@ class MailWebListener
             'subject' => $event->message->getSubject(),
             'body' => $event->message->getBody(),
             'from_email' => array_key_first($event->message->getFrom()),
-            'to_email' => array_key_first($event->message->getTo())
+            'to_email' => array_key_first($event->message->getTo()),
         ]);
         // dd($event->message->getBody());
     }

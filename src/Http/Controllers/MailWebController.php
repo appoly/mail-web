@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class MailWebController
 {
-
     public function index()
     {
         $emails = MailwebEmail::get();
