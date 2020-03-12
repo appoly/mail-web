@@ -2,7 +2,7 @@
 
 Mail Web is a Laravel package allowing you to debug emails in one place
 
-![StyleCi](https://github.styleci.io/repos/245465277/shield)
+[![StyleCi](https://github.styleci.io/repos/245465277/shield)](https://github.styleci.io/repos/245465277)
 
 ## Installation
 
