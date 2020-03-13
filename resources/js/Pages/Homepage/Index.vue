@@ -27,22 +27,22 @@
 			<div v-if="selectedEmail !== null" class="w-3/4 h-screen">
 				<!-- <div class="flex flex-wrap mb-2"> -->
 				<div class="card w-full mx-5 mb-3">
-					<button :class="[{ 'text-gray-300': view === 'xl' }, 'btn']" @click="view = 'xl'">
+					<button v-if="toolbar.LARGE_SCREEN" :class="[{ 'text-gray-300': view === 'xl' }, 'btn']" @click="view = 'xl'">
 						<img src="/vendor/mailweb/icons/Monitor.svg" width="25">
 						<!-- LG -->
 					</button>
-					<button :class="[{ 'text-gray-300': view === 'md' }, 'btn']" @click="view = 'md'">
+					<button v-if="toolbar.MEDIUM_SCREEN" :class="[{ 'text-gray-300': view === 'md' }, 'btn']" @click="view = 'md'">
 						<img src="/vendor/mailweb/icons/Laptop.svg" width="30">
 						<!-- MD -->
 					</button>
-					<button :class="[{ 'text-gray-300': view === 'sm' }, 'btn']" @click="view = 'sm'">
+					<button v-if="toolbar.SMALL_SCREEN" :class="[{ 'text-gray-300': view === 'sm' }, 'btn']" @click="view = 'sm'">
 						<img src="/vendor/mailweb/icons/Phone.svg" width="20">
 						<!-- SM -->
 					</button>
-					<button :class="[{ 'text-gray-300': view === 'html' }, 'btn']" @click="view = 'html'">
+					<button v-if="toolbar.HTML" :class="[{ 'text-gray-300': view === 'html' }, 'btn']" @click="view = 'html'">
 						HTML Source
 					</button>
-					<button :class="[{ 'text-gray-300': view === 'markdown' }, 'btn']" @click="view = 'markdown'">
+					<button v-if="toolbar.MARKDOWN" :class="[{ 'text-gray-300': view === 'markdown' }, 'btn']" @click="view = 'markdown'">
 						Markdown
 					</button>
 				</div>
@@ -70,6 +70,11 @@ import turndown from 'turndown';
 import axios from 'axios';
 
 export default {
+    props: {
+        toolbar: {
+            type: Object,
+        },
+    },
     data() {
         return {
             selectedEmail: null,

@@ -1983,6 +1983,11 @@ __webpack_require__.r(__webpack_exports__);
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
+  props: {
+    toolbar: {
+      type: Object
+    }
+  },
   data: function data() {
     return {
       selectedEmail: null,
@@ -21738,91 +21743,104 @@ var render = function() {
       _vm.selectedEmail !== null
         ? _c("div", { staticClass: "w-3/4 h-screen" }, [
             _c("div", { staticClass: "card w-full mx-5 mb-3" }, [
-              _c(
-                "button",
-                {
-                  class: [{ "text-gray-300": _vm.view === "xl" }, "btn"],
-                  on: {
-                    click: function($event) {
-                      _vm.view = "xl"
-                    }
-                  }
-                },
-                [
-                  _c("img", {
-                    attrs: {
-                      src: "/vendor/mailweb/icons/Monitor.svg",
-                      width: "25"
-                    }
-                  })
-                ]
-              ),
+              _vm.toolbar.LARGE_SCREEN
+                ? _c(
+                    "button",
+                    {
+                      class: [{ "text-gray-300": _vm.view === "xl" }, "btn"],
+                      on: {
+                        click: function($event) {
+                          _vm.view = "xl"
+                        }
+                      }
+                    },
+                    [
+                      _c("img", {
+                        attrs: {
+                          src: "/vendor/mailweb/icons/Monitor.svg",
+                          width: "25"
+                        }
+                      })
+                    ]
+                  )
+                : _vm._e(),
               _vm._v(" "),
-              _c(
-                "button",
-                {
-                  class: [{ "text-gray-300": _vm.view === "md" }, "btn"],
-                  on: {
-                    click: function($event) {
-                      _vm.view = "md"
-                    }
-                  }
-                },
-                [
-                  _c("img", {
-                    attrs: {
-                      src: "/vendor/mailweb/icons/Laptop.svg",
-                      width: "30"
-                    }
-                  })
-                ]
-              ),
+              _vm.toolbar.MEDIUM_SCREEN
+                ? _c(
+                    "button",
+                    {
+                      class: [{ "text-gray-300": _vm.view === "md" }, "btn"],
+                      on: {
+                        click: function($event) {
+                          _vm.view = "md"
+                        }
+                      }
+                    },
+                    [
+                      _c("img", {
+                        attrs: {
+                          src: "/vendor/mailweb/icons/Laptop.svg",
+                          width: "30"
+                        }
+                      })
+                    ]
+                  )
+                : _vm._e(),
               _vm._v(" "),
-              _c(
-                "button",
-                {
-                  class: [{ "text-gray-300": _vm.view === "sm" }, "btn"],
-                  on: {
-                    click: function($event) {
-                      _vm.view = "sm"
-                    }
-                  }
-                },
-                [
-                  _c("img", {
-                    attrs: {
-                      src: "/vendor/mailweb/icons/Phone.svg",
-                      width: "20"
-                    }
-                  })
-                ]
-              ),
+              _vm.toolbar.SMALL_SCREEN
+                ? _c(
+                    "button",
+                    {
+                      class: [{ "text-gray-300": _vm.view === "sm" }, "btn"],
+                      on: {
+                        click: function($event) {
+                          _vm.view = "sm"
+                        }
+                      }
+                    },
+                    [
+                      _c("img", {
+                        attrs: {
+                          src: "/vendor/mailweb/icons/Phone.svg",
+                          width: "20"
+                        }
+                      })
+                    ]
+                  )
+                : _vm._e(),
               _vm._v(" "),
-              _c(
-                "button",
-                {
-                  class: [{ "text-gray-300": _vm.view === "html" }, "btn"],
-                  on: {
-                    click: function($event) {
-                      _vm.view = "html"
-                    }
-                  }
-                },
-                [_vm._v("\n\t\t\t\t\t\tHTML Source\n\t\t\t\t\t")]
-              ),
+              _vm.toolbar.HTML
+                ? _c(
+                    "button",
+                    {
+                      class: [{ "text-gray-300": _vm.view === "html" }, "btn"],
+                      on: {
+                        click: function($event) {
+                          _vm.view = "html"
+                        }
+                      }
+                    },
+                    [_vm._v("\n\t\t\t\t\t\tHTML Source\n\t\t\t\t\t")]
+                  )
+                : _vm._e(),
               _vm._v(" "),
-              _c(
-                "button",
-                {
-                  class: [{ "text-gray-300": _vm.view === "markdown" }, "btn"],
-                  on: {
-                    click: function($event) {
-                      _vm.view = "markdown"
-                    }
-                  }
-                },
-                [_vm._v("\n\t\t\t\t\t\tMarkdown\n\t\t\t\t\t")]
-              )
+              _vm.toolbar.MARKDOWN
+                ? _c(
+                    "button",
+                    {
+                      class: [
+                        { "text-gray-300": _vm.view === "markdown" },
+                        "btn"
+                      ],
+                      on: {
+                        click: function($event) {
+                          _vm.view = "markdown"
+                        }
+                      }
+                    },
+                    [_vm._v("\n\t\t\t\t\t\tMarkdown\n\t\t\t\t\t")]
+                  )
+                : _vm._e()
             ]),
             _vm._v(" "),
             _c(
