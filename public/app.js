@@ -1967,40 +1967,23 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  data: function data() {
-    return {
-      selectedEmail: null,
-      view: 'xl',
-      emails: []
-    };
-  },
   computed: {
     widthClass: function widthClass() {
       switch (this.view) {
         case 'md':
-          return 'medium';
+          return 'w-1/2';
+          break;
 
         case 'sm':
-          return 'small';
+          return 'w-1/4';
+          break;
 
         default:
-          return 'large';
+          return 'w-full';
       }
     },
     markdown: function markdown() {
@@ -2012,10 +1995,16 @@ __webpack_require__.r(__webpack_exports__);
       return '';
     }
   },
+  data: function data() {
+    return {
+      selectedEmail: null,
+      view: 'xl',
+      emails: []
+    };
+  },
   mounted: function mounted() {
     var _this2 = this;
 
-    this.getEmails();
     window.setInterval(function () {
       _this2.getEmails();
     }, 5000);
@@ -2055,7 +2044,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, "pre[data-v-32c848ba] {\n  padding: 1em;\n  overflow: auto;\n  margin: 0.5em 0;\n}\n.small[data-v-32c848ba]{\n  width: 375px;\n  height: 812px;\n}\n.medium[data-v-32c848ba] {\n  width: 1280px;\n  height: 800px;\n}\n.large[data-v-32c848ba] {\n  width: 1920px;\n  height: 1028px;\n}\n", ""]);
+exports.push([module.i, "pre[data-v-32c848ba] {\n  padding: 1em;\n  overflow: auto;\n  margin: 0.5em 0;\n}\n", ""]);
 
 // exports
 
@@ -21710,14 +21699,14 @@ var render = function() {
                 _c("div", { staticClass: "card-header p-2" }, [
                   _c("span", { staticClass: "block" }, [
                     _vm._v(
-                      "From < " +
+                      "From <" +
                         _vm._s(_vm.getFromEmailAddress(email.from_email)) +
-                        " >"
+                        ">"
                     )
                   ]),
                   _vm._v(" "),
                   _c("span", { staticClass: "block" }, [
-                    _vm._v("To < " + _vm._s(email.to_email) + " >")
+                    _vm._v("To <" + _vm._s(email.to_email) + ">")
                   ]),
                   _vm._v(" "),
                   _c("span", { staticClass: "block font-semibold" }, [
@@ -21748,7 +21737,7 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n\t\t\t\t\t\tLG\n\t\t\t\t\t")]
+                [_vm._v("XL")]
               ),
               _vm._v(" "),
               _c(
@@ -21761,7 +21750,7 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n\t\t\t\t\t\tMD\n\t\t\t\t\t")]
+                [_vm._v("MD")]
               ),
               _vm._v(" "),
               _c(
@@ -21774,7 +21763,7 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n\t\t\t\t\t\tSM\n\t\t\t\t\t")]
+                [_vm._v("SM")]
               ),
               _vm._v(" "),
               _c(
@@ -21787,7 +21776,7 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n\t\t\t\t\t\tHTML Source\n\t\t\t\t\t")]
+                [_vm._v("\n                    HTML Source\n                ")]
               ),
               _vm._v(" "),
               _c(
@@ -21800,7 +21789,7 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n\t\t\t\t\t\tMarkdown\n\t\t\t\t\t")]
+                [_vm._v("\n                    Markdown\n                ")]
               )
             ]),
             _vm._v(" "),
@@ -21812,7 +21801,7 @@ var render = function() {
               [
                 _vm.view === "xl" || _vm.view === "md" || _vm.view === "sm"
                   ? _c("iframe", {
-                      class: [_vm.widthClass, "h-screen border-2"],
+                      class: [_vm.widthClass, "h-screen"],
                       attrs: {
                         srcdoc: _vm.selectedEmail.body,
                         frameborder: "0"
@@ -21824,9 +21813,9 @@ var render = function() {
                     ])
                   : _c("pre", { staticClass: "text-sm" }, [
                       _vm._v(
-                        "                        " +
+                        "                    " +
                           _vm._s(_vm.markdown) +
-                          "\n                    "
+                          "\n                "
                       )
                     ])
               ]
@@ -21842,9 +21831,7 @@ var staticRenderFns = [
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "header w-full my-5" }, [
-      _c("p", { staticClass: "text-4xl" }, [
-        _vm._v("\n\t\t\t\t\tMail Web\n\t\t\t\t")
-      ]),
+      _c("p", { staticClass: "text-4xl" }, [_vm._v("Mail Web")]),
       _vm._v(" "),
       _c("hr")
     ])

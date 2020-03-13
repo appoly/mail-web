@@ -3,7 +3,7 @@
 namespace Appoly\MailWeb\Http\Controllers;
 
 use Appoly\MailWeb\Http\Models\MailwebEmail;
-use Appoly\MailWeb\Remote\Spam;
+use Illuminate\Http\Request;
 
 class MailWebController
 {
@@ -20,13 +20,5 @@ class MailWebController
 
         return response()
             ->json($emails, 200);
-    }
-
-    public function spamScore(MailwebEmail $email)
-    {
-        $spamScore = Spam::getSpamScore($email);
-
-        return response()
-            ->json($spamScore, 200);
     }
 }
