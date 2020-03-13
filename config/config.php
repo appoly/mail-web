@@ -17,6 +17,6 @@ return [
         'MEDIUM_SCREEN' => env('MAILWEB_MEDIUM_SCREEN', true),
         'SMALL_SCREEN' => env('MAILWEB_SMALL_SCREEN', true),
         'HTML' => env('MAILWEB_HTML', true),
-        'MARKDOWN' => env('MAILWEB_MARKDOWN', true)
-    ]
+        'MARKDOWN' => env('MAILWEB_MARKDOWN', true),
+    ],
 ];
