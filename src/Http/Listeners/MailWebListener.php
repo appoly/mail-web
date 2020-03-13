@@ -32,6 +32,5 @@ class MailWebListener
         MailwebEmail::create([
             'email' => serialize($event->message),
         ]);
-       
     }
 }
