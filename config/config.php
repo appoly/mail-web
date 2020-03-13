@@ -11,7 +11,6 @@ return [
     |
     */
     'MAILWEB_ENABLED' => env('MAILWEB_ENABLED', true),
-    'AUTH_MIDDLEWARE' => env('MAILWEB_AUTH_MIDDLEWARE', 'auth'),
     'MAILWEB_LIMIT' => env('MAILWEB_LIMIT', 20),
     'MAILWEB_TOOLBAR' => [
         'LARGE_SCREEN' => env('MAILWEB_LARGE_SCREEN', true),
