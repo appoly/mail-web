@@ -8,9 +8,13 @@ class MailWebServiceProvider extends ServiceProvider
 {
     public function boot()
     {
-        $this->loadRoutesFrom(__DIR__ . '/routes.php');
+        // if (! config('MailWeb.MAILWEB_ENABLED')) {
+        //     return;
+        // }
+
         $this->loadMigrationsFrom(__DIR__ . '/Migrations');
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'mail-web');
+        $this->loadRoutesFrom(__DIR__ . '/routes.php');
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
