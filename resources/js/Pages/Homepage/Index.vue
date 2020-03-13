@@ -83,7 +83,7 @@ export default {
         return {
             selectedEmail: null,
             view: 'xl',
-            emails: []
+            emails: [],
         };
     },
     mounted() {
@@ -92,7 +92,7 @@ export default {
         }, 5000);
     },
     methods: {
-        getEmails(){
+        getEmails() {
             const _this = this;
             axios.get('/mailweb/emails').then(response => {
                 _this.emails = response.data;
@@ -106,10 +106,8 @@ export default {
                 return from_email;
             }
             return 'No from email found, please add one to your .env';
-        }
-        
+        },
     },
-   
 };
 </script>
 

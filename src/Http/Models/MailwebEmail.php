@@ -14,11 +14,13 @@ class MailwebEmail extends Model
         'subject',
     ];
 
-    public function getEmailAttribute($value){
+    public function getEmailAttribute($value)
+    {
         return unserialize($value);
     }
 
-    public function getBodyAttribute(){
+    public function getBodyAttribute()
+    {
         return $this->email->getBody();
     }
 
@@ -36,5 +38,4 @@ class MailwebEmail extends Model
     {
         return $this->email->getSubject();
     }
-
 }

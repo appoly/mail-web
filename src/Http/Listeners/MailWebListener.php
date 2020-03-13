@@ -34,7 +34,7 @@ class MailWebListener
             // 'body' => $event->message->getBody(),
             // 'from_email' => array_key_first($event->message->getFrom()),
             // 'to_email' => array_key_first($event->message->getTo()),
-            'email' => serialize($event->message)
+            'email' => serialize($event->message),
         ]);
         $s = serialize($event->message);
         dump($s);
