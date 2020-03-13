@@ -12,6 +12,7 @@ class MailwebEmail extends Model
         'from_email',
         'to_email',
         'subject',
+        'markdown'
     ];
 
     public function getEmailAttribute($value)
@@ -38,4 +39,5 @@ class MailwebEmail extends Model
     {
         return $this->email->getSubject();
     }
+
 }

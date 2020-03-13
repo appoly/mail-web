@@ -2,12 +2,8 @@
 
 namespace Appoly\MailWeb\Http\Listeners;
 
-use Appoly\MailWeb\Http\Models\MailWeb;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Events\MessageSending;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 
 class MailWebListener
 {
