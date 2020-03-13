@@ -25,6 +25,10 @@ class MailWebListener
      */
     public function handle(MessageSending $event)
     {
+        if (!config('MailWeb.MAILWEB_ENABLED')) {
+            return;
+        }
+
         MailwebEmail::create([
             'email' => serialize($event->message),
         ]);
