@@ -28,13 +28,13 @@ php artisan migrate
 Publish the assets to your project using
 
 ```bash
-php artisan vendor:publish --tag=public --force
+php artisan vendor:publish --tag=mailweb-public --force
 ```
 
 Publish the config to your project using
 
 ```bash
-php artisan vendor:publish --tag=config --force
+php artisan vendor:publish --tag=mailweb-config --force
 ```
 
 Add MailSending to your EventServiceProvider.php
