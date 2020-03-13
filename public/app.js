@@ -21882,7 +21882,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "header w-full my-5" }, [
       _c("p", { staticClass: "text-4xl" }, [
-        _vm._v("\n\t\t\t\t\tMail Web\n\t\t\t\t")
+        _c("img", { attrs: { src: "/vendor/mailweb/icons/MailWebInline.png" } })
       ]),
       _vm._v(" "),
       _c("hr")

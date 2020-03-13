@@ -4,7 +4,7 @@
 		<div class="flex flex-wrap">
 			<div class="header w-full my-5">
 				<p class="text-4xl">
-					Mail Web
+					<img src="/vendor/mailweb/icons/MailWebInline.png">
 				</p>
 				<hr>
 			</div>

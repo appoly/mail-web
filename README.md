@@ -1,8 +1,13 @@
-# Mail Web
+<p align="center">
+  <img width="460" height="auto" src="https://www.appoly.co.uk/app/uploads/2020/03/MailWebInline.png"> 
+</p>
 
 Mail Web is a Laravel package allowing you to debug emails in one place
 
 [![StyleCi](https://github.styleci.io/repos/245465277/shield)](https://github.styleci.io/repos/245465277)
+[![Latest Stable Version](https://poser.pugx.org/appoly/mail-web/v/stable?format=flat-square)](https://packagist.org/packages/appoly/mail-web)
+[![License](https://poser.pugx.org/appoly/mail-web/license?format=flat-square)](https://packagist.org/packages/appoly/mail-web)
+[![Total Downloads](https://poser.pugx.org/appoly/mail-web/downloads?format=flat-square)](https://packagist.org/packages/appoly/mail-web)
 
 ## Installation
 
@@ -22,9 +27,14 @@ php artisan migrate
 
 Publish the assets to your project using
 
-
 ```bash
 php artisan vendor:publish --tag=public --force
+```
+
+Publish the config to your project using
+
+```bash
+php artisan vendor:publish --tag=config --force
 ```
 
 Add MailSending to your EventServiceProvider.php
