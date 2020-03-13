@@ -55,14 +55,9 @@
 <script>
 import moment from 'moment';
 import turndown from 'turndown';
+import axios from 'axios';
 
 export default {
-    props: {
-        emails: {
-            type: Array,
-            default: null,
-        },
-    },
     computed: {
         widthClass() {
             switch (this.view) {
@@ -88,9 +83,21 @@ export default {
         return {
             selectedEmail: null,
             view: 'xl',
+            emails: []
         };
     },
+    mounted() {
+        window.setInterval(() => {
+            this.getEmails();
+        }, 5000);
+    },
     methods: {
+        getEmails(){
+            const _this = this;
+            axios.get('/mailweb/emails').then(response => {
+                _this.emails = response.data;
+            });
+        },
         parseDate(date) {
             return moment(date, 'YYYY/MM/DD').format('DD/MM/YYYY');
         },
@@ -99,8 +106,10 @@ export default {
                 return from_email;
             }
             return 'No from email found, please add one to your .env';
-        },
+        }
+        
     },
+   
 };
 </script>
 

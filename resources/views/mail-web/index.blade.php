@@ -1,6 +1,6 @@
 @extends('mail-web::layouts.app')
 @section('content')
 
-<mail-web :emails="{{json_encode($emails)}}"></mail-web>
+<mail-web></mail-web>
 
 @endsection

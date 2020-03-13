@@ -14,7 +14,14 @@ composer require appoly/mail-web
 
 ## Usage
 
+Run the migration
+
+```bash
+php artisan migrate
+```
+
 Publish the assets to your project using
+
 
 ```bash
 php artisan vendor:publish --tag=public --force
