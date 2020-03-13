@@ -30,16 +30,8 @@ class MailWebListener
     public function handle(MessageSending $event)
     {
         MailwebEmail::create([
-            // 'subject' => $event->message->getSubject(),
-            // 'body' => $event->message->getBody(),
-            // 'from_email' => array_key_first($event->message->getFrom()),
-            // 'to_email' => array_key_first($event->message->getTo()),
             'email' => serialize($event->message),
         ]);
-        $s = serialize($event->message);
-        dump($s);
-        $b = unserialize($s);
-        dd($b->toString(), $b->getFrom());
-        // dd($event->message->toString());
+       
     }
 }
