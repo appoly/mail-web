@@ -21748,7 +21748,14 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n                    LG\n                ")]
+                [
+                  _c("img", {
+                    attrs: {
+                      src: "/vendor/mailweb/icons/Monitor.svg",
+                      width: "25"
+                    }
+                  })
+                ]
               ),
               _vm._v(" "),
               _c(
@@ -21761,7 +21768,14 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n                    MD\n                ")]
+                [
+                  _c("img", {
+                    attrs: {
+                      src: "/vendor/mailweb/icons/Laptop.svg",
+                      width: "30"
+                    }
+                  })
+                ]
               ),
               _vm._v(" "),
               _c(
@@ -21774,7 +21788,14 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n                    SM\n                ")]
+                [
+                  _c("img", {
+                    attrs: {
+                      src: "/vendor/mailweb/icons/Phone.svg",
+                      width: "20"
+                    }
+                  })
+                ]
               ),
               _vm._v(" "),
               _c(
@@ -21787,7 +21808,7 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n                    HTML Source\n                ")]
+                [_vm._v("\n\t\t\t\t\t\tHTML Source\n\t\t\t\t\t")]
               ),
               _vm._v(" "),
               _c(
@@ -21800,7 +21821,7 @@ var render = function() {
                     }
                   }
                 },
-                [_vm._v("\n                    Markdown\n                ")]
+                [_vm._v("\n\t\t\t\t\t\tMarkdown\n\t\t\t\t\t")]
               )
             ]),
             _vm._v(" "),
@@ -21824,9 +21845,9 @@ var render = function() {
                     ])
                   : _c("pre", { staticClass: "text-sm" }, [
                       _vm._v(
-                        "                    " +
+                        "                        " +
                           _vm._s(_vm.markdown) +
-                          "\n                "
+                          "\n                    "
                       )
                     ])
               ]
@@ -21843,7 +21864,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("div", { staticClass: "header w-full my-5" }, [
       _c("p", { staticClass: "text-4xl" }, [
-        _vm._v("\n                Mail Web\n            ")
+        _vm._v("\n\t\t\t\t\tMail Web\n\t\t\t\t")
       ]),
       _vm._v(" "),
       _c("hr")
@@ -34108,7 +34129,8 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports, __webpack_require__) {
 
 window.Vue = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
-Vue.component('mail-web', __webpack_require__(/*! ./Pages/Homepage/Index.vue */ "./resources/js/Pages/Homepage/Index.vue")["default"]);
+Vue.component('mail-web', __webpack_require__(/*! ./Pages/Homepage/Index.vue */ "./resources/js/Pages/Homepage/Index.vue")["default"]); // eslint-disable-next-line no-unused-vars
+
 var app = new Vue({
   el: '#app'
 });

@@ -2,12 +2,8 @@
 
 namespace Appoly\MailWeb\Http\Listeners;
 
-use Appoly\MailWeb\Http\Models\MailWeb;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Events\MessageSending;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Log;
 
 class MailWebListener
 {
@@ -32,5 +28,11 @@ class MailWebListener
         MailwebEmail::create([
             'email' => serialize($event->message),
         ]);
+
+        $count = MailwebEmail::count();
+        while ($count > config('MailWeb.MAILWEB_LIMIT')) {
+            MailwebEmail::oldest()->first()->delete();
+            $count -= 1;
+        }
     }
 }

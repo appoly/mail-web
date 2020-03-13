@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-
+    <title>Mail Web</title>
     <link href="{{ asset("/vendor/mailweb/app.css") }}" rel="stylesheet" />
 </head>
 
