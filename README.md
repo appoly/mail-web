@@ -58,14 +58,17 @@ class EventServiceProvider extends ServiceProvider
 
 ```
 
-To use Mail Web you need to add a Gate to your route service provider. If you would like to limit the users that can access the route then use
+To use Mail Web you need to add a Gate to your AuthServiceProvider. If you would like to limit the users that can access the route then use
 
 ```php
-Gate::define("view-mailweb", function ($user) {
-    return in_array($user->email, [
-        'user@appoly.co.uk',
-    ]);
-});
+public function boot()
+{
+  Gate::define("view-mailweb", function ($user) {
+      return in_array($user->email, [
+          'user@appoly.co.uk',
+      ]);
+  });
+}
 ```
 
 Should you want to allow access to all users then change the above code to
