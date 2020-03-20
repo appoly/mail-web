@@ -3,14 +3,11 @@
 namespace Appoly\MailWeb;
 
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Foundation\Testing\TestCase;
 
-class RouteTest extends TestCase
+class RouteTest
 {
     public function setUp()
     {
-        parent::setUp();
-
         $this->actingAs(factory(User::class)->create());
     }
 
