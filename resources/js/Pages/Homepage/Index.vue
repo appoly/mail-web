@@ -10,19 +10,21 @@
 			</div>
 
 			<div class="w-1/4">
-				<div v-for="email in emails" :key="email.id">
-					<div
-						:class="['card mx-2 mb-2 cursor-pointer', { 'bg-gray-200': email === selectedEmail }]"
-						@click="selectedEmail = email"
-					>
-						<div class="card-header p-2">
-							<span class="block">From < {{ getFromEmailAddress(email.from_email) }} ></span>
-							<span class="block">To < {{ email.to_email }} ></span>
-							<span class="block font-semibold">{{ email.subject }}</span>
-							<span class="block">Sent: {{ parseDate(email.created_at) }}</span>
+				<transition-group name="list" tag="div">
+					<div v-for="email in emails" :key="email.id">
+						<div
+							:class="['card mx-2 mb-2 cursor-pointer', { 'bg-gray-200': email === selectedEmail }]"
+							@click="selectedEmail = email"
+						>
+							<div class="card-header p-2">
+								<span class="block">From < {{ getFromEmailAddress(email.from_email) }} ></span>
+								<span class="block">To < {{ email.to_email }} ></span>
+								<span class="block font-semibold">{{ email.subject }}</span>
+								<span class="block">Sent: {{ parseDate(email.created_at) }}</span>
+							</div>
 						</div>
 					</div>
-				</div>
+				</transition-group>
 			</div>
 			<div v-if="selectedEmail !== null" class="w-3/4 h-screen">
 				<!-- <div class="flex flex-wrap mb-2"> -->
@@ -110,9 +112,7 @@ export default {
     },
     mounted() {
         this.getEmails();
-        // window.setInterval(() => {
-        //     this.getEmails();
-        // }, 5000);
+        window.addEventListener("focus",  this.getEmails);
     },
     methods: {
         getEmails() {
@@ -128,13 +128,16 @@ export default {
         
             axios.get('/mailweb/emails', config).then(response => {
                 if(sendingLatest){
-                    _this.emails.unshift(response.data);
+                    if(response.data.length > 0){
+                        this.emails = [...response.data, ..._this.emails];
+                    }
+                }else{
+                    _this.emails = response.data;
                 }
-                _this.emails = response.data;
             });
         },
         parseDate(date) {
-            return moment(date, 'YYYY/MM/DD').format('DD/MM/YYYY');
+            return moment(date, 'YYYY/MM/DD HH:mm:ss').format('DD/MM/YYYY HH:mm:ss');
         },
         getFromEmailAddress(from_email) {
             if (from_email !== undefined && from_email !== null && from_email !== '') {
@@ -163,5 +166,13 @@ pre {
 .large {
     width: 1920px;
     height: 1028px;
+}
+.list-enter-active,
+.list-leave-active {
+    transition: all 1s;
+}
+.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+    opacity: 0;
+    transform: translateX(30px);
 }
 </style>

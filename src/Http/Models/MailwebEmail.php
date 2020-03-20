@@ -7,11 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 class MailwebEmail extends Model
 {
     protected $guarded = ['id'];
+
     protected $appends = [
         'body',
         'from_email',
         'to_email',
         'subject',
+    ];
+
+    protected $dates = [
+        'created_at'
     ];
 
     public function getEmailAttribute($value)
