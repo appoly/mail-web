@@ -1,10 +1,11 @@
 <?php
 
-namespace Appoly\MailWeb;
+namespace Appoly\MailWeb\Tests\Unit;
 
+use Appoly\MailWeb\Tests\MailWebTestCase;
 use Illuminate\Foundation\Auth\User;
 
-class RouteTest
+class RouteTest extends MailWebTestCase
 {
     public function setUp()
     {

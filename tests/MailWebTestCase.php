@@ -1,6 +1,6 @@
 <?php
 
-namespace Appoly\MailWeb;
+namespace Appoly\MailWeb\Tests;
 
 use Illuminate\Database\Eloquent\Factory;
 use Orchestra\Testbench\TestCase;
@@ -11,9 +11,20 @@ class MailWebTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->setUpDatabase();
+        // $this->setUpDatabase();
 
-        $this->app->make(Factory::class)->load(__DIR__ . '/factories');
+        // $this->app->make(Factory::class)->load(__DIR__ . '/factories');
+    }
+
+    protected function getEnvironmentSetUp($app)
+    {
+        // Setup default database to use sqlite :memory:
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
     }
 
     protected function getPackageProviders($app)
@@ -33,11 +44,5 @@ class MailWebTestCase extends TestCase
             $table->string('remember_token');
             $table->timestamps();
         });
-    }
-
-    /** @test */
-    public function a_user_can_view_mailweb()
-    {
-        assert(true);
     }
 }
