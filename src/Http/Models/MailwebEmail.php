@@ -16,7 +16,7 @@ class MailwebEmail extends Model
     ];
 
     protected $dates = [
-        'created_at'
+        'created_at',
     ];
 
     public function getEmailAttribute($value)
