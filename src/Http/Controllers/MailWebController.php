@@ -3,6 +3,7 @@
 namespace Appoly\MailWeb\Http\Controllers;
 
 use Appoly\MailWeb\Http\Models\MailwebEmail;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 class MailWebController
@@ -18,9 +19,13 @@ class MailWebController
         return view('mail-web::mail-web.index');
     }
 
-    public function get()
+    public function get(Request $request)
     {
-        $emails = MailwebEmail::get();
+        $emails = MailwebEmail::orderBy('created_at', 'DESC');
+        if ($request->has('last_email_date') && $request->last_email_date !== null) {
+            $emails->where('created_at', '>', $request->last_email_date);
+        }
+        $emails = $emails->get();
 
         return response()
             ->json($emails, 200);

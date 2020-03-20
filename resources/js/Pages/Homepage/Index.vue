@@ -100,17 +100,36 @@ export default {
             }
             return '';
         },
+        latestEmail(){
+            let email = {};
+            if(this.emails.length > 0){
+                email = this.emails[0];
+            }
+            return email;
+        },
     },
     mounted() {
         this.getEmails();
-        window.setInterval(() => {
-            this.getEmails();
-        }, 5000);
+        // window.setInterval(() => {
+        //     this.getEmails();
+        // }, 5000);
     },
     methods: {
         getEmails() {
             const _this = this;
-            axios.get('/mailweb/emails').then(response => {
+            let config = {};
+            let sendingLatest = false;
+            if(Object.prototype.hasOwnProperty.call(this.latestEmail, 'created_at')){
+                sendingLatest = true;
+                config.params = {
+                    last_email_date: this.latestEmail.created_at,
+                };
+            }
+        
+            axios.get('/mailweb/emails', config).then(response => {
+                if(sendingLatest){
+                    _this.emails.unshift(response.data);
+                }
                 _this.emails = response.data;
             });
         },
