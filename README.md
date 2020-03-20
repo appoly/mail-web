@@ -2,12 +2,19 @@
   <img width="460" height="auto" src="https://www.appoly.co.uk/app/uploads/2020/03/MailWebInline.png"> 
 </p>
 
-Mail Web is a Laravel package allowing you to debug emails in one place
+<p align="center">
+    Mail Web is a Laravel package which catches emails locally for debugging
+</p>
+<p align="center">
+    <a href="https://github.styleci.io/repos/245465277"><img src="https://github.styleci.io/repos/245465277/shield" alt="StyleCI Status"></a>
+    <a href="https://packagist.org/packages/appoly/mail-web"><img src="https://poser.pugx.org/appoly/mail-web/downloads?format=flat-square" alt="Total Downloads"></a>
+    <a href="https://packagist.org/packages/appoly/mail-web"><img src="https://poser.pugx.org/appoly/mail-web/v/stable?format=flat-square" alt="Latest Stable Version"></a>
+    <a href="https://packagist.org/packages/appoly/mail-web"><img src="https://poser.pugx.org/appoly/mail-web/license?format=flat-square" alt="License"></a>
+</p>
 
-[![StyleCi](https://github.styleci.io/repos/245465277/shield)](https://github.styleci.io/repos/245465277)
-[![Latest Stable Version](https://poser.pugx.org/appoly/mail-web/v/stable?format=flat-square)](https://packagist.org/packages/appoly/mail-web)
-[![License](https://poser.pugx.org/appoly/mail-web/license?format=flat-square)](https://packagist.org/packages/appoly/mail-web)
-[![Total Downloads](https://poser.pugx.org/appoly/mail-web/downloads?format=flat-square)](https://packagist.org/packages/appoly/mail-web)
+<p align="center">
+    <img width="1080" height="auto" src="https://www.appoly.co.uk/app/uploads/2020/03/Screenshot-2020-03-20-at-14.58.16.png">
+</p>
 
 ## Installation
 
@@ -77,6 +84,12 @@ Should you want to allow access to all users then change the above code to
 Gate::define("view-mailweb", function ($user) {
     return true;
 });
+```
+
+To view emails then go to
+
+```
+{url}\mailweb
 ```
 
 ## Contributing
