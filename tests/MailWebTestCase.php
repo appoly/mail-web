@@ -12,13 +12,13 @@ class MailWebTestCase extends TestCase
 
         $this->setUpDatabase();
 
-        $this->app->make(EloquentFactory::class)->load(__DIR__ . '/factories');
+        $this->app->make(EloquentFactory::class)->load(__DIR__.'/factories');
     }
 
     protected function getPackageProviders($app)
     {
         return [
-            MailWebServiceProvider::class
+            MailWebServiceProvider::class,
         ];
     }
 
