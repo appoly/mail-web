@@ -2,7 +2,8 @@
 
 namespace Appoly\MailWeb;
 
-use Illuminate\Foundation\Testing\TestCase;
+use Illuminate\Database\Eloquent\Factory;
+use Orchestra\Testbench\TestCase;
 
 class MailWebTestCase extends TestCase
 {
@@ -12,7 +13,7 @@ class MailWebTestCase extends TestCase
 
         $this->setUpDatabase();
 
-        $this->app->make(EloquentFactory::class)->load(__DIR__.'/factories');
+        $this->app->make(Factory::class)->load(__DIR__ . '/factories');
     }
 
     protected function getPackageProviders($app)
