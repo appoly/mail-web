@@ -1,65 +1,67 @@
 <template>
 	<!-- eslint-disable vue/no-parsing-error -->
-	<div class="mx-5 w-full">
-		<div class="flex flex-wrap">
-			<div class="header w-full my-5">
-				<p class="text-4xl">
-					<img src="/vendor/mailweb/icons/MailWebInline.png">
+	<div>
+		<div class="header w-full bg-white mb-5 border-b-2">
+			<div class="flex justify-between">
+				<p class="text-4xl mx-6">
+					<img src="/vendor/mailweb/icons/MailWebInline.png" width="75%">
 				</p>
-				<hr>
 			</div>
-
-			<div class="w-1/4">
-				<transition-group name="list" tag="div">
-					<div v-for="email in emails" :key="email.id">
-						<div
-							:class="['card mx-2 mb-2 cursor-pointer', { 'bg-gray-200': email === selectedEmail }]"
-							@click="selectedEmail = email"
-						>
-							<div class="card-header p-2">
-								<span class="block">From < {{ getFromEmailAddress(email.from_email) }} ></span>
-								<span class="block">To < {{ email.to_email }} ></span>
-								<span class="block font-semibold">{{ email.subject }}</span>
-								<span class="block">Sent: {{ parseDate(email.created_at) }}</span>
+		</div>
+		<div class="mx-5">
+			<div class="flex flex-wrap">
+				<div class="w-1/5">
+					<transition-group name="list" tag="div">
+						<div v-for="email in emails" :key="email.id">
+							<div
+								:class="['card mx-2 mb-2 cursor-pointer', { 'bg-gray-200': email === selectedEmail }]"
+								@click="selectedEmail = email"
+							>
+								<div class="card-header p-2">
+									<span class="block">From < {{ getFromEmailAddress(email.from_email) }} ></span>
+									<span class="block">To < {{ email.to_email }} ></span>
+									<span class="block font-semibold">{{ email.subject }}</span>
+									<span class="block">Sent: {{ parseDate(email.created_at) }}</span>
+								</div>
 							</div>
 						</div>
-					</div>
-				</transition-group>
-			</div>
-			<div v-if="selectedEmail !== null" class="w-3/4 h-screen">
-				<!-- <div class="flex flex-wrap mb-2"> -->
-				<div class="card w-full mx-5 mb-3">
-					<button v-if="toolbar.LARGE_SCREEN" :class="[{ 'text-gray-300': view === 'xl' }, 'btn']" @click="view = 'xl'">
-						<img src="/vendor/mailweb/icons/Monitor.svg" width="25">
-						<!-- LG -->
-					</button>
-					<button v-if="toolbar.MEDIUM_SCREEN" :class="[{ 'text-gray-300': view === 'md' }, 'btn']" @click="view = 'md'">
-						<img src="/vendor/mailweb/icons/Laptop.svg" width="30">
-						<!-- MD -->
-					</button>
-					<button v-if="toolbar.SMALL_SCREEN" :class="[{ 'text-gray-300': view === 'sm' }, 'btn']" @click="view = 'sm'">
-						<img src="/vendor/mailweb/icons/Phone.svg" width="20">
-						<!-- SM -->
-					</button>
-					<button v-if="toolbar.HTML" :class="[{ 'text-gray-300': view === 'html' }, 'btn']" @click="view = 'html'">
-						HTML Source
-					</button>
-					<button v-if="toolbar.MARKDOWN" :class="[{ 'text-gray-300': view === 'markdown' }, 'btn']" @click="view = 'markdown'">
-						Markdown
-					</button>
+					</transition-group>
 				</div>
-				<!-- </div> -->
-				<div class="card h-full mx-5 flex justify-center bg-gray-200">
-					<iframe
-						v-if="view === 'xl' || view === 'md' || view === 'sm'"
-						:class="[widthClass, 'h-screen border-2']"
-						:srcdoc="selectedEmail.body"
-						frameborder="0"
-					/>
-					<pre v-else-if="view === 'html'" class="text-sm"><code>{{ selectedEmail.body }}</code></pre>
-					<pre v-else class="text-sm">
+				<div v-if="selectedEmail !== null" :class="['h-screen', {'w-4/5': view === 'html' || view === 'markdown'}]">
+					<!-- <div class="flex flex-wrap mb-2"> -->
+					<div class="card w-full mx-5 mb-3">
+						<button v-if="toolbar.LARGE_SCREEN" :class="[{ 'text-gray-300': view === 'xl' }, 'btn']" @click="view = 'xl'">
+							<img src="/vendor/mailweb/icons/Monitor.svg" width="25">
+						<!-- LG -->
+						</button>
+						<button v-if="toolbar.MEDIUM_SCREEN" :class="[{ 'text-gray-300': view === 'md' }, 'btn']" @click="view = 'md'">
+							<img src="/vendor/mailweb/icons/Laptop.svg" width="30">
+						<!-- MD -->
+						</button>
+						<button v-if="toolbar.SMALL_SCREEN" :class="[{ 'text-gray-300': view === 'sm' }, 'btn']" @click="view = 'sm'">
+							<img src="/vendor/mailweb/icons/Phone.svg" width="20">
+						<!-- SM -->
+						</button>
+						<button v-if="toolbar.HTML" :class="[{ 'text-gray-300': view === 'html' }, 'btn']" @click="view = 'html'">
+							HTML Source
+						</button>
+						<button v-if="toolbar.MARKDOWN" :class="[{ 'text-gray-300': view === 'markdown' }, 'btn']" @click="view = 'markdown'">
+							Markdown
+						</button>
+					</div>
+					<!-- </div> -->
+					<div :class="['card h-full mx-5 p-3 flex justify-center bg-white']">
+						<iframe
+							v-if="view === 'xl' || view === 'md' || view === 'sm'"
+							:class="[widthClass, 'h-screen border-2']"
+							:srcdoc="selectedEmail.body"
+							frameborder="0"
+						/>
+						<pre v-else-if="view === 'html'" class="text-sm w-100"><code>{{ selectedEmail.body }}</code></pre>
+						<pre v-else class="text-sm w-100">
                         {{ markdown }}
                     </pre>
+					</div>
 				</div>
 			</div>
 		</div>
