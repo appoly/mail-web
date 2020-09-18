@@ -9,7 +9,7 @@
     <link href="{{ asset("/vendor/mailweb/app.css") }}" rel="stylesheet" />
 </head>
 
-<body class='max-w-full'>
+<body class='max-w-full bg-gray-100 bg-opacity-100	'>
     <div id="app">
         @yield('content')
     </div>
