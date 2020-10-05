@@ -18,7 +18,7 @@
         "cross-env": "^7.0.2",
         "eslint": "^6.8.0",
         "eslint-loader": "^4.0.2",
-        "eslint-plugin-vue": "^6.2.2",
+        "eslint-plugin-vue": "^7.0.1",
         "laravel-mix": "^5.0.5",
         "laravel-mix-purgecss": "^5.0.0",
         "laravel-mix-tailwind": "^0.1.0",
