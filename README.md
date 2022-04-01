@@ -44,27 +44,6 @@ Publish the config to your project using
 php artisan vendor:publish --tag=mailweb-config --force
 ```
 
-Add MailSending to your EventServiceProvider.php
-
-```php
-use Appoly\MailWeb\Http\Listeners\MailWebListener;
-use Illuminate\Mail\Events\MessageSending;
-
-class EventServiceProvider extends ServiceProvider
-{
-    /**
-     * The event listener mappings for the application.
-     *
-     * @var array
-     */
-    protected $listen = [
-        MessageSending::class => [
-            MailWebListener::class
-        ]
-    ];
-
-```
-
 To use Mail Web you need to add a Gate to your AuthServiceProvider. If you would like to limit the users that can access the route then use
 
 ```php
