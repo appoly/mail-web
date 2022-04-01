@@ -10,8 +10,6 @@ class MailWebController
 {
     public function index()
     {
-        // $emails = MailwebEmail::get();
-
         if (Gate::denies('view-mailweb', auth()->user())) {
             return abort('403');
         }

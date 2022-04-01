@@ -12,11 +12,11 @@ class MailwebEmail extends Model
         'body',
         'from_email',
         'to_email',
-        'subject',
+        'subject'
     ];
 
     protected $dates = [
-        'created_at',
+        'created_at'
     ];
 
     public function getEmailAttribute($value)
@@ -26,17 +26,17 @@ class MailwebEmail extends Model
 
     public function getBodyAttribute()
     {
-        return $this->email->getBody();
+        return $this->email->getBody()->getParts()[1]->getBody();
     }
 
     public function getFromEmailAttribute()
     {
-        return array_key_first($this->email->getFrom());
+        return $this->email->getFrom()[0]->getAddress();
     }
 
     public function getToEmailAttribute()
     {
-        return array_key_first($this->email->getTo());
+        return $this->email->getTo()[0]->getAddress();
     }
 
     public function getSubjectAttribute()

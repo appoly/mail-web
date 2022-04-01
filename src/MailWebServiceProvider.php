@@ -2,7 +2,7 @@
 
 namespace Appoly\MailWeb;
 
-use Appoly\MailWeb\Facades\MailWeb;
+use Appoly\MailWeb\Providers\MessageServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 class MailWebServiceProvider extends ServiceProvider
@@ -31,9 +31,10 @@ class MailWebServiceProvider extends ServiceProvider
     {
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'MailWeb');
+        $this->app->register(MessageServiceProvider::class);
 
         // Register the main class to use with the facade
-        $this->app->bind('MailWeb', function () {
+        $this->app->singleton('MailWeb', function () {
             return new MailWeb();
         });
     }
