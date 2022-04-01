@@ -19,20 +19,20 @@
         }
     },
     "require": {
-        "php": "^7.1",
-        "illuminate/support": "^6.0|^7.0|^8.0"
+        "php": "^7.4|^8.0",
+        "illuminate/support": "^9.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^6.0",
+        "orchestra/testbench": "^7.0",
         "phpunit/phpunit": "^9.0"
     },
-    "extra": {
+     "extra": {
         "laravel": {
             "providers": [
                 "Appoly\\MailWeb\\MailWebServiceProvider"
             ],
             "aliases": {
-                "MailWeb": "Appoly\\MailWeb\\Facades\\MailWeb"
+                "MailWeb": "Appoly\\MailWeb\\MailWebFacade"
             }
         }
     },
