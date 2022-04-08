@@ -1,5 +1,6 @@
-<p align="center">
-  <img width="460" height="auto" src="https://www.appoly.co.uk/app/uploads/2020/03/MailWebInline.png"> 
+<h1 align="center"> MailWeb</h1>
+<p align="center">    
+    <img src="https://www.appoly.co.uk/app/uploads/2022/04/mail-web-logo.png"> 
 </p>
 
 <p align="center">
@@ -12,7 +13,7 @@
 </p>
 
 <p align="center">
-    <img width="1080" height="auto" src="https://www.appoly.co.uk/app/uploads/2020/03/Screenshot-2020-03-20-at-14.58.16.png">
+    <img width="1080" height="auto" src="https://www.appoly.co.uk/app/uploads/2022/04/mail-web.png">
 </p>
 
 ## Installation
