@@ -1,66 +1,11 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   height="62.000038"
-   width="90"
-   version="1.1"
-   x="0px"
-   y="0px"
-   viewBox="0 0 90 62.000038"
-   id="svg6"
-   sodipodi:docname="noun_Laptop_1778472.svg"
-   style="fill:#000000"
-   inkscape:version="0.92.2 5c3e80d, 2017-08-06">
-  <metadata
-     id="metadata12">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs10" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="776"
-     inkscape:window-height="480"
-     id="namedview8"
-     showgrid="false"
-     inkscape:zoom="2.36"
-     inkscape:cx="45"
-     inkscape:cy="31.00002"
-     inkscape:window-x="1680"
-     inkscape:window-y="0"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg6" />
-  <g
-     transform="translate(-4.9999998,-971.36216)"
-     id="g4">
-    <path
-       style="color:#000000;display:inline;overflow:visible;visibility:visible;fill:#000000;stroke:none;enable-background:accumulate"
-       d="m 16,971.36216 c -2.77,0 -5,2.23 -5,5 v 45.00004 h 78 v -45.00004 c 0,-2.77 -2.2299,-5 -5,-5 z M 4.9999998,1023.3622 v 4 c 0,3.324 2.676,6 6.0000002,6 h 78 c 3.324,0 6,-2.676 6,-6 v -4 z"
-       marker="none"
-       visibility="visible"
-       display="inline"
-       overflow="visible"
-       id="path2"
-       inkscape:connector-curvature="0" />
-  </g>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="22px" viewBox="0 0 30 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>0AEBAD83-89EE-47B9-9C13-F18D10B21897</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="MailWeb" transform="translate(-627.000000, -88.000000)" fill="#1D1D1B">
+            <g id="laptop" transform="translate(610.000000, 72.000000)">
+                <path d="M45.6363636,35.3321023 C45.6363636,35.9514489 45.1328409,36.4553125 44.5138352,36.4553125 L19.48625,36.4553125 C18.8672443,36.4553125 18.3636364,35.9514489 18.3636364,35.3321023 L18.3636364,34.409858 L45.6363636,34.409858 L45.6363636,35.3321023 Z M20.75,18.488892 C20.75,17.8684375 21.253608,17.3636364 21.8726136,17.3636364 L42.1274716,17.3636364 C42.7464773,17.3636364 43.25,17.8684375 43.25,18.488892 L43.25,33.0462216 L20.75,33.0462216 L20.75,18.488892 Z M46.3181818,33.0462216 L44.6136364,33.0462216 L44.6136364,18.488892 C44.6136364,17.1164773 43.4983523,16 42.1274716,16 L21.8726136,16 C20.501733,16 19.3863636,17.1164773 19.3863636,18.488892 L19.3863636,33.0462216 L17.6818182,33.0462216 C17.3052841,33.0462216 17,33.3515057 17,33.7280398 L17,35.3321023 C17,36.7033239 18.1153693,37.8189489 19.48625,37.8189489 L44.5138352,37.8189489 C45.8847159,37.8189489 47,36.7033239 47,35.3321023 L47,33.7280398 C47,33.3515057 46.6947159,33.0462216 46.3181818,33.0462216 L46.3181818,33.0462216 Z M23.4772727,30.3181818 L40.5227273,30.3181818 L40.5227273,20.0909091 L23.4772727,20.0909091 L23.4772727,30.3181818 Z M41.2045455,18.7272727 L22.7954545,18.7272727 C22.4189205,18.7272727 22.1136364,19.0325568 22.1136364,19.4090909 L22.1136364,31 C22.1136364,31.3765341 22.4189205,31.6818182 22.7954545,31.6818182 L41.2045455,31.6818182 C41.5810795,31.6818182 41.8863636,31.3765341 41.8863636,31 L41.8863636,19.4090909 C41.8863636,19.0325568 41.5810795,18.7272727 41.2045455,18.7272727 L41.2045455,18.7272727 Z" id="Fill-1"></path>
+            </g>
+        </g>
+    </g>
 </svg>

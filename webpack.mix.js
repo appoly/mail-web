@@ -1,6 +1,6 @@
 const mix = require('laravel-mix');
-require('laravel-mix-tailwind');
 require('laravel-mix-purgecss');
+
 
 /*
  |--------------------------------------------------------------------------
@@ -13,7 +13,6 @@ require('laravel-mix-purgecss');
  |
  */
 
-mix.js('./resources/js/app.js', 'public')
+mix.js('resources/js/app.js', 'public').vue()
     .sass('./resources/sass/app.scss', 'public')
-    .tailwind()
     .purgeCss();

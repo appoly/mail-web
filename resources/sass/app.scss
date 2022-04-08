@@ -1,117 +1,71 @@
-/**
- * This injects Tailwind's base styles, which is a combination of
- * Normalize.css and some additional base styles.
- *
- * You can see the styles here:
- * https://unpkg.com/tailwindcss/dist/base.css
- *
- * If using `postcss-import`, use this import instead:
- *
- * @import "tailwindcss/base";
- */
-@tailwind base;
+@import '~bootstrap';
 
-/**
- * This injects any component classes registered by plugins.
- *
- * If using `postcss-import`, use this import instead:
- *
- * @import "tailwindcss/components";
- */
-@tailwind components;
+body {
+    font-size: 14px;
+    background-color: #e1e4e9;
+    height: 100vh;
+    max-width: 100%;
+    overflow-x: auto;
+}
 
-/**
- * Here you would add any of your custom component classes; stuff that you'd
- * want loaded *before* the utilities so that the utilities could still
- * override them.
- *
- * Example:
- *
- * .btn { ... }
- * .form-input { ... }
- *
- * Or if using a preprocessor or `postcss-import`:
- *
- * @import "components/buttons";
- * @import "components/forms";
- */
+.header {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    height: 100px;
+}
+
+.bg-white {
+    background-color: #fff;
+}
+
+.unset-padding-left {
+    padding-left: unset !important;
+}
+
+.font-smaller {
+    font-size: 14px;
+}
 
 .card {
-    @apply w-full mb-4 bg-white rounded-lg overflow-hidden shadow-xl relative;
+    border-radius: 10px;
+
+    &.email-card {
+        opacity: 0.9;
+        border-radius: 10px;
+        background-color: #ffffff;
+        box-shadow: 0 2px 6px 0 #dce1ec;
+
+        .card-body {
+            opacity: 0.4;
+        }
+
+        &.selected {
+            opacity: 1;
+            background-color: #ffffff;
+            box-shadow: 0 20px 40px 0 #d0d6e3;
+
+            .card-body {
+                opacity: 1;
+            }
+        }
+    }
 }
 
-.card-body {
-    @apply p-4 h-auto;
-}
-
-@screen md {
-    .card {
-        @apply mx-2 mb-0;
-    }
-    .card-body {
-        @apply h-40;
-    }
-}
-
-@screen lg {
-    .card-body {
-        @apply h-48;
-    }
+.form-control {
+    border-radius: 10px;
+    background-color: #ffffff;
+    box-shadow: 0 2px 6px 0 #dce1ec;
 }
 
 .btn {
-    @apply font-bold py-2 px-4 rounded;
+    border-radius: 10px;
+    background-color: #ffffff;
+    opacity: 0.6;
+    box-shadow: 0 2px 6px 0 #dce1ec;
+
+    &.selected {
+        opacity: 1;
+        background-color: #ffffff;
+        box-shadow: 0 20px 40px 0 #d0d6e3;
+    }
 }
-
-.btn-blue {
-    @apply bg-blue-500 text-white;
-}
-
-.btn-blue:hover {
-    @apply bg-blue-700;
-}
-
-.btn-gray {
-    @apply bg-gray-400 text-gray-800;
-}
-
-.btn-gray:hover {
-    @apply bg-gray-500;
-}
-
-.input {
-    @apply bg-white border rounded-lg py-2 px-4 block w-full appearance-none leading-normal border-gray-300;
-}
-
-.input:focus {
-    @apply outline-none shadow-outline;
-}
-
-.is-invalid {
-    @apply border-red-300;
-}
-
-/**
- * This injects all of Tailwind's utility classes, generated based on your
- * config file.
- *
- * If using `postcss-import`, use this import instead:
- *
- * @import "tailwindcss/utilities";
- */
-@tailwind utilities;
-
-/**
- * Here you would add any custom utilities you need that don't come out of the
- * box with Tailwind.
- *
- * Example :
- *
- * .bg-pattern-graph-paper { ... }
- * .skew-45 { ... }
- *
- * Or if using a preprocessor or `postcss-import`:
- *
- * @import "utilities/background-patterns";
- * @import "utilities/skew-transforms";
- */

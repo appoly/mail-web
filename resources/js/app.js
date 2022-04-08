@@ -1,6 +1,6 @@
-window.Vue = require('vue');
+import Vue from 'vue';
 
-Vue.component('mail-web', require('./Pages/Homepage/Index.vue').default);
+Vue.component('MailWeb', require('./Pages/Homepage/Index.vue').default);
 
 // eslint-disable-next-line no-unused-vars
 const app = new Vue({

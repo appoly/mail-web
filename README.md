@@ -6,7 +6,6 @@
     Mail Web is a Laravel package which catches emails locally for debugging
 </p>
 <p align="center">
-    <a href="https://github.styleci.io/repos/245465277"><img src="https://github.styleci.io/repos/245465277/shield" alt="StyleCI Status"></a>
     <a href="https://packagist.org/packages/appoly/mail-web"><img src="https://poser.pugx.org/appoly/mail-web/downloads?format=flat-square" alt="Total Downloads"></a>
     <a href="https://packagist.org/packages/appoly/mail-web"><img src="https://poser.pugx.org/appoly/mail-web/v/stable?format=flat-square" alt="Latest Stable Version"></a>
     <a href="https://packagist.org/packages/appoly/mail-web"><img src="https://poser.pugx.org/appoly/mail-web/license?format=flat-square" alt="License"></a>
