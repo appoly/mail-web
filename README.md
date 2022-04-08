@@ -1,7 +1,4 @@
 <h1 align="center"> MailWeb</h1>
-<p align="center">    
-    <img src="https://www.appoly.co.uk/app/uploads/2022/04/mail-web-logo.png"> 
-</p>
 
 <p align="center">
     Mail Web is a Laravel package which catches emails locally for debugging
