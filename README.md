@@ -68,7 +68,7 @@ class EventServiceProvider extends ServiceProvider
 Register the routes using the mailweb macro
 
 ```php
-Route::impersonate();
+Route::mailweb();
 ```
 
 To use Mail Web you need to add a Gate to your AuthServiceProvider. If you would like to limit the users that can access the route then use
