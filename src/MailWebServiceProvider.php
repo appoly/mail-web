@@ -2,6 +2,7 @@
 
 namespace Appoly\MailWeb;
 
+use Appoly\MailWeb\Facades\MailWeb;
 use Illuminate\Support\ServiceProvider;
 
 class MailWebServiceProvider extends ServiceProvider
