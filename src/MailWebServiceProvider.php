@@ -49,8 +49,8 @@ class MailWebServiceProvider extends ServiceProvider
         $router = $this->app['router'];
 
         $router->macro('mailweb', function () use ($router) {
-            $router->('/mailweb', 'Appoly\MailWeb\Http\Controllers\MailWebController@index');
-            $router->('/mailweb/emails', 'Appoly\MailWeb\Http\Controllers\MailWebController@get');
+            $router->get('/mailweb', 'Appoly\MailWeb\Http\Controllers\MailWebController@index')->name('mailweb.index');
+            $router->get('/mailweb/emails', 'Appoly\MailWeb\Http\Controllers\MailWebController@get');
         });
     }
 }
