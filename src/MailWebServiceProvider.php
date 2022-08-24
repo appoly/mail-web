@@ -15,7 +15,7 @@ class MailWebServiceProvider extends ServiceProvider
 
         $this->loadMigrationsFrom(__DIR__.'/Migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'mail-web');
-        $this->loadRoutesFrom(__DIR__.'/routes.php');
+        $this->registerRoutesMacro();
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -35,6 +35,22 @@ class MailWebServiceProvider extends ServiceProvider
         // Register the main class to use with the facade
         $this->app->singleton('MailWeb', function () {
             return new MailWeb;
+        });
+    }
+
+    /**
+     * Register routes macro.
+     *
+     * @param void
+     * @return  void
+     */
+    protected function registerRoutesMacro()
+    {
+        $router = $this->app['router'];
+
+        $router->macro('mailweb', function () use ($router) {
+            $router->('/mailweb', 'Appoly\MailWeb\Http\Controllers\MailWebController@index');
+            $router->('/mailweb/emails', 'Appoly\MailWeb\Http\Controllers\MailWebController@get');
         });
     }
 }
