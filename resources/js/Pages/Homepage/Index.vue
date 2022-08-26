@@ -6,52 +6,69 @@
 					<div class="px-4">
 						<div class="d-flex">
 							<h1>MailWeb</h1>
-							<img class="ml-4" src="/vendor/mailweb/icons/logo.svg" alt="">
+							<img class="ml-4" src="/vendor/mailweb/icons/logo.svg">
 						</div>
 					</div>
 				</div>
 				<div class="col">
 					<div class="d-flex">
-						<button :class="['btn font-smaller mx-2', {'selected' : view == 'xl'}]" @click="view = 'xl'">
+						<button :class="['btn font-smaller mx-2', { 'selected': view == 'xl' }]" @click="view = 'xl'">
 							<div class="d-flex align-items-center">
-								<img src="/vendor/mailweb/icons/desktop.svg" alt="">
+								<img src="/vendor/mailweb/icons/desktop.svg">
 								<span class="px-2 align-self-center">
 									Desktop
 								</span>
 							</div>
 						</button>
-						<button :class="['btn font-smaller mx-2', {'selected' : view == 'md'}]" @click="view = 'md'">
+						<button :class="['btn font-smaller mx-2', { 'selected': view == 'md' }]" @click="view = 'md'">
 							<div class="d-flex align-items-center ">
-								<img src="/vendor/mailweb/icons/laptop.svg" alt="">
+								<img src="/vendor/mailweb/icons/laptop.svg">
 								<span class="px-2 align-self-center">
 									Laptop
 								</span>
 							</div>
 						</button>
-						<button :class="['btn font-smaller mx-2', {'selected' : view == 'sm'}]" @click="view = 'sm'">
+						<button :class="['btn font-smaller mx-2', { 'selected': view == 'sm' }]" @click="view = 'sm'">
 							<div class="d-flex align-items-center ">
-								<img src="/vendor/mailweb/icons/mobile.svg" alt="">
+								<img src="/vendor/mailweb/icons/mobile.svg">
 								<span class="px-2 align-self-center">
 									Mobile
 								</span>
 							</div>
 						</button>
-						<button :class="['btn font-smaller mx-2', {'selected' : view == 'html'}]" @click="view = 'html'">
+						<button
+							:class="['btn font-smaller mx-2', { 'selected': view == 'html' }]"
+							@click="view = 'html'"
+						>
 							<div class="d-flex align-items-center ">
-								<img src="/vendor/mailweb/icons/html.svg" alt="">
+								<img src="/vendor/mailweb/icons/html.svg">
 								<span class="px-2 align-self-center">
 									HTML Source
 								</span>
 							</div>
 						</button>
-						<button :class="['btn font-smaller mx-2', {'selected': view == 'markdown'}]" @click="view = 'markdown'">
+						<button
+							:class="['btn font-smaller mx-2', { 'selected': view == 'markdown' }]"
+							@click="view = 'markdown'"
+						>
 							<div class="d-flex align-items-center ">
-								<img src="/vendor/mailweb/icons/markdown.svg" alt="">
+								<img src="/vendor/mailweb/icons/markdown.svg">
 								<span class="px-2 align-self-center">
 									Markdown
 								</span>
 							</div>
 						</button>
+						<div class="ml-auto">
+							<button class="btn font-smaller mx-2" @click="back">
+								<div class="d-flex align-items-center ">
+									<!-- markdown image rotated 45 deg  -->
+									<img class="rotate-90" src="/vendor/mailweb/icons/markdown.svg">
+									<span class="px-2 align-self-center">
+										Back
+									</span>
+								</div>
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -59,35 +76,63 @@
 		<div class="row h-100 overflow-auto">
 			<div class="col-sm-4 col-md-4 col-lg-3 col-xl-3 bg-white">
 				<div class="py-4 px-4 ">
-					<input
-						v-model="search"
-						type="text"
-						placeholder="Search via Subject, To or From"
-						class="form-control font-smaller mb-4"
-					>
+					<div class="form-group">
+						<input
+							v-model="search"
+							type="text"
+							placeholder="Search via Subject, To or From"
+							class="form-control font-smaller mb-4"
+						>
+					</div>
+					<div class="d-flex align-items-center">
+						<div class="form-group w-100 mr-1">
+							<label class="font-smaller">From</label>
+							<input
+								v-model="dates.from"
+								type="date"
+								class="form-control font-smaller"
+							>
+						</div>
+						<div class="form-group w-100 ml-1">
+							<label class="font-smaller">To</label>
+							<input
+								v-model="dates.to"
+								type="date"
+								class="form-control font-smaller"
+							>
+						</div>
+					</div>
 
 					<transition-group name="list" tag="div">
 						<div v-for="email in filteredEmails" :key="email.id">
 							<div
-								:class="['card font-smaller email-card my-3', {'selected': selectedEmail == email}]"
-								@click="selectedEmail = email"
+								:class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
+								@click="changeEmail(email)"
 							>
 								<div class="card-body">
-									<span class="d-block font-weight-bold">{{ email.subject }}</span>
-
-									<span class="fw-lighter d-block text-muted">From: {{ getFromEmailAddress(email.from_email) }}</span>
-									<span class="fw-lighter d-block text-muted">To: {{ email.to_email }}</span>
-									<span class="fw-lighter d-block text-muted">Sent: {{ parseDate(email.created_at) }}</span>
+									<span class="d-block font-weight-bold">
+										{{ email.subject }}
+									</span>
+									<span class="fw-lighter d-block text-muted">
+										From: {{ getFromEmailAddress(email.from_email) }}
+									</span>
+									<span class="fw-lighter d-block text-muted">
+										To: {{ email.to_email }}
+									</span>
+									<span class="fw-lighter d-block text-muted">
+										Sent: {{ parseDate(email.created_at) }}
+									</span>
 								</div>
 							</div>
 						</div>
 					</transition-group>
 				</div>
 			</div>
-			<div class="col-sm-8 col-md-8 col-lg-9 col-xl-9 unset-padding-left">
-				<div v-if="selectedEmail" class="email-content h-100">
+			<div v-if="filteredEmails.length > 0" class="col-sm-8 col-md-8 col-lg-9 col-xl-9 unset-padding-left">
+				<div class="email-content h-100 d-flex justify-content-center">
 					<iframe
 						v-if="(view === 'xl' || view === 'md' || view === 'sm')"
+						ref="emailFrame"
 						:class="widthClass"
 						:srcdoc="selectedEmail.body"
 						frameborder="0"
@@ -119,6 +164,10 @@ export default {
             view: 'xl',
             emails: [],
             search: '',
+            dates: {
+                from: moment().subtract(1, 'month').format('YYYY-MM-DD'),
+                to: moment().format('YYYY-MM-DD'),
+            },
         };
     },
     computed: {
@@ -139,43 +188,48 @@ export default {
             }
             return '';
         },
-        latestEmail(){
+        latestEmail() {
             let email = {};
-            if(this.emails.length > 0){
+            if (this.emails.length > 0) {
                 email = this.emails[0];
             }
             return email;
         },
-        filteredEmails() {
+        filteredSearchEmails() {
             return this.emails.filter(email => {
                 return email.subject.toLowerCase().includes(this.search.toLowerCase()) ||
                     email.to_email.toLowerCase().includes(this.search.toLowerCase()) ||
                     email.from_email.toLowerCase().includes(this.search.toLowerCase());
             });
         },
+        filteredEmails() {
+            return this.filteredSearchEmails.filter(email => {
+                return moment(email.created_at).isBetween(this.dates.from, this.dates.to);
+            });
+        },
     },
     mounted() {
         this.getEmails();
-        window.addEventListener("focus",  this.getEmails);
+        window.addEventListener("focus", this.getEmails);
     },
     methods: {
         getEmails() {
             const _this = this;
             let config = {};
             let sendingLatest = false;
-            if(Object.prototype.hasOwnProperty.call(this.latestEmail, 'created_at')){
+            if (Object.prototype.hasOwnProperty.call(this.latestEmail, 'created_at')) {
                 sendingLatest = true;
                 config.params = {
                     last_email_date: this.latestEmail.created_at,
                 };
             }
-        
+
             axios.get('/mailweb/emails', config).then(response => {
-                if(sendingLatest){
-                    if(response.data.length > 0){
+                if (sendingLatest) {
+                    if (response.data.length > 0) {
                         this.emails = [...response.data, ..._this.emails];
                     }
-                }else{
+                } else {
                     _this.emails = response.data;
                     _this.selectedEmail = _this.emails[0];
                 }
@@ -190,12 +244,22 @@ export default {
             }
             return 'No from email found, please add one to your .env';
         },
+        back(){
+            //get previous page url
+            let url = document.referrer;
+            //redirect to previous page
+            window.location.href = url;
+        },
+        changeEmail(email) {
+            this.selectedEmail = email;
+        },
     },
 };
 </script>
 
 <style lang="scss" scoped>
-pre, code {
+pre,
+code {
     padding: 1em;
     overflow: auto;
     font-family: monospace;
@@ -203,24 +267,57 @@ pre, code {
     margin: 1em 0;
     height: 35rem;
 }
-.small {
-    width: 375px;
-    height: 812px;
+
+.email-content{
+	iframe{
+		transition: all 0.5s ease;
+		opacity: 1;
+		&.small {
+			width: 375px;
+			height: 812px;
+		}
+
+		&.medium {
+			width: 1280px;
+			height: 800px;
+		}
+
+		&.large {
+			width: 1920px;
+			height: 1028px;
+		}
+		&.hidden {
+			opacity: 0;
+		}
+	}
 }
-.medium {
-    width: 1280px;
-    height: 800px;
-}
-.large {
-    width: 1920px;
-    height: 1028px;
-}
+
+
 .list-enter-active,
 .list-leave-active {
     transition: all 1s;
 }
-.list-enter, .list-leave-to /* .list-leave-active below version 2.1.8 */ {
+
+.list-enter,
+.list-leave-to
+
+/* .list-leave-active below version 2.1.8 */
+    {
     opacity: 0;
     transform: translateX(30px);
+}
+
+.rotate-90{
+    transform: rotate(90deg);
+}
+
+.ml-1{
+	margin-left: 1rem;
+}
+.mr-1{
+	margin-right: 1rem;
+}
+.ml-auto{
+	margin-left: auto;
 }
 </style>
