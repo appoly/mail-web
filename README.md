@@ -98,6 +98,9 @@ To view emails then go to
 {url}\mailweb
 ```
 
+NOTE version 2.1.0 fixes a database issue where the email column should be longblob instead of longtext.
+either update your table manually or delete the table and entry in the migrations table and run the migration again.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

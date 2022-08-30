@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateMailWebTable extends Migration
 {
@@ -15,10 +16,12 @@ class CreateMailWebTable extends Migration
     {
         Schema::create('mailweb_emails', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->longText('email')->nullable();
             $table->boolean('read')->default(false);
             $table->timestamps();
         });
+
+        // add long blob column to store the email after the id column
+        DB::statement('ALTER TABLE mailweb_emails ADD COLUMN email LONGBLOB AFTER id');
     }
 
     /**
