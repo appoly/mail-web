@@ -202,11 +202,6 @@ export default {
                     email.from_email.toLowerCase().includes(this.search.toLowerCase());
             });
         },
-        filteredEmails() {
-            return this.filteredSearchEmails.filter(email => {
-                return moment(email.created_at).isBetween(this.dates.from, this.dates.to);
-            });
-        },
     },
     mounted() {
         this.getEmails();
@@ -215,23 +210,12 @@ export default {
     methods: {
         getEmails() {
             const _this = this;
-            let config = {};
-            let sendingLatest = false;
-            if (Object.prototype.hasOwnProperty.call(this.latestEmail, 'created_at')) {
-                sendingLatest = true;
-                config.params = {
-                    last_email_date: this.latestEmail.created_at,
-                };
-            }
-
+            let config = this.dates;
+           
             axios.get('/mailweb/emails', config).then(response => {
-                if (sendingLatest) {
-                    if (response.data.length > 0) {
-                        this.emails = [...response.data, ..._this.emails];
-                    }
-                } else {
-                    _this.emails = response.data;
-                    _this.selectedEmail = _this.emails[0];
+                _this.emails = response.data;
+                if (_this.selectedEmail === null) {
+                    _this.selectedEmail = _this.latestEmail;
                 }
             });
         },

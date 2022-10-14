@@ -19,13 +19,11 @@ class MailWebController
 
     public function get(Request $request)
     {
-        $emails = MailwebEmail::orderBy('created_at', 'DESC');
-        if ($request->has('last_email_date') && $request->last_email_date !== null) {
-            $emails->where('created_at', '>', $request->last_email_date);
-        }
-        $emails = $emails->get();
+        $emails = MailwebEmail::orderBy('created_at', 'DESC')
+            ->whereDate('created_at', '>=', $request->from)
+            ->whereDate('created_at', '<=', $request->to)
+            ->get();
 
-        return response()
-            ->json($emails, 200);
+        return response()->json($emails, 200);
     }
 }
