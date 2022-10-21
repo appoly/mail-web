@@ -203,6 +203,14 @@ export default {
             });
         },
     },
+    watch:{
+        dates:{
+            handler(){
+                this.getEmails();
+            },
+            deep:true,
+        },
+    },
     mounted() {
         this.getEmails();
         window.addEventListener("focus", this.getEmails);
