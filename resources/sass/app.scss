@@ -30,23 +30,16 @@ body {
     border-radius: 10px;
 
     &.email-card {
-        opacity: 0.9;
         border-radius: 10px;
         background-color: #ffffff;
         box-shadow: 0 2px 6px 0 #dce1ec;
-
-        .card-body {
-            opacity: 0.4;
-        }
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
 
         &.selected {
             opacity: 1;
-            background-color: #ffffff;
-            box-shadow: 0 20px 40px 0 #d0d6e3;
-
-            .card-body {
-                opacity: 1;
-            }
+            box-shadow: 0 20px 40px 0 #b9babb;
+            border: 1px solid #17c8e3;
         }
     }
 }

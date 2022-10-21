@@ -11,8 +11,9 @@ class MailwebEmail extends Model
     protected $appends = [
         'body',
         'from_email',
-        'to_email',
-        'subject'
+        'to_emails',
+        'subject',
+        'attachments',
     ];
 
     protected $dates = [
@@ -34,14 +35,31 @@ class MailwebEmail extends Model
         return $this->email->getFrom()[0]->getAddress();
     }
 
-    public function getToEmailAttribute()
+    public function getToEmailsAttribute()
     {
-        return $this->email->getTo()[0]->getAddress();
+        $to = [];
+        foreach ($this->email->getTo() as $email) {
+            $to[] = $email->getAddress();
+        }
+        return $to;
     }
 
     public function getSubjectAttribute()
     {
         return $this->email->getSubject();
+    }
+
+    public function getAttachmentsAttribute()
+    {
+        $attachments = [];
+        $emailAttachments = $this->email->getAttachments();
+        foreach ($emailAttachments as $attachment) {
+            $attachments[] = [
+                'name' => $attachment->getFilename(),
+                'content' => $attachment->getBody()
+            ];
+        }
+        return $attachments;
     }
 
     public function scopeFilterByDates($query, $start, $end)
