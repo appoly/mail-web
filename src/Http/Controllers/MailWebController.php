@@ -19,11 +19,9 @@ class MailWebController
 
     public function get(Request $request)
     {
-        $emails = MailwebEmail::orderBy('created_at', 'DESC');
-        if ($request->has('last_email_date') && $request->last_email_date !== null) {
-            $emails->where('created_at', '>', $request->last_email_date);
-        }
-        $emails = $emails->get();
+        $emails = MailwebEmail::orderBy('created_at', 'DESC')
+            ->filterByDates($request->from, $request->to)
+            ->get();
 
         return response()
             ->json($emails, 200);
