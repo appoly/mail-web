@@ -109,10 +109,13 @@
 										From: {{ getFromEmailAddress(email.from_email) }}
 									</span>
 									<span class="fw-lighter d-block text-muted">
-										To: {{ email.to_email }}
+										To: {{ getToEmailAddress(email) }}
 									</span>
 									<span class="fw-lighter d-block text-muted">
 										Sent: {{ parseDate(email.created_at) }}
+									</span>
+									<span v-if="email.attachments.length > 0" class="fw-lighter d-block text-muted">
+										Attachments: {{ email.attachments.length }}
 									</span>
 								</div>
 							</div>
@@ -189,8 +192,9 @@ export default {
         },
         filteredSearchEmails() {
             return this.emails.filter(email => {
+				
                 return email.subject.toLowerCase().includes(this.search.toLowerCase()) ||
-					email.to_email.toLowerCase().includes(this.search.toLowerCase()) ||
+					this.getToEmailAddress(email).toLowerCase().includes(this.search.toLowerCase()) ||
 					email.from_email.toLowerCase().includes(this.search.toLowerCase());
             });
         },
@@ -201,6 +205,12 @@ export default {
                 this.getEmails();
             },
             deep: true,
+        },
+        selectedEmail(newVal, oldVal) {
+            // Don't allow selectedEmail to be null
+            if(newVal == null || newVal == undefined){
+                this.selectedEmail = oldVal;
+            }
         },
     },
     mounted() {
@@ -229,6 +239,10 @@ export default {
                 return from_email;
             }
             return 'No from email found, please add one to your .env';
+        },
+        getToEmailAddress(email){
+            // to email is an array
+            return email.to_emails.join(', ');
         },
         back() {
             //get previous page url
@@ -290,7 +304,7 @@ code {
 .list-leave-to
 
 /* .list-leave-active below version 2.1.8 */
-{
+	{
 	opacity: 0;
 	transform: translateX(30px);
 }
