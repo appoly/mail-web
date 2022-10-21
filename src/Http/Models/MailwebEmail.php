@@ -43,4 +43,13 @@ class MailwebEmail extends Model
     {
         return $this->email->getSubject();
     }
+
+    public function scopeFilterByDates($query, $start, $end)
+    {
+        return $query->when($start, function ($query, $start) {
+            return $query->whereDate('created_at', '>=', $start);
+        })->when($end, function ($query, $end) {
+            return $query->whereDate('created_at', '<=', $end);
+        });
+    }
 }

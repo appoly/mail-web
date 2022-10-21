@@ -87,24 +87,16 @@
 					<div class="d-flex align-items-center">
 						<div class="form-group w-100 mr-1">
 							<label class="font-smaller">From</label>
-							<input
-								v-model="dates.from"
-								type="date"
-								class="form-control font-smaller"
-							>
+							<input v-model="dates.from" type="date" class="form-control font-smaller">
 						</div>
 						<div class="form-group w-100 ml-1">
 							<label class="font-smaller">To</label>
-							<input
-								v-model="dates.to"
-								type="date"
-								class="form-control font-smaller"
-							>
+							<input v-model="dates.to" type="date" class="form-control font-smaller">
 						</div>
 					</div>
 
 					<transition-group name="list" tag="div">
-						<div v-for="email in filteredEmails" :key="email.id">
+						<div v-for="email in filteredSearchEmails" :key="email.id">
 							<div
 								:class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
 								@click="changeEmail(email)"
@@ -128,7 +120,7 @@
 					</transition-group>
 				</div>
 			</div>
-			<div v-if="filteredEmails.length > 0" class="col-sm-8 col-md-8 col-lg-9 col-xl-9 unset-padding-left">
+			<div v-if="filteredSearchEmails.length > 0" class="col-sm-8 col-md-8 col-lg-9 col-xl-9 unset-padding-left">
 				<div class="email-content h-100 d-flex justify-content-center">
 					<iframe
 						v-if="(view === 'xl' || view === 'md' || view === 'sm')"
@@ -198,17 +190,17 @@ export default {
         filteredSearchEmails() {
             return this.emails.filter(email => {
                 return email.subject.toLowerCase().includes(this.search.toLowerCase()) ||
-                    email.to_email.toLowerCase().includes(this.search.toLowerCase()) ||
-                    email.from_email.toLowerCase().includes(this.search.toLowerCase());
+					email.to_email.toLowerCase().includes(this.search.toLowerCase()) ||
+					email.from_email.toLowerCase().includes(this.search.toLowerCase());
             });
         },
     },
-    watch:{
-        dates:{
-            handler(){
+    watch: {
+        dates: {
+            handler() {
                 this.getEmails();
             },
-            deep:true,
+            deep: true,
         },
     },
     mounted() {
@@ -219,8 +211,10 @@ export default {
         getEmails() {
             const _this = this;
             let config = this.dates;
-           
-            axios.get('/mailweb/emails', config).then(response => {
+
+            axios.get('/mailweb/emails', {
+                params: config,
+            }).then(response => {
                 _this.emails = response.data;
                 if (_this.selectedEmail === null) {
                     _this.selectedEmail = _this.latestEmail;
@@ -236,7 +230,7 @@ export default {
             }
             return 'No from email found, please add one to your .env';
         },
-        back(){
+        back() {
             //get previous page url
             let url = document.referrer;
             //redirect to previous page
@@ -252,18 +246,19 @@ export default {
 <style lang="scss" scoped>
 pre,
 code {
-    padding: 1em;
-    overflow: auto;
-    font-family: monospace;
-    white-space: pre;
-    margin: 1em 0;
-    height: 35rem;
+	padding: 1em;
+	overflow: auto;
+	font-family: monospace;
+	white-space: pre;
+	margin: 1em 0;
+	height: 35rem;
 }
 
-.email-content{
-	iframe{
+.email-content {
+	iframe {
 		transition: all 0.5s ease;
 		opacity: 1;
+
 		&.small {
 			width: 375px;
 			height: 812px;
@@ -278,6 +273,7 @@ code {
 			width: 1920px;
 			height: 1028px;
 		}
+
 		&.hidden {
 			opacity: 0;
 		}
@@ -287,29 +283,31 @@ code {
 
 .list-enter-active,
 .list-leave-active {
-    transition: all 1s;
+	transition: all 1s;
 }
 
 .list-enter,
 .list-leave-to
 
 /* .list-leave-active below version 2.1.8 */
-    {
-    opacity: 0;
-    transform: translateX(30px);
+{
+	opacity: 0;
+	transform: translateX(30px);
 }
 
-.rotate-90{
-    transform: rotate(90deg);
+.rotate-90 {
+	transform: rotate(90deg);
 }
 
-.ml-1{
+.ml-1 {
 	margin-left: 1rem;
 }
-.mr-1{
+
+.mr-1 {
 	margin-right: 1rem;
 }
-.ml-auto{
+
+.ml-auto {
 	margin-left: auto;
 }
 </style>

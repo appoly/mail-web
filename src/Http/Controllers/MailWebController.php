@@ -20,10 +20,10 @@ class MailWebController
     public function get(Request $request)
     {
         $emails = MailwebEmail::orderBy('created_at', 'DESC')
-            ->whereDate('created_at', '>=', $request->from)
-            ->whereDate('created_at', '<=', $request->to)
+            ->filterByDates($request->from, $request->to)
             ->get();
 
-        return response()->json($emails, 200);
+        return response()
+            ->json($emails, 200);
     }
 }
