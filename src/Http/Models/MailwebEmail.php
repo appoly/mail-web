@@ -56,7 +56,7 @@ class MailwebEmail extends Model
         foreach ($emailAttachments as $attachment) {
             $attachments[] = [
                 'name' => $attachment->getFilename(),
-                'content' => $attachment->getBody()
+                // 'content' => $attachment->getBody()
             ];
         }
         return $attachments;
