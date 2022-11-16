@@ -21,7 +21,18 @@ class MailWebController
     {
         $emails = MailwebEmail::orderBy('created_at', 'DESC')
             ->filterByDates($request->from, $request->to)
-            ->get();
+            ->get()
+            ->map(function ($email) {
+                return [
+                    'id' => $email->id,
+                    'body' => $email->body,
+                    'from_emails' => $email->from_email,
+                    'to_emails' => $email->to_emails,
+                    'subject' => $email->subject,
+                    'attachments' => $email->attachments,
+                    'created_at' => $email->created_at,
+                ];
+            });
 
         return response()
             ->json($emails, 200);
