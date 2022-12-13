@@ -133,9 +133,7 @@
 						frameborder="0"
 					/>
 					<pre v-else-if="view === 'html'" class="w-100 h-100"><code>{{ selectedEmail.body }}</code></pre>
-					<pre v-else class="text-sm w-100">
-                            {{ markdown }}
-                        </pre>
+					<pre v-else class="text-sm w-100">{{ markdown }}</pre>
 				</div>
 			</div>
 		</div>
