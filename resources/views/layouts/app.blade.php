@@ -9,8 +9,8 @@
     <link href="{{ asset("/vendor/mailweb/app.css") }}" rel="stylesheet" />
 </head>
 
-<body>
-    <div id="app" class="h-100">
+<body class="h-100">
+    <div id="app">
         @yield('content')
     </div>
 </body>
