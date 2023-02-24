@@ -27,7 +27,7 @@ class MailWebController
                     return [
                         'id' => $email->id,
                         'body' => $email->body,
-                        'from_emails' => $email->from_email,
+                        'from_email' => $email->from_email,
                         'to_emails' => $email->to_emails,
                         'subject' => $email->subject,
                         'attachments' => $email->attachments,
@@ -38,7 +38,7 @@ class MailWebController
                         'error' => true,
                         'id' => $email->id,
                         'body' => '',
-                        'from_emails' => '',
+                        'from_email' => '',
                         'to_emails' => '',
                         'subject' => '',
                         'attachments' => '',
