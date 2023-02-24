@@ -94,11 +94,13 @@
 						<transition-group name="list" tag="div">
 							<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}</div>
 							<div v-for="email in filteredSearchEmails" :key="email.id">
-								<div v-if="email.error" class="card font-smaller email-card my-3" style="cursor: not-allowed">
+								<div v-if="email.error" class="card font-smaller email-card my-3"
+									style="cursor: not-allowed">
 									<div class="card-body">
 										<span class="d-flex justify-content-between">
 											<span class="font-weight-bold text-danger">ERROR</span>
-											<span class="btn btn-outline-danger btn-sm p-1" @click="() => deleteEmail(id)">Delete</span>
+											<span class="btn btn-outline-danger btn-sm px-1 py-0"
+												@click="() => deleteEmail(email.id)">Delete</span>
 										</span>
 										<span class="fw-lighter d-block text-muted">
 											From: -
