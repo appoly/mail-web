@@ -109,7 +109,6 @@
 							</div>
 						</template>
 						<template v-else>
-							<pre>{{ showReload }}</pre>
 							<transition-group name="list" tag="div">
 								<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}
 								</div>
@@ -207,10 +206,6 @@ export default {
 		};
 	},
 	computed: {
-		handleRefetch() {
-			this.showReload = false;
-			this.getEmails();
-		},
 		widthClass() {
 			switch (this.view) {
 				case 'md':
@@ -307,7 +302,11 @@ export default {
 			}).catch((e) => {
 				console.log(e.message ?? "Failed to retrieve emails.");
 			});
-		}
+		},
+		handleRefetch() {
+			this.showReload = false;
+			this.getEmails();
+		},
 	},
 };
 </script>
