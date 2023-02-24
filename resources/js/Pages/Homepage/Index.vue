@@ -112,14 +112,21 @@
 							<transition-group name="list" tag="div">
 								<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}
 								</div>
+								<div v-if="showReload" class="card font-smaller email-card my-3" @click="handleRefetch">
+									<div class="card-body">
+										<span class="d-block font-weight-bold">
+											Reload Emails? Click here.
+										</span>
+									</div>
+								</div>
 								<div v-for="email in filteredSearchEmails" :key="email.id">
-									<div v-if="email.error && !email.deleted" class="card font-smaller email-card my-3"
+									<div v-if="email.error" class="card font-smaller email-card my-3"
 										style="cursor: not-allowed">
 										<div class="card-body">
 											<span class="d-flex justify-content-between">
 												<span class="font-weight-bold text-danger">ERROR</span>
 												<span class="btn btn-outline-danger btn-sm px-1 py-0"
-													@click="($event) => deleteEmail($event.currentTarget, email.id)">Delete</span>
+													@click="() => deleteEmail(email.id)">Delete</span>
 											</span>
 											<span class="fw-lighter d-block text-muted">
 												From: -
@@ -194,10 +201,15 @@ export default {
 				to: moment().format('YYYY-MM-DD'),
 			},
 			errorMessage: "",
-			isLoading: false
+			isLoading: false,
+			showReload: false,
 		};
 	},
 	computed: {
+		handleRefetch() {
+			this.showReload = false;
+			this.getEmails();
+		},
 		widthClass() {
 			switch (this.view) {
 				case 'md':
@@ -247,7 +259,7 @@ export default {
 	},
 	mounted() {
 		this.getEmails();
-		window.addEventListener("focus", this.getEmails);
+		window.addEventListener("focus", () => this.showReload = true);
 	},
 	methods: {
 		getEmails() {
@@ -288,11 +300,9 @@ export default {
 		changeEmail(email) {
 			this.selectedEmail = email;
 		},
-		deleteEmail(target, emailId) {
-			axios.delete('/mailweb/emails/' + emailId).then(({ data }) => {
-				if (data.success) {
-					target.display = 'none';
-				}
+		deleteEmail(emailId) {
+			axios.delete('/mailweb/emails/' + emailId).then(() => {
+				this.emails = this.emails.filter(email => email.id != emailId);
 			}).catch((e) => {
 				console.log(e.message ?? "Failed to retrieve emails.");
 			});
