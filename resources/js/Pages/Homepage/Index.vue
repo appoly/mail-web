@@ -109,6 +109,7 @@
 							</div>
 						</template>
 						<template v-else>
+							<pre>{{ showReload }}</pre>
 							<transition-group name="list" tag="div">
 								<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}
 								</div>
