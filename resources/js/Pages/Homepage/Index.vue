@@ -255,9 +255,12 @@ export default {
 	},
 	mounted() {
 		this.getEmails();
-		window.addEventListener("focus", () => this.showReload = true);
+		window.addEventListener("focus", this.handleFocus);
 	},
 	methods: {
+		handleFocus() {
+			this.showReload = true;
+		},
 		getEmails() {
 			const _this = this;
 			this.isLoading = true;
