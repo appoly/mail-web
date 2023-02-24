@@ -23,18 +23,36 @@ class MailWebController
             ->filterByDates($request->from, $request->to)
             ->get()
             ->map(function ($email) {
-                return [
-                    'id' => $email->id,
-                    'body' => $email->body,
-                    'from_emails' => $email->from_email,
-                    'to_emails' => $email->to_emails,
-                    'subject' => $email->subject,
-                    'attachments' => $email->attachments,
-                    'created_at' => $email->created_at,
-                ];
+                try {
+                    return [
+                        'id' => $email->id,
+                        'body' => $email->body,
+                        'from_email' => $email->from_email,
+                        'to_emails' => $email->to_emails,
+                        'subject' => $email->subject,
+                        'attachments' => $email->attachments,
+                        'created_at' => $email->created_at,
+                    ];
+                } catch (\Throwable $th) {
+                    return [
+                        'error' => true,
+                        'id' => $email->id,
+                        'body' => '',
+                        'from_email' => '',
+                        'to_emails' => '',
+                        'subject' => '',
+                        'attachments' => '',
+                        'created_at' => $email->created_at, // This one should never throw an exception
+                    ];
+                }
             });
 
         return response()
             ->json($emails, 200);
+    }
+
+    public function delete(MailwebEmail $mailwebEmail) {
+        $mailwebEmail->delete();
+        return response()->json(['success' => true]);
     }
 }
