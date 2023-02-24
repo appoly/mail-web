@@ -291,7 +291,7 @@ export default {
 		deleteEmail(target, emailId) {
 			axios.delete('/mailweb/emails/' + emailId).then(({ data }) => {
 				if (data.success) {
-					target.display = none;
+					target.display = 'none';
 				}
 			}).catch((e) => {
 				console.log(e.message ?? "Failed to retrieve emails.");
