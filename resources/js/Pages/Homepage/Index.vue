@@ -112,7 +112,7 @@
 							<transition-group name="list" tag="div">
 								<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}
 								</div>
-								<div v-if="showReload" class="card font-smaller email-card my-3" @click="handleRefetch">
+								<div v-if="showReload" key="showReload" class="card font-smaller email-card my-3" @click="handleRefetch">
 									<div class="card-body">
 										<span class="d-block font-weight-bold">
 											Reload Emails? Click here.

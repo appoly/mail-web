@@ -2386,6 +2386,7 @@ var render = function render() {
     key: "errorMessage",
     staticClass: "mt-3 text-danger"
   }, [_vm._v(_vm._s(_vm.errorMessage) + "\n\t\t\t\t\t\t\t")]) : _vm._e(), _vm._v(" "), _vm.showReload ? _c("div", {
+    key: "showReload",
     staticClass: "card font-smaller email-card my-3",
     on: {
       click: _vm.handleRefetch
