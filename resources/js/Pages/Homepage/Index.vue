@@ -94,10 +94,11 @@
 						<transition-group name="list" tag="div">
 							<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}</div>
 							<div v-for="email in filteredSearchEmails" :key="email.id">
-								<div v-if="email.error" class="card font-smaller email-card my-3">
+								<div v-if="email.error" class="card font-smaller email-card my-3" style="cursor: none">
 									<div class="card-body">
-										<span class="d-block font-weight-bold text-danger">
-											ERROR
+										<span class="d-flex">
+											<span class="font-weight-bold text-danger">ERROR</span>
+											<span class="btn btn-danger btn-sm" @click="() => deleteEmail(id)">Delete</span>
 										</span>
 										<span class="fw-lighter d-block text-muted">
 											From: -
@@ -110,7 +111,8 @@
 										</span>
 									</div>
 								</div>
-								<div v-else :class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
+								<div v-else
+									:class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
 									@click="changeEmail(email)">
 									<div class="card-body">
 										<span class="d-block font-weight-bold">
@@ -260,6 +262,13 @@ export default {
 		changeEmail(email) {
 			this.selectedEmail = email;
 		},
+		deleteEmail(emailId) {
+			axios.delete('/mailweb/emails/' + emailId).then(() => {
+				this.emails.filter(email => email.id !== emailId);
+			}).catch((e) => {
+				console.log(e.message ?? "Failed to retrieve emails.");
+			});
+		}
 	},
 };
 </script>

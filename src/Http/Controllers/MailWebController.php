@@ -50,4 +50,9 @@ class MailWebController
         return response()
             ->json($emails, 200);
     }
+
+    public function delete(MailwebEmail $mailwebEmail) {
+        $mailwebEmail->delete();
+        return response()->json(['success' => true]);
+    }
 }
