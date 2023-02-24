@@ -36,6 +36,12 @@ class MailWebController
                 } catch (\Throwable $th) {
                     return [
                         'error' => true,
+                        'id' => $email->id,
+                        'body' => '',
+                        'from_emails' => '',
+                        'to_emails' => '',
+                        'subject' => '',
+                        'attachments' => '',
                         'created_at' => $email->created_at, // This one should never throw an exception
                     ];
                 }
