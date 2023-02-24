@@ -1,7 +1,7 @@
 <template>
 	<div class="content">
 		<div class="header">
-			<div class="container">
+			<div class="container-fluid">
 				<div class="row">
 					<div class="col-3 pt-0 pt-lg-2">
 						<div class="px-4">
@@ -71,7 +71,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="container">
+		<div class="container-fluid">
 			<div class="row">
 				<div class="email-list col-sm-4 col-md-4 col-lg-3 col-xl-3 bg-white">
 					<div class="py-4 px-4 ">
