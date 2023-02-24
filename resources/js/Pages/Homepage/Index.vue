@@ -91,20 +91,13 @@
 						</div>
 
 						<template v-if="isLoading">
-							<div v-for="row in 10" class="card font-smaller email-card my-3" style="cursor: not-allowed">
-								<div class="card-body">
-									<span class="d-block font-weight-bold">
-										<span class="placeholder col-9"></span>
-									</span>
-									<span class="fw-lighter d-block text-muted">
-										<span class="placeholder col-6"></span>
-									</span>
-									<span class="fw-lighter d-block text-muted">
-										<span class="placeholder col-11"></span>
-									</span>
-									<span class="fw-lighter d-block text-muted">
-										<span class="placeholder col-5"></span>
-									</span>
+							<div v-for="row in 10" :key="`placeholder_${row}`" class="card font-smaller email-card my-3"
+								style="cursor: not-allowed">
+								<div class="card-body placeholder-glow">
+									<span class="placeholder col-9"></span>
+									<span class="placeholder col-6"></span>
+									<span class="placeholder col-11"></span>
+									<span class="placeholder col-5"></span>
 								</div>
 							</div>
 						</template>
@@ -112,7 +105,8 @@
 							<transition-group name="list" tag="div">
 								<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}
 								</div>
-								<div v-if="showReload" key="showReload" class="card font-smaller email-card my-3" @click="handleRefetch">
+								<div v-if="showReload" key="showReload" class="card font-smaller email-card my-3"
+									@click="handleRefetch">
 									<div class="card-body">
 										<span class="d-block font-weight-bold">
 											Reload Emails? Click here.
