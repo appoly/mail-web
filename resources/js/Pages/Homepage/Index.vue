@@ -3,7 +3,7 @@
 		<div class="header">
 			<div class="container-fluid">
 				<div class="row">
-					<div class="col-3 pt-0 pt-lg-2">
+					<div class="col-3 pt-2">
 						<div class="px-4">
 							<div class="d-flex">
 								<h1>MailWeb</h1>
@@ -11,7 +11,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col pt-0 pt-lg-2">
+					<div class="col pt-2">
 						<div class="d-flex">
 							<button :class="['btn font-smaller mx-2', { 'selected': view == 'xl' }]" @click="view = 'xl'">
 								<div class="d-flex align-items-center">
@@ -79,12 +79,12 @@
 							<input v-model="search" type="text" placeholder="Search via Subject, To or From"
 								class="form-control font-smaller mb-4">
 						</div>
-						<div class="d-flex align-items-center justify-content-between gap-1">
-							<div class="form-group basis-45">
+						<div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
+							<div class="form-group flex-basis-45">
 								<label class="font-smaller">From</label>
 								<input v-model="dates.from" type="date" class="form-control font-smaller">
 							</div>
-							<div class="form-group basis-45">
+							<div class="form-group flex-basis-45">
 								<label class="font-smaller">To</label>
 								<input v-model="dates.to" type="date" class="form-control font-smaller">
 							</div>
@@ -94,7 +94,23 @@
 						<transition-group name="list" tag="div">
 							<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}</div>
 							<div v-for="email in filteredSearchEmails" :key="email.id">
-								<div :class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
+								<div v-if="email.error" class="card font-smaller email-card my-3">
+									<div class="card-body">
+										<span class="d-block font-weight-bold text-danger">
+											ERROR
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											From: -
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											To: -
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											Sent: {{ parseDate(email.created_at) }}
+										</span>
+									</div>
+								</div>
+								<div v-else :class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
 									@click="changeEmail(email)">
 									<div class="card-body">
 										<span class="d-block font-weight-bold">
@@ -325,7 +341,7 @@ code {
 	gap: 1rem;
 }
 
-.flex-45 {
+.flex-basis-45 {
 	flex-basis: 45%;
 }
 </style>
