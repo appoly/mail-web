@@ -113,13 +113,13 @@
 								<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}
 								</div>
 								<div v-for="email in filteredSearchEmails" :key="email.id">
-									<div v-if="email.error" class="card font-smaller email-card my-3"
+									<div v-if="email.error && !email.deleted" class="card font-smaller email-card my-3"
 										style="cursor: not-allowed">
 										<div class="card-body">
 											<span class="d-flex justify-content-between">
 												<span class="font-weight-bold text-danger">ERROR</span>
 												<span class="btn btn-outline-danger btn-sm px-1 py-0"
-													@click="() => deleteEmail(email.id)">Delete</span>
+													@click="($event) => deleteEmail($event.currentTarget, email.id)">Delete</span>
 											</span>
 											<span class="fw-lighter d-block text-muted">
 												From: -
@@ -288,9 +288,11 @@ export default {
 		changeEmail(email) {
 			this.selectedEmail = email;
 		},
-		deleteEmail(emailId) {
-			axios.delete('/mailweb/emails/' + emailId).then(() => {
-				this.emails.filter(email => email.id != emailId);
+		deleteEmail(target, emailId) {
+			axios.delete('/mailweb/emails/' + emailId).then(({ data }) => {
+				if (data.success) {
+					target.display = none;
+				}
 			}).catch((e) => {
 				console.log(e.message ?? "Failed to retrieve emails.");
 			});
