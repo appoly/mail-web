@@ -90,52 +90,73 @@
 							</div>
 						</div>
 
-
-						<transition-group name="list" tag="div">
-							<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}</div>
-							<div v-for="email in filteredSearchEmails" :key="email.id">
-								<div v-if="email.error" class="card font-smaller email-card my-3"
-									style="cursor: not-allowed">
-									<div class="card-body">
-										<span class="d-flex justify-content-between">
-											<span class="font-weight-bold text-danger">ERROR</span>
-											<span class="btn btn-outline-danger btn-sm px-1 py-0"
-												@click="() => deleteEmail(email.id)">Delete</span>
-										</span>
-										<span class="fw-lighter d-block text-muted">
-											From: -
-										</span>
-										<span class="fw-lighter d-block text-muted">
-											To: -
-										</span>
-										<span class="fw-lighter d-block text-muted">
-											Sent: {{ parseDate(email.created_at) }}
-										</span>
-									</div>
-								</div>
-								<div v-else
-									:class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
-									@click="changeEmail(email)">
-									<div class="card-body">
-										<span class="d-block font-weight-bold">
-											{{ email.subject }}
-										</span>
-										<span class="fw-lighter d-block text-muted">
-											From: {{ getFromEmailAddress(email.from_email) }}
-										</span>
-										<span class="fw-lighter d-block text-muted">
-											To: {{ getToEmailAddress(email) }}
-										</span>
-										<span class="fw-lighter d-block text-muted">
-											Sent: {{ parseDate(email.created_at) }}
-										</span>
-										<span v-if="email.attachments.length > 0" class="fw-lighter d-block text-muted">
-											Attachments: {{ email.attachments.length }}
-										</span>
-									</div>
+						<template v-if="isLoading">
+							<div v-for="row in 10" class="card font-smaller email-card my-3" style="cursor: not-allowed">
+								<div class="card-body">
+									<span class="d-block font-weight-bold">
+										<span class="placeholder col-9"></span>
+									</span>
+									<span class="fw-lighter d-block text-muted">
+										<span class="placeholder col-6"></span>
+									</span>
+									<span class="fw-lighter d-block text-muted">
+										<span class="placeholder col-11"></span>
+									</span>
+									<span class="fw-lighter d-block text-muted">
+										<span class="placeholder col-5"></span>
+									</span>
 								</div>
 							</div>
-						</transition-group>
+						</template>
+						<template v-else>
+							<transition-group name="list" tag="div">
+								<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}
+								</div>
+								<div v-for="email in filteredSearchEmails" :key="email.id">
+									<div v-if="email.error" class="card font-smaller email-card my-3"
+										style="cursor: not-allowed">
+										<div class="card-body">
+											<span class="d-flex justify-content-between">
+												<span class="font-weight-bold text-danger">ERROR</span>
+												<span class="btn btn-outline-danger btn-sm px-1 py-0"
+													@click="() => deleteEmail(email.id)">Delete</span>
+											</span>
+											<span class="fw-lighter d-block text-muted">
+												From: -
+											</span>
+											<span class="fw-lighter d-block text-muted">
+												To: -
+											</span>
+											<span class="fw-lighter d-block text-muted">
+												Sent: {{ parseDate(email.created_at) }}
+											</span>
+										</div>
+									</div>
+									<div v-else
+										:class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
+										@click="changeEmail(email)">
+										<div class="card-body">
+											<span class="d-block font-weight-bold">
+												{{ email.subject }}
+											</span>
+											<span class="fw-lighter d-block text-muted">
+												From: {{ getFromEmailAddress(email.from_email) }}
+											</span>
+											<span class="fw-lighter d-block text-muted">
+												To: {{ getToEmailAddress(email) }}
+											</span>
+											<span class="fw-lighter d-block text-muted">
+												Sent: {{ parseDate(email.created_at) }}
+											</span>
+											<span v-if="email.attachments.length > 0" class="fw-lighter d-block text-muted">
+												Attachments: {{ email.attachments.length }}
+											</span>
+										</div>
+									</div>
+								</div>
+							</transition-group>
+						</template>
+
 					</div>
 				</div>
 				<div v-if="filteredSearchEmails.length > 0" class="col-sm-8 col-md-8 col-lg-9 col-xl-9 unset-padding-left">
@@ -173,6 +194,7 @@ export default {
 				to: moment().format('YYYY-MM-DD'),
 			},
 			errorMessage: "",
+			isLoading: false
 		};
 	},
 	computed: {
@@ -230,6 +252,7 @@ export default {
 	methods: {
 		getEmails() {
 			const _this = this;
+			this.isLoading = true;
 			let config = this.dates;
 			this.errorMessage = "";
 
@@ -240,7 +263,8 @@ export default {
 				if (_this.selectedEmail === null) {
 					_this.selectedEmail = _this.latestEmail;
 				}
-			}).catch((e) => (_this.errorMessage = e.message ?? "Failed to retrieve emails."));
+			}).catch((e) => (_this.errorMessage = e.message ?? "Failed to retrieve emails."))
+				.finally(() => this.isLoading = false);
 		},
 		parseDate(date) {
 			return moment(date, 'YYYY/MM/DD HH:mm:ss').format('DD/MM/YYYY HH:mm:ss');
