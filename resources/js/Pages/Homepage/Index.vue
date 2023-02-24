@@ -1,125 +1,130 @@
 <template>
 	<div class="content">
 		<div class="header">
-			<div class="row">
-				<div class="col-3">
-					<div class="px-4">
-						<div class="d-flex">
-							<h1>MailWeb</h1>
-							<img class="ml-4" src="/vendor/mailweb/icons/logo.svg">
+			<div class="container">
+				<div class="row">
+					<div class="col-3 pt-0 pt-lg-2">
+						<div class="px-4">
+							<div class="d-flex">
+								<h1>MailWeb</h1>
+								<img class="ml-4" src="/vendor/mailweb/icons/logo.svg">
+							</div>
 						</div>
 					</div>
-				</div>
-				<div class="col">
-					<div class="d-flex">
-						<button :class="['btn font-smaller mx-2', { 'selected': view == 'xl' }]" @click="view = 'xl'">
-							<div class="d-flex align-items-center">
-								<img src="/vendor/mailweb/icons/desktop.svg">
-								<span class="px-2 align-self-center">
-									Desktop
-								</span>
-							</div>
-						</button>
-						<button :class="['btn font-smaller mx-2', { 'selected': view == 'md' }]" @click="view = 'md'">
-							<div class="d-flex align-items-center ">
-								<img src="/vendor/mailweb/icons/laptop.svg">
-								<span class="px-2 align-self-center">
-									Laptop
-								</span>
-							</div>
-						</button>
-						<button :class="['btn font-smaller mx-2', { 'selected': view == 'sm' }]" @click="view = 'sm'">
-							<div class="d-flex align-items-center ">
-								<img src="/vendor/mailweb/icons/mobile.svg">
-								<span class="px-2 align-self-center">
-									Mobile
-								</span>
-							</div>
-						</button>
-						<button :class="['btn font-smaller mx-2', { 'selected': view == 'html' }]" @click="view = 'html'">
-							<div class="d-flex align-items-center ">
-								<img src="/vendor/mailweb/icons/html.svg">
-								<span class="px-2 align-self-center">
-									HTML Source
-								</span>
-							</div>
-						</button>
-						<button :class="['btn font-smaller mx-2', { 'selected': view == 'markdown' }]"
-							@click="view = 'markdown'">
-							<div class="d-flex align-items-center ">
-								<img src="/vendor/mailweb/icons/markdown.svg">
-								<span class="px-2 align-self-center">
-									Markdown
-								</span>
-							</div>
-						</button>
-						<div class="ml-auto">
-							<button class="btn font-smaller mx-2" @click="back">
-								<div class="d-flex align-items-center ">
-									<!-- markdown image rotated 45 deg  -->
-									<img class="rotate-90" src="/vendor/mailweb/icons/markdown.svg">
+					<div class="col pt-0 pt-lg-2">
+						<div class="d-flex">
+							<button :class="['btn font-smaller mx-2', { 'selected': view == 'xl' }]" @click="view = 'xl'">
+								<div class="d-flex align-items-center">
+									<img src="/vendor/mailweb/icons/desktop.svg">
 									<span class="px-2 align-self-center">
-										Back
+										Desktop
 									</span>
 								</div>
 							</button>
+							<button :class="['btn font-smaller mx-2', { 'selected': view == 'md' }]" @click="view = 'md'">
+								<div class="d-flex align-items-center ">
+									<img src="/vendor/mailweb/icons/laptop.svg">
+									<span class="px-2 align-self-center">
+										Laptop
+									</span>
+								</div>
+							</button>
+							<button :class="['btn font-smaller mx-2', { 'selected': view == 'sm' }]" @click="view = 'sm'">
+								<div class="d-flex align-items-center ">
+									<img src="/vendor/mailweb/icons/mobile.svg">
+									<span class="px-2 align-self-center">
+										Mobile
+									</span>
+								</div>
+							</button>
+							<button :class="['btn font-smaller mx-2', { 'selected': view == 'html' }]"
+								@click="view = 'html'">
+								<div class="d-flex align-items-center ">
+									<img src="/vendor/mailweb/icons/html.svg">
+									<span class="px-2 align-self-center">
+										HTML Source
+									</span>
+								</div>
+							</button>
+							<button :class="['btn font-smaller mx-2', { 'selected': view == 'markdown' }]"
+								@click="view = 'markdown'">
+								<div class="d-flex align-items-center ">
+									<img src="/vendor/mailweb/icons/markdown.svg">
+									<span class="px-2 align-self-center">
+										Markdown
+									</span>
+								</div>
+							</button>
+							<div class="ml-auto">
+								<button class="btn font-smaller mx-2" @click="back">
+									<div class="d-flex align-items-center ">
+										<!-- markdown image rotated 45 deg  -->
+										<img class="rotate-90" src="/vendor/mailweb/icons/markdown.svg">
+										<span class="px-2 align-self-center">
+											Back
+										</span>
+									</div>
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="row">
-			<div class="email-list col-sm-4 col-md-4 col-lg-3 col-xl-3 bg-white">
-				<div class="py-4 px-4 ">
-					<div class="form-group">
-						<input v-model="search" type="text" placeholder="Search via Subject, To or From"
-							class="form-control font-smaller mb-4">
-					</div>
-					<div class="d-flex align-items-center">
-						<div class="form-group w-100 mr-1">
-							<label class="font-smaller">From</label>
-							<input v-model="dates.from" type="date" class="form-control font-smaller">
+		<div class="container">
+			<div class="row">
+				<div class="email-list col-sm-4 col-md-4 col-lg-3 col-xl-3 bg-white">
+					<div class="py-4 px-4 ">
+						<div class="form-group">
+							<input v-model="search" type="text" placeholder="Search via Subject, To or From"
+								class="form-control font-smaller mb-4">
 						</div>
-						<div class="form-group w-100 ml-1">
-							<label class="font-smaller">To</label>
-							<input v-model="dates.to" type="date" class="form-control font-smaller">
-						</div>
-					</div>
-
-
-					<transition-group name="list" tag="div">
-						<div v-if="errorMessage" key="errorMessage">{{ errorMessage }}</div>
-						<div v-for="email in filteredSearchEmails" :key="email.id">
-							<div :class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
-								@click="changeEmail(email)">
-								<div class="card-body">
-									<span class="d-block font-weight-bold">
-										{{ email.subject }}
-									</span>
-									<span class="fw-lighter d-block text-muted">
-										From: {{ getFromEmailAddress(email.from_email) }}
-									</span>
-									<span class="fw-lighter d-block text-muted">
-										To: {{ getToEmailAddress(email) }}
-									</span>
-									<span class="fw-lighter d-block text-muted">
-										Sent: {{ parseDate(email.created_at) }}
-									</span>
-									<span v-if="email.attachments.length > 0" class="fw-lighter d-block text-muted">
-										Attachments: {{ email.attachments.length }}
-									</span>
-								</div>
+						<div class="d-flex align-items-center justify-content-between gap-1">
+							<div class="form-group basis-45">
+								<label class="font-smaller">From</label>
+								<input v-model="dates.from" type="date" class="form-control font-smaller">
+							</div>
+							<div class="form-group basis-45">
+								<label class="font-smaller">To</label>
+								<input v-model="dates.to" type="date" class="form-control font-smaller">
 							</div>
 						</div>
-					</transition-group>
+
+
+						<transition-group name="list" tag="div">
+							<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}</div>
+							<div v-for="email in filteredSearchEmails" :key="email.id">
+								<div :class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
+									@click="changeEmail(email)">
+									<div class="card-body">
+										<span class="d-block font-weight-bold">
+											{{ email.subject }}
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											From: {{ getFromEmailAddress(email.from_email) }}
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											To: {{ getToEmailAddress(email) }}
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											Sent: {{ parseDate(email.created_at) }}
+										</span>
+										<span v-if="email.attachments.length > 0" class="fw-lighter d-block text-muted">
+											Attachments: {{ email.attachments.length }}
+										</span>
+									</div>
+								</div>
+							</div>
+						</transition-group>
+					</div>
 				</div>
-			</div>
-			<div v-if="filteredSearchEmails.length > 0" class="col-sm-8 col-md-8 col-lg-9 col-xl-9 unset-padding-left">
-				<div class="email-content h-100 d-flex justify-content-center">
-					<iframe v-if="(view === 'xl' || view === 'md' || view === 'sm')" ref="emailFrame" :class="widthClass"
-						:srcdoc="selectedEmail.body" frameborder="0" />
-					<pre v-else-if="view === 'html'" class="w-100 h-100"><code>{{ selectedEmail.body }}</code></pre>
-					<pre v-else class="text-sm w-100">{{ markdown }}</pre>
+				<div v-if="filteredSearchEmails.length > 0" class="col-sm-8 col-md-8 col-lg-9 col-xl-9 unset-padding-left">
+					<div class="email-content h-100 d-flex justify-content-center">
+						<iframe v-if="(view === 'xl' || view === 'md' || view === 'sm')" ref="emailFrame"
+							:class="widthClass" :srcdoc="selectedEmail.body" frameborder="0" />
+						<pre v-else-if="view === 'html'" class="w-100 h-100"><code>{{ selectedEmail.body }}</code></pre>
+						<pre v-else class="text-sm w-100">{{ markdown }}</pre>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -314,5 +319,13 @@ code {
 
 .ml-auto {
 	margin-left: auto;
+}
+
+.gap-1 {
+	gap: 1rem;
+}
+
+.flex-45 {
+	flex-basis: 45%;
 }
 </style>
