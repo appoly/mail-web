@@ -26,7 +26,7 @@ class MailWebController
                 try {
                     return [
                         'id' => $email->id,
-                        'body' => $email->body,
+                        'body' => mb_convert_encoding($email->body, 'UTF-8'), // Convert to UTF-8 to prevent JSON errors
                         'from_email' => $email->from_email,
                         'to_emails' => $email->to_emails,
                         'subject' => $email->subject,
