@@ -272,7 +272,8 @@ export default {
 			axios.get('/mailweb/emails', {
 				params: { ...this.dates, ...this.nextCursor },
 			}).then(response => {
-				this.emails = response.data;
+				this.emails = response.data.data;
+				this.nextCursor = response.data.next_cursor;
 				if (this.selectedEmail === null) {
 					this.selectedEmail = this.latestEmail;
 				}
