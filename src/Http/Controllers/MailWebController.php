@@ -21,8 +21,8 @@ class MailWebController
     {
         $emails = MailwebEmail::orderBy('created_at', 'DESC')
             ->filterByDates($request->from, $request->to)
-            ->get()
-            ->map(function ($email) {
+            ->cursorPaginate(25)
+            ->through(function ($email) {
                 try {
                     return [
                         'id' => $email->id,

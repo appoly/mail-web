@@ -156,6 +156,15 @@
 									</div>
 								</div>
 							</transition-group>
+
+							<div v-if="nextCursor" key="seeMore" class="card font-smaller email-card my-3"
+								@click="handleRefetch">
+								<div class="card-body">
+									<span class="d-block font-weight-bold">
+										See More
+									</span>
+								</div>
+							</div>
 						</template>
 
 					</div>
@@ -197,6 +206,7 @@ export default {
 			errorMessage: "",
 			isLoading: false,
 			showReload: false,
+			nextCursor: null,
 		};
 	},
 	computed: {
@@ -256,19 +266,17 @@ export default {
 			this.showReload = true;
 		},
 		getEmails() {
-			const _this = this;
 			this.isLoading = true;
-			let config = this.dates;
 			this.errorMessage = "";
 
 			axios.get('/mailweb/emails', {
-				params: config,
+				params: { ...this.dates, ...this.nextCursor },
 			}).then(response => {
-				_this.emails = response.data;
-				if (_this.selectedEmail === null) {
-					_this.selectedEmail = _this.latestEmail;
+				this.emails = response.data;
+				if (this.selectedEmail === null) {
+					this.selectedEmail = this.latestEmail;
 				}
-			}).catch((e) => (_this.errorMessage = e.message ?? "Failed to retrieve emails."))
+			}).catch((e) => (this.errorMessage = e.message ?? "Failed to retrieve emails."))
 				.finally(() => this.isLoading = false);
 		},
 		parseDate(date) {
@@ -302,6 +310,7 @@ export default {
 		},
 		handleRefetch() {
 			this.showReload = false;
+			this.nextCursor = null; // Reset cursor
 			this.getEmails();
 		},
 	},
