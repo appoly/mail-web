@@ -265,23 +265,25 @@ export default {
 		handleFocus() {
 			this.showReload = true;
 		},
-		getEmails() {
+		async getEmails() {
 			this.isLoading = true;
 			this.errorMessage = "";
 
-			axios.get('/mailweb/emails', {
-				params: { ...this.dates, ...this.nextCursor },
-			}).then(response => {
-				console.log(response.data);
-				this.emails = response.data.data;
-				console.log(this.emails);
-				this.nextCursor = response.data.next_cursor;
+			console.log({ ...this.dates, next_cursor: this.nextCursor });
+			try {
+				let { data } = await axios.get('/mailweb/emails', {
+					params: { ...this.dates, next_cursor: this.nextCursor },
+				});
+				this.emails = data.data;
+				this.nextCursor = data.next_cursor;
 				if (this.selectedEmail === null) {
 					this.selectedEmail = this.latestEmail;
 				}
-			}).catch((e) => (this.errorMessage = e.message ?? "Failed to retrieve emails."))
-				.finally(() => this.isLoading = false);
-
+			} catch (error) {
+				this.errorMessage = error.message ?? "Failed to retrieve emails.";
+			} finally {
+				this.isLoading = false;
+			}
 			console.log(this.emails);
 		},
 		parseDate(date) {
