@@ -272,13 +272,17 @@ export default {
 			axios.get('/mailweb/emails', {
 				params: { ...this.dates, ...this.nextCursor },
 			}).then(response => {
+				console.log(response.data);
 				this.emails = response.data.data;
+				console.log(this.emails);
 				this.nextCursor = response.data.next_cursor;
 				if (this.selectedEmail === null) {
 					this.selectedEmail = this.latestEmail;
 				}
 			}).catch((e) => (this.errorMessage = e.message ?? "Failed to retrieve emails."))
 				.finally(() => this.isLoading = false);
+
+			console.log(this.emails);
 		},
 		parseDate(date) {
 			return moment(date, 'YYYY/MM/DD HH:mm:ss').format('DD/MM/YYYY HH:mm:ss');
