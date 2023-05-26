@@ -64,8 +64,8 @@ class MailwebEmail extends Model
 
     public function scopeApplyFilters($query, $filters)
     {
-        return $query->filterByDates($filters['from'], $filters['to'])
-            ->filterBySearch($filters['search']);
+        return $query->filterByDates(optional($filters)['from'], optional($filters)['to'])
+            ->filterBySearch(optional($filters)['search']);
     }
 
     public function scopeFilterByDates($query, $start, $end)
