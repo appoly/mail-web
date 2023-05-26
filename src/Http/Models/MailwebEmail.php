@@ -62,12 +62,29 @@ class MailwebEmail extends Model
         return $attachments;
     }
 
+    public function scopeApplyFilters($query, $filters)
+    {
+        return $query->filterByDates($filters['from'], $filters['to'])
+            ->filterBySearch($filters['search']);
+    }
+
     public function scopeFilterByDates($query, $start, $end)
     {
         return $query->when($start, function ($query, $start) {
             return $query->whereDate('created_at', '>=', $start);
         })->when($end, function ($query, $end) {
             return $query->whereDate('created_at', '<=', $end);
+        });
+    }
+
+    public function scopeFilterBySearch($query, $search)
+    {
+        return $query->when($search, function ($query, $search) {
+            return $query->where(function ($query) use ($search) {
+                $query->where('from_email', 'like', '%' . $search . '%')
+                    ->orWhere('to_emails', 'like', '%' . $search . '%')
+                    ->orWhere('subject', 'like', '%' . $search . '%');
+            });
         });
     }
 }

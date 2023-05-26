@@ -76,100 +76,101 @@
 				<div class="email-list col-sm-4 col-md-4 col-lg-3 col-xl-3 bg-white">
 					<div class="py-4 px-4 ">
 						<div class="form-group">
-							<input v-model="search" type="text" placeholder="Search via Subject, To or From"
-								class="form-control font-smaller mb-4">
+							<input v-model="search" @input="handleSearch" type="text"
+								placeholder="Search via Subject, To or From" class="form-control font-smaller mb-4">
 						</div>
 						<div class="d-flex align-items-center justify-content-between flex-wrap gap-1">
 							<div class="form-group flex-basis-45">
 								<label class="font-smaller">From</label>
-								<input v-model="dates.from" type="date" class="form-control font-smaller">
+								<input v-model="dates.from" @change="handleDateChange" type="date"
+									class="form-control font-smaller">
 							</div>
 							<div class="form-group flex-basis-45">
 								<label class="font-smaller">To</label>
-								<input v-model="dates.to" type="date" class="form-control font-smaller">
+								<input v-model="dates.to" @change="handleDateChange" type="date"
+									class="form-control font-smaller">
 							</div>
 						</div>
 
-						<template v-if="isLoading">
-							<div v-for="row in 10" :key="`placeholder_${row}`" class="card font-smaller email-card my-3"
-								style="cursor: not-allowed">
-								<div class="card-body placeholder-glow">
-									<span class="placeholder col-9"></span>
-									<span class="placeholder col-6"></span>
-									<span class="placeholder col-11"></span>
-									<span class="placeholder col-5"></span>
-								</div>
-							</div>
-						</template>
-						<template v-else>
-							<transition-group name="list" tag="div">
-								<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}
-								</div>
-								<div v-if="showReload" key="showReload" class="card font-smaller email-card my-3"
-									@click="handleRefetch">
-									<div class="card-body">
-										<span class="d-block font-weight-bold">
-											Reload Emails? Click here.
-										</span>
-									</div>
-								</div>
-								<div v-for="email in filteredSearchEmails" :key="email.id">
-									<div v-if="email.error" class="card font-smaller email-card my-3"
-										style="cursor: not-allowed">
-										<div class="card-body">
-											<span class="d-flex justify-content-between">
-												<span class="font-weight-bold text-danger">ERROR</span>
-												<span class="btn btn-outline-danger btn-sm px-1 py-0"
-													@click="() => deleteEmail(email.id)">Delete</span>
-											</span>
-											<span class="fw-lighter d-block text-muted">
-												From: -
-											</span>
-											<span class="fw-lighter d-block text-muted">
-												To: -
-											</span>
-											<span class="fw-lighter d-block text-muted">
-												Sent: {{ parseDate(email.created_at) }}
-											</span>
-										</div>
-									</div>
-									<div v-else
-										:class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
-										@click="changeEmail(email)">
-										<div class="card-body">
-											<span class="d-block font-weight-bold">
-												{{ email.subject }}
-											</span>
-											<span class="fw-lighter d-block text-muted">
-												From: {{ getFromEmailAddress(email.from_email) }}
-											</span>
-											<span class="fw-lighter d-block text-muted">
-												To: {{ getToEmailAddress(email) }}
-											</span>
-											<span class="fw-lighter d-block text-muted">
-												Sent: {{ parseDate(email.created_at) }}
-											</span>
-											<span v-if="email.attachments.length > 0" class="fw-lighter d-block text-muted">
-												Attachments: {{ email.attachments.length }}
-											</span>
-										</div>
-									</div>
-								</div>
-							</transition-group>
 
-							<div v-if="nextCursor" key="seeMore" class="card font-smaller email-card my-3"
+						<transition-group name="list" tag="div">
+							<div v-if="errorMessage" class="mt-3 text-danger" key="errorMessage">{{ errorMessage }}
+							</div>
+							<div v-if="showReload && !isLoading" key="showReload" class="card font-smaller email-card my-3"
 								@click="handleRefetch">
 								<div class="card-body">
 									<span class="d-block font-weight-bold">
-										See More
+										Reload Emails? Click here.
 									</span>
 								</div>
 							</div>
-						</template>
+							<div v-for="email in emails" :key="email.id">
+								<div v-if="email.error" class="card font-smaller email-card my-3"
+									style="cursor: not-allowed">
+									<div class="card-body">
+										<span class="d-flex justify-content-between">
+											<span class="font-weight-bold text-danger">ERROR</span>
+											<span class="btn btn-outline-danger btn-sm px-1 py-0"
+												@click="() => deleteEmail(email.id)">Delete</span>
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											From: -
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											To: -
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											Sent: {{ parseDate(email.created_at) }}
+										</span>
+									</div>
+								</div>
+								<div v-else
+									:class="['card font-smaller email-card my-3 cursor-pointer', { 'selected': selectedEmail == email }]"
+									@click="changeEmail(email)">
+									<div class="card-body">
+										<span class="d-block font-weight-bold">
+											{{ email.subject }}
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											From: {{ getFromEmailAddress(email.from_email) }}
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											To: {{ getToEmailAddress(email) }}
+										</span>
+										<span class="fw-lighter d-block text-muted">
+											Sent: {{ parseDate(email.created_at) }}
+										</span>
+										<span v-if="email.attachments.length > 0" class="fw-lighter d-block text-muted">
+											Attachments: {{ email.attachments.length }}
+										</span>
+									</div>
+								</div>
+							</div>
+							<template v-if="isLoading">
+								<div v-for="row in 10" :key="`placeholder_${row}`" class="card font-smaller email-card my-3"
+									style="cursor: not-allowed">
+									<div class="card-body placeholder-glow">
+										<span class="placeholder col-9"></span>
+										<span class="placeholder col-6"></span>
+										<span class="placeholder col-11"></span>
+										<span class="placeholder col-5"></span>
+									</div>
+								</div>
+							</template>
+						</transition-group>
+
+						<div v-if="nextCursor" key="seeMore" class="card font-smaller email-card my-3"
+							@click="handleRefetch">
+							<div class="card-body">
+								<span class="d-block font-weight-bold">
+									See More
+								</span>
+							</div>
+						</div>
 
 					</div>
 				</div>
-				<div v-if="filteredSearchEmails.length > 0" class="col-sm-8 col-md-8 col-lg-9 col-xl-9 unset-padding-left">
+				<div v-if="emails.length > 0" class="col-sm-8 col-md-8 col-lg-9 col-xl-9 unset-padding-left">
 					<div class="email-content h-100 d-flex justify-content-center">
 						<iframe v-if="(view === 'xl' || view === 'md' || view === 'sm')" ref="emailFrame"
 							:class="widthClass" :srcdoc="selectedEmail.body" frameborder="0" />
@@ -207,6 +208,7 @@ export default {
 			isLoading: false,
 			showReload: false,
 			nextCursor: null,
+			searchTimeout: null,
 		};
 	},
 	computed: {
@@ -234,22 +236,8 @@ export default {
 			}
 			return email;
 		},
-		filteredSearchEmails() {
-			return this.emails.filter(email => {
-
-				return email.subject.toLowerCase().includes(this.search.toLowerCase()) ||
-					this.getToEmailAddress(email).toLowerCase().includes(this.search.toLowerCase()) ||
-					email.from_email.toLowerCase().includes(this.search.toLowerCase());
-			});
-		},
 	},
 	watch: {
-		dates: {
-			handler() {
-				this.getEmails();
-			},
-			deep: true,
-		},
 		selectedEmail(newVal, oldVal) {
 			// Don't allow selectedEmail to be null
 			if (newVal == null || newVal == undefined) {
@@ -268,11 +256,9 @@ export default {
 		async getEmails() {
 			this.isLoading = true;
 			this.errorMessage = "";
-
-			console.log({ ...this.dates, next_cursor: this.nextCursor });
 			try {
 				let { data } = await axios.get('/mailweb/emails', {
-					params: { ...this.dates, next_cursor: this.nextCursor },
+					params: { ...this.dates, search: this.search, cursor: this.nextCursor },
 				});
 				this.emails = data.data;
 				this.nextCursor = data.next_cursor;
@@ -284,7 +270,18 @@ export default {
 			} finally {
 				this.isLoading = false;
 			}
-			console.log(this.emails);
+		},
+		handleDateChange() {
+			this.cursor = null; // Reset cursor because dates have changed...
+			this.getEmails(); // ...then re-fetch the emails
+		},
+		handleSearchInput() {
+			// Debounce search input to prevent spamming the server:
+			clearTimeout(this.searchTimeout);
+			this.searchTimeout = setTimeout(() => {
+				this.cursor = null; // Reset cursor because search has changed...
+				this.getEmails(); // ...then re-fetch the emails
+			}, 500);
 		},
 		parseDate(date) {
 			return moment(date, 'YYYY/MM/DD HH:mm:ss').format('DD/MM/YYYY HH:mm:ss');

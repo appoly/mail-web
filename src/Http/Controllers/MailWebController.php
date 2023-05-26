@@ -3,6 +3,7 @@
 namespace Appoly\MailWeb\Http\Controllers;
 
 use Appoly\MailWeb\Http\Models\MailwebEmail;
+use Appoly\MailWeb\Http\Requests\MailWebRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -17,11 +18,11 @@ class MailWebController
         return view('mail-web::mail-web.index');
     }
 
-    public function get(Request $request)
+    public function get(MailWebRequest $request)
     {
         $emails = MailwebEmail::orderBy('created_at', 'DESC')
-            ->filterByDates($request->from, $request->to)
-            ->cursorPaginate(25)
+            ->applyFilters($request->validated())
+            ->cursorPaginate(config('mail-web.MAILWEB_PER_PAGE'))
             ->through(function ($email) {
                 try {
                     return [

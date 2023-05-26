@@ -19,4 +19,5 @@ return [
         'HTML' => env('MAILWEB_HTML', true),
         'MARKDOWN' => env('MAILWEB_MARKDOWN', true),
     ],
+    'MAILWEB_PER_PAGE' => env('MAILWEB_PER_PAGE', 25),
 ];
