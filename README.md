@@ -68,6 +68,14 @@ Gate::define("view-mailweb", function ($user) {
 });
 ```
 
+Although it can be dangerous, should you want to allow access to anyone (regardless of authentication) then change the above code to
+
+```php
+Gate::define("view-mailweb", function ($user = null) {
+    return true;
+});
+```
+
 To view emails then go to
 
 ```
