@@ -23,7 +23,7 @@
 							</button>
 							<button :class="['btn font-smaller mx-2', { 'selected': view == 'md' }]" @click="view = 'md'">
 								<div class="d-flex align-items-center ">
-									<img src="/vendor/mailweb/icons/laptop.svg">
+									<img src="/vendor/mailweb/icons/Laptop.svg">
 									<span class="px-2 align-self-center">
 										Laptop
 									</span>
