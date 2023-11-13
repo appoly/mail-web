@@ -76,6 +76,12 @@ Gate::define("view-mailweb", function ($user = null) {
 });
 ```
 
+In your local environment it's advised to set your mail driver to LOG to prevent SMTP errors.
+
+```
+MAIL_MAILER=log
+```
+
 To view emails then go to
 
 ```
