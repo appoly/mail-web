@@ -1,8 +1,10 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
+import MailWeb from './Pages/MailWeb.vue';
 
-Vue.component('MailWeb', require('./Pages/Homepage/Index.vue').default);
-
-// eslint-disable-next-line no-unused-vars
-const app = new Vue({
-    el: '#app',
+const app = createApp({
+    components: {
+        MailWeb
+    }
 });
+
+app.mount('#app');
