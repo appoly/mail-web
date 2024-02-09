@@ -18,25 +18,44 @@ class MailWebListener
     }
 
     /**
-     * Handle the event.
-     *
-     * @param  object  $event
-     * @return void
+     * Handle and store the mailweb email.
      */
-    public function handle(MessageSending $event)
+    public function handle(MessageSending $event): void
     {
-        if (!config('MailWeb.MAILWEB_ENABLED')) {
+        if (! config('mailweb.enabled')) {
             return;
         }
 
         MailwebEmail::create([
-            'email' => serialize($event->message)
+            'from' => $this->getAddresses($event->message->getFrom()),
+            'to' => $this->getAddresses($event->message->getTo()),
+            'cc' => $this->getAddresses($event->message->getCc()),
+            'bcc' => $this->getAddresses($event->message->getBcc()),
+            'subject' => $event->message->getSubject(),
+            'body_html' => $event->message->getHtmlBody(),
+            'body_text' => $event->message->getTextBody(),
+            'read' => false,
         ]);
 
-        $count = MailwebEmail::count();
-        while ($count > config('MailWeb.MAILWEB_LIMIT')) {
-            MailwebEmail::oldest()->first()->delete();
-            $count -= 1;
+        $this->prune();
+    }
+
+    private function getAddresses(array $addresses): array
+    {
+        return collect($addresses)->map(function ($address) {
+            return [
+                'address' => $address->getAddress(),
+                'name' => $address->getName(),
+            ];
+        })->toArray();
+    }
+
+    private function prune(): void
+    {
+        if ((int) config('mailweb.limit') === 0) {
+            return;
         }
+
+        MailwebEmail::oldest()->limit((int) config('mailweb.limit'))->delete();
     }
 }
