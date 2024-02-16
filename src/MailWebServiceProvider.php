@@ -4,8 +4,11 @@ namespace Appoly\MailWeb;
 
 use Livewire\Livewire;
 use Appoly\MailWeb\Facades\MailWeb;
+use Illuminate\Support\Facades\Blade;
+use Appoly\MailWeb\Livewire\EmailView;
 use Illuminate\Support\ServiceProvider;
 use Appoly\MailWeb\Livewire\EmailListView;
+use Appoly\MailWeb\View\Components\Forms\Input;
 use Appoly\MailWeb\Providers\MessageServiceProvider;
 
 class MailWebServiceProvider extends ServiceProvider
@@ -32,6 +35,7 @@ class MailWebServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'mailweb');
         $this->registerRoutesMacro();
         $this->registerLivewireComponents();
+        $this->registerBladeComponents();
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
@@ -69,6 +73,18 @@ class MailWebServiceProvider extends ServiceProvider
     protected function registerLivewireComponents()
     {
         \Livewire\Livewire::component('mailweb::email-list-view', EmailListView::class);
+        \Livewire\Livewire::component('mailweb::email-view', EmailView::class);
+    }
+
+    /**
+     * Register blade components.
+     *
+     * @param void
+     * @return void
+     */
+    protected function registerBladeComponents()
+    {
+        Blade::component('mailweb::forms.input', Input::class);
     }
 
     /**

@@ -3,29 +3,26 @@
 namespace Appoly\MailWeb\Livewire;
 
 use Livewire\Component;
-use Livewire\WithPagination;
-use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
 
-class EmailListView extends Component
+class EmailView extends Component
 {
-    use WithPagination;
-
-    public $searchQuery = '';
+    public $email;
 
     public function render()
     {
-        return view('mailweb::livewire.email-list-view', [
-            'emails' => MailwebEmail::paginate(15),
-        ]);
+        if (! $this->email) {
+            $this->email = MailwebEmail::latest()->first();
+        }
+
+        return view('mailweb::livewire.email-view');
     }
 
-    public function markAsRead($emailId)
+    #[On('viewEmail')]
+    public function viewEmail($emailId)
     {
-        DB::transaction(function () use ($emailId) {
-            $email = MailwebEmail::find($emailId);
-            $email->read = true;
-            $email->save();
-        });
+        $email = MailwebEmail::find($emailId);
+        $this->email = $email;
     }
 }

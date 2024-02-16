@@ -11,12 +11,12 @@ class EmailListView extends Component
 {
     use WithPagination;
 
-    public $searchQuery = '';
+    public $search = '';
 
     public function render()
     {
         return view('mailweb::livewire.email-list-view', [
-            'emails' => MailwebEmail::paginate(15),
+            'emails' => MailwebEmail::search($this->search)->paginate(10),
         ]);
     }
 
@@ -27,5 +27,12 @@ class EmailListView extends Component
             $email->read = true;
             $email->save();
         });
+    }
+
+    public function showEmail($emailId)
+    {
+        $this->markAsRead($emailId);
+
+        $this->dispatch('viewEmail', emailId: $emailId);
     }
 }

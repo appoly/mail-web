@@ -2,8 +2,8 @@
 
 namespace Appoly\MailWeb\Http\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 
 class MailwebEmail extends Model
 {
@@ -20,27 +20,12 @@ class MailwebEmail extends Model
         'bcc' => 'json',
     ];
 
-    // public function getAttachmentsAttribute()
-    // {
-    //     $attachments = [];
-    //     $emailAttachments = $this->email->getAttachments();
-    //     foreach ($emailAttachments as $attachment) {
-    //         $attachments[] = [
-    //             'name' => $attachment->getFilename(),
-    //             // 'content' => $attachment->getBody()
-    //         ];
-    //     }
-    //     return $attachments;
-    // }
-
-    // public function scopeFilterByDates($query, $start, $end)
-    // {
-    //     return $query->when($start, function ($query, $start) {
-    //         return $query->whereDate('created_at', '>=', $start);
-    //     })->when($end, function ($query, $end) {
-    //         return $query->whereDate('created_at', '<=', $end);
-    //     });
-    // }
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('subject', 'like', "%$search%")
+            ->orWhere('body_text', 'like', "%$search%")
+            ->orWhere('body_html', 'like', "%$search%");
+    }
 
     public function getSnippetAttribute()
     {
