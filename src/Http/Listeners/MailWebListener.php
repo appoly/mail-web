@@ -2,8 +2,8 @@
 
 namespace Appoly\MailWeb\Http\Listeners;
 
-use Appoly\MailWeb\Http\Models\MailwebEmail;
 use Illuminate\Mail\Events\MessageSending;
+use Appoly\MailWeb\Http\Models\MailwebEmail;
 
 class MailWebListener
 {
@@ -22,7 +22,7 @@ class MailWebListener
      */
     public function handle(MessageSending $event): void
     {
-        if (! config('mailweb.enabled')) {
+        if (! config('MailWeb.MAILWEB_ENABLED')) {
             return;
         }
 

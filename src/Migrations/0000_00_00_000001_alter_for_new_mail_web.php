@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
-class CreateMailWebTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -40,5 +40,9 @@ class CreateMailWebTable extends Migration
     public function down()
     {
         Schema::dropIfExists('mailweb_emails');
+
+        if (Schema::hasTable('mailweb_emails_archived')) {
+            Schema::rename('mailweb_emails_archived', 'mailweb_emails');
+        }
     }
-}
+};

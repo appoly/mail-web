@@ -3,6 +3,7 @@
 namespace Appoly\MailWeb\Http\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class MailwebEmail extends Model
 {
@@ -40,4 +41,10 @@ class MailwebEmail extends Model
     //         return $query->whereDate('created_at', '<=', $end);
     //     });
     // }
+
+    public function getSnippetAttribute()
+    {
+        // truncate $this->body_text to 100 characters with ...
+        return Str::limit($this->body_text, 130, '...');
+    }
 }
