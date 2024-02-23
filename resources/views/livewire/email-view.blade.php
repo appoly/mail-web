@@ -3,7 +3,7 @@
     {{-- toolbar with, html, source, text --}}
     @if ($email)
         @if (!$this->showOnly)
-            <nav class="flex justify-between my-4 bg-gray-200 dark:bg-gray-700">
+            <nav class="flex justify-between mb-4 bg-gray-200 dark:bg-gray-700">
                 <div class="flex gap-4">
                     <x-mailweb::toolbar-button wire:click="toggleEmailView" @class(['border-b-2 border-b-blue-500' => $this->mode === 'email'])>
                         <div class="flex gap-2">
