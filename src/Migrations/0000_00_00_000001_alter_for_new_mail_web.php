@@ -19,7 +19,7 @@ return new class extends Migration
         }
 
         Schema::create('mailweb_emails', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->uuid('id')->primary();
             $table->json('from')->nullable();
             $table->json('to')->nullable();
             $table->json('cc')->nullable();
@@ -28,6 +28,7 @@ return new class extends Migration
             $table->longText('body_html')->nullable();
             $table->longText('body_text')->nullable();
             $table->boolean('read')->default(false);
+            $table->boolean('share_enabled')->default(false);
             $table->timestamps();
         });
     }

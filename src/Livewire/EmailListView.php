@@ -16,7 +16,7 @@ class EmailListView extends Component
     public function render()
     {
         return view('mailweb::livewire.email-list-view', [
-            'emails' => MailwebEmail::search($this->search)->paginate(10),
+            'emails' => MailwebEmail::search($this->search)->paginate(15),
         ]);
     }
 

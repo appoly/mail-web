@@ -3,8 +3,9 @@
 
     <x-mailweb::forms.input type="text" wire:model.live.debounce.250ms="search" placeholder="Search..." class="mb-4" />
 
-    <span class="my-4"> Showing {{ $emails->firstItem() }} to {{ $emails->lastItem() }} of {{ $emails->total() }}
-        emails</span>
+    <span class="my-4 text-gray-700 dark:text-gray-300">
+        Showing {{ $emails->firstItem() ?? 0 }} to {{ $emails->lastItem() ?? 0 }} of {{ $emails->total() }} emails
+        </span>
     <div class="overflow-y-auto scrollbar-hide max-h-[calc(100vh-200px)]">
         <div class="flex flex-col gap-4">
             @foreach ($emails as $email)
