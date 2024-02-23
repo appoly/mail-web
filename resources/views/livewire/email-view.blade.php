@@ -31,14 +31,7 @@
     @else
         <div class="flex items-center justify-center w-full h-full gap-4 ">
             <div class="text-gray-700 dark:text-gray-300 align-center">
-                <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"
-                    class="w-[5rem] h-[5rem] mx-auto">
-                    <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" />
-                    <path d="M9.6 4.6A2 2 0 1 1 11 8H2" />
-                    <path d="M12.6 19.4A2 2 0 1 0 14 16H2" />
-                </svg>
-
+                {!! $this->emptyIcon !!}
                 <h1 class="text-2xl font-bold">
                     {{ $this->emptyMessage }}
                 </h1>
