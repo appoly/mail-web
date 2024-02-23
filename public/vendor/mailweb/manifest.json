@@ -1,0 +1,12 @@
+{
+  "resources/css/mailweb.css": {
+    "file": "assets/mailweb-66vI0ndp.css",
+    "src": "resources/css/mailweb.css",
+    "isEntry": true
+  },
+  "resources/js/mailweb.js": {
+    "file": "assets/mailweb-w40geAFS.js",
+    "src": "resources/js/mailweb.js",
+    "isEntry": true
+  }
+}
