@@ -12,6 +12,7 @@ class EmailView extends Component
     public $email;
     public $showOnly = true;
     public $mode = 'email';
+    public $size = '';
 
     public function render()
     {
@@ -94,6 +95,11 @@ class EmailView extends Component
         $this->email = null;
 
         $this->dispatch('reloadEmails');
+    }
+
+    public function setSize($size)
+    {
+        $this->size = $size;
     }
 
 }

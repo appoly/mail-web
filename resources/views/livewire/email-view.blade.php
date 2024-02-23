@@ -39,6 +39,28 @@
                             <span>Text</span>
                         </div>
                     </x-mailweb::toolbar-button>
+                    <x-mailweb::toolbar-button wire:click="setSize('desktop')">
+                        <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-laptop">
+                                <path
+                                    d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16" />
+                            </svg>
+                            <span>Desktop</span>
+                        </div>
+                    </x-mailweb::toolbar-button>
+                    <x-mailweb::toolbar-button wire:click="setSize('mobile')">
+                        <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-smartphone">
+                                <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
+                                <path d="M12 18h.01" />
+                            </svg>
+                            <span>Mobile</span>
+                        </div>
+                    </x-mailweb::toolbar-button>
                 </div>
                 <div class="flex gap-4">
                     <x-mailweb::toolbar-button wire:click="delete" class="hover:bg-red-500 dark:hover:bg-red-600">
@@ -56,6 +78,7 @@
                         </div>
                     </x-mailweb::toolbar-button>
                 </div>
+
             </nav>
         @endif
 
@@ -99,22 +122,26 @@
             @endif
 
 
-            <div class="mt-4"></div>
-            @switch($this->mode)
-                @case('email')
-                    {!! $email->body_html !!}
-                @break
+            <div @class([
+                'mt-4 transition-all flex justify-center',
+                'lg:w-1/4' => $this->size === 'mobile',
+            ])>
+                @switch($this->mode)
+                    @case('email')
+                        {!! $email->body_html !!}
+                    @break
 
-                @case('source')
-                    <pre class="whitespace-pre-wrap">{{ $email->body_html }}</pre>
-                @break
+                    @case('source')
+                        <pre class="whitespace-pre-wrap">{{ $email->body_html }}</pre>
+                    @break
 
-                @case('text')
-                    <pre class="whitespace-pre-wrap">{{ $email->body_text }}</pre>
-                @break
+                    @case('text')
+                        <pre class="whitespace-pre-wrap">{{ $email->body_text }}</pre>
+                    @break
 
-                @default
-            @endswitch
+                    @default
+                @endswitch
+            </div>
         </div>
 
         @if (!$this->showOnly)
@@ -124,9 +151,9 @@
                         Disable Sharing
                     @else
                         <div class="flex justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
-                                stroke-linejoin="round" class="lucide lucide-share">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"
+                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share">
                                 <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
                                 <polyline points="16 6 12 2 8 6" />
                                 <line x1="12" x2="12" y1="2" y2="15" />
