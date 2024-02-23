@@ -42,7 +42,7 @@ class MailwebSampleNotification extends Notification
                 [
                     'type' => 'button',
                     'content' => 'Click here',
-                    'url' => 'example.com',
+                    'url' => 'http://example.com',
                 ],
                 [
                     'type' => 'line',
@@ -64,7 +64,7 @@ class MailwebSampleNotification extends Notification
                 [
                     'type' => 'button',
                     'content' => 'Reset Password',
-                    'url' => 'example.com',
+                    'url' => 'http://example.com',
                 ],
                 [
                     'type' => 'line',
@@ -86,7 +86,7 @@ class MailwebSampleNotification extends Notification
                 [
                     'type' => 'button',
                     'content' => 'View Comment',
-                    'url' => 'example.com',
+                    'url' => 'http://example.com',
                 ],
             ],
         ],
