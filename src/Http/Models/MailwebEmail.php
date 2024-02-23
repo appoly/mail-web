@@ -23,6 +23,11 @@ class MailwebEmail extends Model
         'bcc' => 'json',
     ];
 
+    public function attachments()
+    {
+        return $this->hasMany(MailwebEmailAttachment::class);
+    }
+
     public function scopeSearch($query, $search)
     {
         return $query->where('subject', 'like', "%$search%")
@@ -34,5 +39,10 @@ class MailwebEmail extends Model
     {
         // truncate $this->body_text to 100 characters with ...
         return Str::limit($this->body_text, 130, '...');
+    }
+
+    public function getAttachmentCountAttribute()
+    {
+        return $this->attachments->count();
     }
 }

@@ -128,6 +128,9 @@ class MailwebSampleNotification extends Notification
             }
         }
 
+        // create a dummy text attachment
+        $mail->attachData('Dummy Attachment', 'Dummy.txt', ['mime' => 'text/plain']);
+
         return $mail;
     }
 

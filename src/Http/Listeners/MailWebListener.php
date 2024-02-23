@@ -2,6 +2,7 @@
 
 namespace Appoly\MailWeb\Http\Listeners;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Mail\Events\MessageSending;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
 
@@ -26,7 +27,8 @@ class MailWebListener
             return;
         }
 
-        MailwebEmail::create([
+        // DB::transaction(function () use ($event) {
+        $mailwebEmail = MailwebEmail::create([
             'from' => $this->getAddresses($event->message->getFrom()),
             'to' => $this->getAddresses($event->message->getTo()),
             'cc' => $this->getAddresses($event->message->getCc()),
@@ -36,6 +38,15 @@ class MailWebListener
             'body_text' => $event->message->getTextBody(),
             'read' => false,
         ]);
+
+        foreach ($event->message->getAttachments() as $attachment) {
+            $mailwebEmail->attachments()->create([
+                'name' => $attachment->getFilename(),
+                'path' => null,
+            ]);
+        }
+
+        // });
 
         $this->prune();
     }

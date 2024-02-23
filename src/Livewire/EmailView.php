@@ -22,6 +22,7 @@ class EmailView extends Component
     public function viewEmail($emailId)
     {
         $email = MailwebEmail::find($emailId);
+        $email->load('attachments');
         $this->email = $email;
     }
 

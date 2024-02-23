@@ -82,6 +82,23 @@
                         @endforeach
                 </div>
             </div>
+            @if ($email->attachments)
+                <div class="mt-4">
+                    <span class="mb-2 text-sm font-bold text-gray-700 dark:text-gray-300">Attachments:</span>
+                    <div class="flex gap-4 ">
+                        @foreach ($email->attachments as $attachment)
+                            <div
+                                class="flex items-center justify-center w-24 h-10 bg-gray-200 rounded-lg dark:bg-gray-800">
+                                <span class="text-sm text-gray-500 dark:text-gray-300">
+                                    {{ $attachment->name }}
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+
             <div class="mt-4"></div>
             @switch($this->mode)
                 @case('email')
