@@ -10,6 +10,7 @@ use Appoly\MailWeb\Http\Models\MailwebEmail;
 class EmailView extends Component
 {
     public $email;
+    public $showOnly = true;
 
     public function render()
     {
@@ -62,5 +63,11 @@ class EmailView extends Component
     public function reload()
     {
         $this->email = null;
+    }
+
+    public function toggleShare()
+    {
+        $this->email->share_enabled = ! $this->email->share_enabled;
+        $this->email->save();
     }
 }
