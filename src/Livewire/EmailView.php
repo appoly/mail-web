@@ -13,10 +13,6 @@ class EmailView extends Component
 
     public function render()
     {
-        if (! $this->email) {
-            $this->email = MailwebEmail::latest()->first();
-        }
-
         return view('mailweb::livewire.email-view');
     }
 
@@ -31,8 +27,7 @@ class EmailView extends Component
     public function emptyMessage()
     {
         return match (true) {
-            MailwebEmail::count() == 0 => 'No emails found, send an email and it will appear here!',
-            $this->email == null => 'Select an email',
+            $this->email == null => 'Select an email to view it here',
             default => '',
         };
     }

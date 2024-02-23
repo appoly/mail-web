@@ -10,7 +10,7 @@
         <div class="flex flex-col gap-4">
             @foreach ($emails as $email)
                 <div class="px-4 pt-6 pb-8 bg-white rounded-lg shadow cursor-pointer dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    wire:click="showEmail({{ $email->id }})">
+                    wire:click="showEmail('{{ $email->id }}')">
                     <div class="flex gap-4">
                         <div class="flex-shrink-0">
                             <img src="https://ui-avatars.com/api/?name={{ $email->from[0]['name'] }}"

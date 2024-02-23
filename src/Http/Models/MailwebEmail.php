@@ -4,9 +4,12 @@ namespace Appoly\MailWeb\Http\Models;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class MailwebEmail extends Model
 {
+    use HasUuids;
+
     protected $guarded = ['id'];
 
     protected $dates = [

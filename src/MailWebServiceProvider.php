@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Blade;
 use Appoly\MailWeb\Livewire\EmailView;
 use Illuminate\Support\ServiceProvider;
 use Appoly\MailWeb\Livewire\EmailListView;
+use Appoly\MailWeb\Livewire\SampleEmailAlert;
 use Appoly\MailWeb\View\Components\Forms\Input;
 use Appoly\MailWeb\Providers\MessageServiceProvider;
 
@@ -72,8 +73,9 @@ class MailWebServiceProvider extends ServiceProvider
      */
     protected function registerLivewireComponents()
     {
-        \Livewire\Livewire::component('mailweb::email-list-view', EmailListView::class);
-        \Livewire\Livewire::component('mailweb::email-view', EmailView::class);
+        Livewire::component('mailweb::email-list-view', EmailListView::class);
+        Livewire::component('mailweb::email-view', EmailView::class);
+        Livewire::component('mailweb::sample-email-alert', SampleEmailAlert::class);
     }
 
     /**
