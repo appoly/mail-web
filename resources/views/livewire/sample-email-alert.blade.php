@@ -1,5 +1,5 @@
 <div
-    class="w-full p-8 bg-orange-500 border rounded-lg shadow-lg dark:bg-gray-800 dark:text-gray-300 dark:border-orange-500">
+    class="w-full p-8 bg-white border border-orange-500 rounded-lg shadow-lg dark:bg-gray-800 dark:text-gray-300 ">
     <span class="text-2xl font-bold">
         {!! $this->message !!}
     </span>
