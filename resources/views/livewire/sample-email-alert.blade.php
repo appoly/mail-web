@@ -9,7 +9,7 @@
         <x-mailweb::forms.input-label value="Send an example email to" />
         <x-mailweb::forms.input class="mt-1" type="email" name="email" placeholder="Email address"
             value="example@mailweb.com" wire:model="email" />
-        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <x-mailweb::forms.input-error :messages="$errors->get('email')" class="mt-2" />
 
         <div class="flex justify-end">
             <x-mailweb::button class="mt-4" type="submit">
