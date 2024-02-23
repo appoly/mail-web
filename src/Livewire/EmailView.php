@@ -11,6 +11,7 @@ class EmailView extends Component
 {
     public $email;
     public $showOnly = true;
+    public $mode = 'email';
 
     public function render()
     {
@@ -70,4 +71,28 @@ class EmailView extends Component
         $this->email->share_enabled = ! $this->email->share_enabled;
         $this->email->save();
     }
+
+    public function toggleEmailView()
+    {
+        $this->mode = 'email';
+    }
+
+    public function toggleSource()
+    {
+        $this->mode = 'source';
+    }
+
+    public function toggleText()
+    {
+        $this->mode = 'text';
+    }
+
+    public function delete()
+    {
+        $this->email->delete();
+        $this->email = null;
+
+        $this->dispatch('reloadEmails');
+    }
+
 }

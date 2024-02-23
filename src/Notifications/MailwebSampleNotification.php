@@ -10,18 +10,85 @@ class MailwebSampleNotification extends Notification
 {
     use Queueable;
 
-    private array $mails = [
+    private $mails = [
         [
             'subject' => 'New Contact Form Submission',
-            'body' => ['You have received a new contact form submission:', 'Lorem ipsum dolor sit amet Consectetur adipiscing elit'],
+            'body' => [
+                [
+                    'type' => 'line',
+                    'content' => 'You have received a new contact form submission:',
+                ],
+                [
+                    'type' => 'line',
+                    'content' => 'Message:',
+                ],
+                [
+                    'type' => 'line',
+                    'content' => "I'm interested in learning more about your services. Can you please provide me with some additional information?",
+                ],
+            ],
         ],
         [
-            'subject' => 'Welcome',
-            'body' => ['Welcome to our site', 'Lorem ipsum dolor sit amet Consectetur adipiscing elit'],
+            'subject' => 'Welcome 👋🏻',
+            'body' => [
+                [
+                    'type' => 'line',
+                    'content' => "We're so excited to have you here! We think you'll love what we've got in store.",
+                ],
+                [
+                    'type' => 'line',
+                    'content' => 'To get started with your new account, please click the button below.',
+                ],
+                [
+                    'type' => 'button',
+                    'content' => 'Click here',
+                    'url' => 'example.com',
+                ],
+                [
+                    'type' => 'line',
+                    'content' => 'We hope to see you soon!',
+                ],
+            ],
         ],
         [
-            'subject' => 'Thanks',
-            'body' => ['Thank you for your message', 'Lorem ipsum dolor sit amet Consectetur adipiscing elit'],
+            'subject' => 'Reset Password 🙈',
+            'body' => [
+                [
+                    'type' => 'line',
+                    'content' => 'Forgotten your password? No worries! We got you covered.',
+                ],
+                [
+                    'type' => 'line',
+                    'content' => 'Click the button below to reset your password.',
+                ],
+                [
+                    'type' => 'button',
+                    'content' => 'Reset Password',
+                    'url' => 'example.com',
+                ],
+                [
+                    'type' => 'line',
+                    'content' => 'If you did not request a password reset, please ignore this email.',
+                ],
+            ],
+        ],
+        [
+            'subject' => 'New Comment on Your Post 📝',
+            'body' => [
+                [
+                    'type' => 'line',
+                    'content' => 'Someone has commented on your post.',
+                ],
+                [
+                    'type' => 'line',
+                    'content' => 'Click the button below to view the comment.',
+                ],
+                [
+                    'type' => 'button',
+                    'content' => 'View Comment',
+                    'url' => 'example.com',
+                ],
+            ],
         ],
     ];
 
@@ -54,7 +121,11 @@ class MailwebSampleNotification extends Notification
             ->subject($mailContent['subject']);
 
         foreach ($mailContent['body'] as $body) {
-            $mail = $mail->line($body);
+            if ($body['type'] == 'line') {
+                $mail = $mail->line($body['content']);
+            } elseif ($body['type'] == 'button') {
+                $mail = $mail->action($body['content'], $body['url']);
+            }
         }
 
         return $mail;

@@ -7,10 +7,10 @@
             </h1>
         </div>
         <div class="flex flex-col gap-4 mt-4 lg:flex-row md:max-w-[100rem] md:mx-auto">
-            <livewire:mailweb::email-list-view  />
+            <livewire:mailweb::email-list-view />
             <div class="flex flex-col w-full gap-4">
                 <livewire:mailweb::email-view :show-only="false" />
-                <livewire:mailweb::sample-email-alert/>
+                <livewire:mailweb::sample-email-alert />
             </div>
         </div>
     </div>
