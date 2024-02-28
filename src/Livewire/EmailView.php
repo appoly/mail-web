@@ -99,6 +99,7 @@ class EmailView extends Component
 
     public function setSize($size)
     {
+        $this->mode = 'email';
         $this->size = $size;
     }
 

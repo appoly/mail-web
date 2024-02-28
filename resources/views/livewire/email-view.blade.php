@@ -121,26 +121,29 @@
                 </div>
             @endif
 
+            <div class="w-full">
+                <div @class([
+                    'mt-4 transition-all flex justify-center',
+                    'lg:w-1/4' => $this->size === 'mobile',
+                ])>
+                <div class="w-full">
+                    @switch($this->mode)
+                        @case('email')
+                            {!! $email->body_html !!}
+                        @break
 
-            <div @class([
-                'mt-4 transition-all flex justify-center',
-                'lg:w-1/4' => $this->size === 'mobile',
-            ])>
-                @switch($this->mode)
-                    @case('email')
-                        {!! $email->body_html !!}
-                    @break
+                        @case('source')
+                            <pre class="whitespace-pre-wrap">{{ $email->body_html }}</pre>
+                        @break
 
-                    @case('source')
-                        <pre class="whitespace-pre-wrap">{{ $email->body_html }}</pre>
-                    @break
+                        @case('text')
+                            <pre class="whitespace-pre-wrap">{{ $email->body_text }}</pre>
+                        @break
 
-                    @case('text')
-                        <pre class="whitespace-pre-wrap">{{ $email->body_text }}</pre>
-                    @break
-
-                    @default
-                @endswitch
+                        @default
+                    @endswitch
+                </div>
+                </div>
             </div>
         </div>
 
