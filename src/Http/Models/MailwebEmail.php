@@ -2,72 +2,47 @@
 
 namespace Appoly\MailWeb\Http\Models;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class MailwebEmail extends Model
 {
+    use HasUuids;
+
     protected $guarded = ['id'];
 
-    protected $appends = [
-        'body',
-        'from_email',
-        'to_emails',
-        'subject',
-        'attachments',
-    ];
-
     protected $dates = [
-        'created_at'
+        'created_at',
     ];
 
-    public function getEmailAttribute($value)
+    protected $casts = [
+        'from' => 'json',
+        'to' => 'json',
+        'cc' => 'json',
+        'bcc' => 'json',
+    ];
+
+    public function attachments()
     {
-        return unserialize($value);
+        return $this->hasMany(MailwebEmailAttachment::class);
     }
 
-    public function getBodyAttribute()
+    public function scopeSearch($query, $search)
     {
-        return $this->email->getBody()->getParts()[1]->getBody();
+        return $query->where('subject', 'like', "%$search%")
+            ->orWhere('body_text', 'like', "%$search%")
+            ->orWhere('body_html', 'like', "%$search%");
     }
 
-    public function getFromEmailAttribute()
+    public function getSnippetAttribute()
     {
-        return $this->email->getFrom()[0]->getAddress();
+        // truncate $this->body_text to 100 characters with ...
+        return Str::limit($this->body_text, 130, '...');
     }
 
-    public function getToEmailsAttribute()
+    public function getAttachmentCountAttribute()
     {
-        $to = [];
-        foreach ($this->email->getTo() as $email) {
-            $to[] = $email->getAddress();
-        }
-        return $to;
-    }
-
-    public function getSubjectAttribute()
-    {
-        return $this->email->getSubject();
-    }
-
-    public function getAttachmentsAttribute()
-    {
-        $attachments = [];
-        $emailAttachments = $this->email->getAttachments();
-        foreach ($emailAttachments as $attachment) {
-            $attachments[] = [
-                'name' => $attachment->getFilename(),
-                // 'content' => $attachment->getBody()
-            ];
-        }
-        return $attachments;
-    }
-
-    public function scopeFilterByDates($query, $start, $end)
-    {
-        return $query->when($start, function ($query, $start) {
-            return $query->whereDate('created_at', '>=', $start);
-        })->when($end, function ($query, $end) {
-            return $query->whereDate('created_at', '<=', $end);
-        });
+        return $this->attachments->count();
     }
 }

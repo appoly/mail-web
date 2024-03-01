@@ -2,8 +2,9 @@
 
 namespace Appoly\MailWeb\Http\Listeners;
 
-use Appoly\MailWeb\Http\Models\MailwebEmail;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Mail\Events\MessageSending;
+use Appoly\MailWeb\Http\Models\MailwebEmail;
 
 class MailWebListener
 {
@@ -18,25 +19,54 @@ class MailWebListener
     }
 
     /**
-     * Handle the event.
-     *
-     * @param  object  $event
-     * @return void
+     * Handle and store the mailweb email.
      */
-    public function handle(MessageSending $event)
+    public function handle(MessageSending $event): void
     {
-        if (!config('MailWeb.MAILWEB_ENABLED')) {
+        if (! config('MailWeb.MAILWEB_ENABLED')) {
             return;
         }
 
-        MailwebEmail::create([
-            'email' => serialize($event->message)
+        // DB::transaction(function () use ($event) {
+        $mailwebEmail = MailwebEmail::create([
+            'from' => $this->getAddresses($event->message->getFrom()),
+            'to' => $this->getAddresses($event->message->getTo()),
+            'cc' => $this->getAddresses($event->message->getCc()),
+            'bcc' => $this->getAddresses($event->message->getBcc()),
+            'subject' => $event->message->getSubject(),
+            'body_html' => $event->message->getHtmlBody(),
+            'body_text' => $event->message->getTextBody(),
+            'read' => false,
         ]);
 
-        $count = MailwebEmail::count();
-        while ($count > config('MailWeb.MAILWEB_LIMIT')) {
-            MailwebEmail::oldest()->first()->delete();
-            $count -= 1;
+        foreach ($event->message->getAttachments() as $attachment) {
+            $mailwebEmail->attachments()->create([
+                'name' => $attachment->getFilename(),
+                'path' => null,
+            ]);
         }
+
+        // });
+
+        $this->prune();
+    }
+
+    private function getAddresses(array $addresses): array
+    {
+        return collect($addresses)->map(function ($address) {
+            return [
+                'address' => $address->getAddress(),
+                'name' => $address->getName(),
+            ];
+        })->toArray();
+    }
+
+    private function prune(): void
+    {
+        if ((int) config('mailweb.limit') === 0) {
+            return;
+        }
+
+        MailwebEmail::oldest()->limit((int) config('mailweb.limit'))->delete();
     }
 }

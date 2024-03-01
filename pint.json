@@ -1,0 +1,16 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "class_attributes_separation": {
+            "elements": {
+                "const": "none"
+            }
+        },
+        "concat_space": {
+            "spacing": "one"
+        },
+        "ordered_imports":{
+            "sort_algorithm": "length"
+        }
+    }
+}
