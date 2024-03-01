@@ -15,7 +15,7 @@
 
 ## Features
 - Outgoing Email Capture: Intercept outgoing emails from your Laravel application seamlessly.
-- Tailwind UI Integration: Enjoy a sleek and responsive user interface crafted with Tailwind CSS.
+- Tailwind UI: Enjoy a sleek and responsive user interface crafted with Tailwind CSS.
 - Email Viewing: Easily view captured emails within the Mail Web dashboard.
 - Shareable Links: Generate shareable links for email previews, facilitating collaboration and debugging.
 - Search Functionality: Quickly search through your emails to find the information you need.
