@@ -19,7 +19,7 @@ class EmailListView extends Component
         return view('mailweb::livewire.email-list-view', [
             'emails' => MailwebEmail::search($this->search)
                 ->orderBy('created_at', 'desc')
-                ->paginate(30),
+                ->paginate(),
         ]);
     }
 
@@ -43,5 +43,18 @@ class EmailListView extends Component
     public function reload()
     {
         $this->resetPage();
+    }
+
+    public function updating($property, $value)
+    {
+
+        if ($property == 'search') {
+            $this->resetPage();
+        }
+    }
+
+    public function paginationView()
+    {
+        return 'mailweb::livewire.pagination';
     }
 }

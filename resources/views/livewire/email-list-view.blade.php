@@ -1,15 +1,13 @@
-<div class="w-full max-h-screen overflow-y-hidden lg:w-1/3">
-    {{-- search bar --}}
+<div class="max-h-screen overflow-y-hidden  max-w-[35rem]">
 
     <x-mailweb::forms.input type="text" wire:model.live.debounce.250ms="search" placeholder="Search..." class="mb-4" />
 
-    <span class="my-4 text-gray-700 dark:text-gray-300">
-        Showing {{ $emails->firstItem() ?? 0 }} to {{ $emails->lastItem() ?? 0 }} of {{ $emails->total() }} emails
-    </span>
     <div class="overflow-y-auto scrollbar-hide max-h-[calc(100vh-200px)]">
         <div class="flex flex-col gap-4">
+            {{ $emails->links() }}
+
             @foreach ($emails as $email)
-                <div class="bg-white rounded-lg shadow cursor-pointer dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
+                <div class="bg-white rounded-md shadow cursor-pointer dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
                     wire:click="showEmail('{{ $email->id }}')">
                     <div class="flex justify-end pt-2 pr-2">
                         @if (!$email->read)
