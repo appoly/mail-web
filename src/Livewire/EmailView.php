@@ -12,7 +12,7 @@ class EmailView extends Component
     public $email;
     public $showOnly = true;
     public $mode = 'email';
-    public $size = '';
+    public $size = 'desktop';
 
     public function render()
     {

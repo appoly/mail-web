@@ -47,7 +47,11 @@
                                 <path
                                     d="M20 16V7a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v9m16 0H4m16 0 1.28 2.55a1 1 0 0 1-.9 1.45H3.62a1 1 0 0 1-.9-1.45L4 16" />
                             </svg>
-                            <span>Desktop</span>
+                        </div>
+                    </x-mailweb::toolbar-button>
+                    <x-mailweb::toolbar-button wire:click="setSize('tablet')">
+                        <div class="flex gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tablet"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>
                         </div>
                     </x-mailweb::toolbar-button>
                     <x-mailweb::toolbar-button wire:click="setSize('mobile')">
@@ -58,7 +62,6 @@
                                 <rect width="14" height="20" x="5" y="2" rx="2" ry="2" />
                                 <path d="M12 18h.01" />
                             </svg>
-                            <span>Mobile</span>
                         </div>
                     </x-mailweb::toolbar-button>
                 </div>
@@ -122,14 +125,17 @@
             @endif
 
             <div class="w-full">
-                <div @class([
-                    'mt-4 transition-all flex justify-center',
-                    'lg:w-1/4' => $this->size === 'mobile',
-                ])>
-                <div class="w-full">
+                <div class="w-full mt-4">
                     @switch($this->mode)
                         @case('email')
-                            {!! $email->body_html !!}
+                        <div @class([
+                            'mx-auto transition-all duration-500 ease-in-out',
+                            'w-[375px] rounded-lg' => $this->size === 'mobile',
+                            'w-[768px] rounded-lg' => $this->size === 'tablet',
+                            'w-full' => $this->size === 'desktop',
+                            ])>
+                            <iframe srcdoc="{{ $email->body_html }}" style="width: 100%; height: 600px;"></iframe>
+                        </div>
                         @break
 
                         @case('source')
@@ -142,7 +148,6 @@
 
                         @default
                     @endswitch
-                </div>
                 </div>
             </div>
         </div>
