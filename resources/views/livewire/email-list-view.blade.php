@@ -15,7 +15,7 @@
                     <div @class([
                         'transition-all duration-300 bg-white rounded-md shadow cursor-pointer dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 w-[95%] mx-auto',
                         'opacity-75' => $email->read && $activeEmailId != $email->id,
-                        'opacity-100 shadow-[rgba(13,_38,_76,_0.19)_0px_9px_20px] shadow-appoly-red/50' =>
+                        'opacity-100 shadow-2xl shadow-appoly-red/20' =>
                             $activeEmailId == $email->id,
                     ]) wire:click="showEmail('{{ $email->id }}')">
 
