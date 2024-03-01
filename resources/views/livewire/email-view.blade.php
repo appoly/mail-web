@@ -158,7 +158,7 @@
         </div>
 
         @if (!$this->showOnly)
-            <div class="flex flex-col gap-4 mt-4">
+            <div class="flex flex-col gap-4 my-4 mr-2">
                 <div class="ms-auto">
                     <x-mailweb::button class="w-52" type="button" wire:click="toggleShare">
                         <span>{{ $email->share_enabled ? 'Disable' : 'Enable' }} Sharing</span>
