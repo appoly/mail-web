@@ -5,7 +5,11 @@ export default {
         "./resources/**/*.js",
     ],
     theme: {
-        extend: {},
+        extend: {
+        colors: {
+            'appoly-red': '#d92128',
+        },
+    },
     },
     plugins: [],
 }

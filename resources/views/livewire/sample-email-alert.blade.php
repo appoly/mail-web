@@ -13,8 +13,7 @@
 
         <div class="flex justify-end">
             <x-mailweb::button class="mt-4" type="submit">
-                <div class="flex gap-2">
-                    <span>Send</span>
+                <div class="px-4 py-2 ">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
                 </div>
             </x-mailweb::button>

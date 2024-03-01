@@ -13,6 +13,8 @@ class EmailListView extends Component
     use WithPagination;
 
     public $search = '';
+    public $hidden = false;
+    public $activeEmailId = null;
 
     public function render()
     {
@@ -35,6 +37,7 @@ class EmailListView extends Component
     public function showEmail($emailId)
     {
         $this->markAsRead($emailId);
+        $this->activeEmailId = $emailId;
 
         $this->dispatch('viewEmail', emailId: $emailId);
     }
@@ -56,5 +59,10 @@ class EmailListView extends Component
     public function paginationView()
     {
         return 'mailweb::livewire.pagination';
+    }
+
+    public function toggle()
+    {
+        $this->hidden = ! $this->hidden;
     }
 }

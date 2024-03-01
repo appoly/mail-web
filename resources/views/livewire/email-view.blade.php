@@ -1,11 +1,11 @@
-<div class="w-full h-full p-8 text-gray-700 bg-white rounded-lg shadow-lg dark:bg-gray-800 dark:text-gray-300">
+<div class="w-full h-full text-gray-700 bg-white rounded-lg shadow-lg dark:bg-gray-800 dark:text-gray-300">
 
     {{-- toolbar with, html, source, text --}}
     @if ($email)
         @if (!$this->showOnly)
-            <div class="flex justify-between mb-4 bg-gray-200 rounded-lg shadow-sm dark:bg-gray-700 ">
+            <div class="flex justify-between gap-4 rounded-t-lg">
                 <div class="flex gap-4">
-                    <x-mailweb::toolbar-button wire:click="toggleEmailView" @class(['border-b-2 border-b-blue-500' => $this->mode === 'email'])>
+                    <x-mailweb::toolbar-button wire:click="toggleEmailView" @class(['border-b-2 border-b-appoly-red/50' => $this->mode === 'email'])>
                         <div class="flex gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
@@ -15,7 +15,7 @@
                             </svg> <span>Email</span>
                         </div>
                     </x-mailweb::toolbar-button>
-                    <x-mailweb::toolbar-button wire:click="toggleSource" @class(['border-b-2 border-b-blue-500' => $this->mode === 'source'])>
+                    <x-mailweb::toolbar-button wire:click="toggleSource" @class(['border-b-2 border-b-appoly-red/50' => $this->mode === 'source'])>
                         <div class="flex gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
@@ -27,7 +27,7 @@
                             <span>Source</span>
                         </div>
                     </x-mailweb::toolbar-button>
-                    <x-mailweb::toolbar-button wire:click="toggleText" @class(['border-b-2 border-b-blue-500' => $this->mode === 'text'])>
+                    <x-mailweb::toolbar-button wire:click="toggleText" @class(['border-b-2 border-b-appoly-red/50' => $this->mode === 'text'])>
                         <div class="flex gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
@@ -51,7 +51,12 @@
                     </x-mailweb::toolbar-button>
                     <x-mailweb::toolbar-button wire:click="setSize('tablet')">
                         <div class="flex gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tablet"><rect width="16" height="20" x="4" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-tablet">
+                                <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+                                <line x1="12" x2="12.01" y1="18" y2="18" />
+                            </svg>
                         </div>
                     </x-mailweb::toolbar-button>
                     <x-mailweb::toolbar-button wire:click="setSize('mobile')">
@@ -85,7 +90,7 @@
             </div>
         @endif
 
-        <div class="p-4 bg-gray-200 rounded-lg dark:bg-gray-700">
+        <div class="p-4 bg-gray-200 dark:bg-gray-700">
             <h1 class="mb-4 text-2xl">
                 {{ $email->subject }}
             </h1>
@@ -128,14 +133,14 @@
                 <div class="w-full mt-4">
                     @switch($this->mode)
                         @case('email')
-                        <div @class([
-                            'mx-auto transition-all duration-500 ease-in-out',
-                            'w-[375px] rounded-lg' => $this->size === 'mobile',
-                            'w-[768px] rounded-lg' => $this->size === 'tablet',
-                            'w-full' => $this->size === 'desktop',
+                            <div @class([
+                                'mx-auto transition-all duration-500 ease-in-out',
+                                'w-[375px] rounded-lg' => $this->size === 'mobile',
+                                'w-[768px] rounded-lg' => $this->size === 'tablet',
+                                'w-full' => $this->size === 'desktop',
                             ])>
-                            <iframe srcdoc="{{ $email->body_html }}" style="width: 100%; height: 600px;"></iframe>
-                        </div>
+                                <iframe srcdoc="{{ $email->body_html }}" style="width: 100%; height: 600px;"></iframe>
+                            </div>
                         @break
 
                         @case('source')
@@ -153,27 +158,17 @@
         </div>
 
         @if (!$this->showOnly)
-            <div class="flex flex-col ">
-                <x-mailweb::button class="my-4" type="button" wire:click="toggleShare">
-                    @if ($email->share_enabled)
-                        Disable Sharing
-                    @else
-                        <div class="flex justify-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25"
-                                stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-share">
-                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
-                                <polyline points="16 6 12 2 8 6" />
-                                <line x1="12" x2="12" y1="2" y2="15" />
-                            </svg>
-                            <span>Enable Sharing</span>
-                        </div>
-                    @endif
-                </x-mailweb::button>
+            <div class="flex flex-col gap-4 mt-4">
+                <div class="ms-auto">
+                    <x-mailweb::button class="w-52" type="button" wire:click="toggleShare">
+                        <span>{{ $email->share_enabled ? 'Disable' : 'Enable' }} Sharing</span>
+                    </x-mailweb::button>
+                </div>
 
                 @if ($email->share_enabled)
                     <x-mailweb::forms.input-label value="Share Link" />
-                    <x-mailweb::forms.input id="shareLink" value="{{ route('mailweb.show', $email->id) }}" disabled />
+                    <x-mailweb::forms.input id="shareLink" value="{{ route('mailweb.show', $email->id) }}"
+                        disabled />
                 @endif
             </div>
         @endif
