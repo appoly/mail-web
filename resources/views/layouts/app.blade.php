@@ -25,7 +25,7 @@
             </h1>
             <div class="justify-end">
                 <div class="flex gap-4">
-                    <a href="{{ config('MailWeb.APP_URL') }}"
+                    <a href="{{ config('MailWeb.APP_URL') ?? config('app.url') }}"
                         class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none rounded-lg text-sm p-2.5">
                         <div class="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
@@ -34,7 +34,7 @@
                                 <path d="m12 19-7-7 7-7" />
                                 <path d="M19 12H5" />
                             </svg>
-                            Return to {{ config('MailWeb.APP_NAME') }}
+                            Return to {{ config('MailWeb.APP_NAME') ?? config('app.name') }}
                         </div>
                     </a>
                     <button x-on:click="darkMode = !darkMode" type="button"
