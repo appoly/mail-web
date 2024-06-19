@@ -52,7 +52,7 @@
                                         {{ $email->snippet }}
                                     </p>
                                     <div class="flex content-end gap-4">
-                                        <p class="ml-auto text-xs text-gray-700 dark:text-gray-300" title="{{ $email->created_at }}>
+                                        <p class="ml-auto text-xs text-gray-700 dark:text-gray-300" title="{{ $email->created_at }}">
                                             {{ $email->created_at->diffForHumans() }}
                                         </p>
                                     </div>
