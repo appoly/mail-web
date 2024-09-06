@@ -28,10 +28,6 @@ class MailWebServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        if (! config('MailWeb.MAILWEB_ENABLED')) {
-            return;
-        }
-
         $this->registerMigrations();
         $this->loadViewsFrom(__DIR__ . '/../resources/views', 'mailweb');
         $this->registerRoutesMacro();
