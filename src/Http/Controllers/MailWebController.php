@@ -2,8 +2,10 @@
 
 namespace Appoly\MailWeb\Http\Controllers;
 
+use Appoly\MailWeb\Http\Models\MailwebEmailAttachment;
 use Illuminate\Support\Facades\Gate;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
+use Illuminate\Support\Facades\Storage;
 
 class MailWebController
 {

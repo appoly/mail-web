@@ -110,6 +110,32 @@ If you previously used MailWeb you will notice a new archived table. This is bec
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+### Setup
+
+There are multiple ways to set up a local composer project, one of which is as follows:
+
+1. Clone this repository
+2. Run `composer install`
+3. Note the path to the directory
+4. Go to another php/Laravel project and add the following items to your composer.json:
+```php
+"repositories": [
+    {
+        "type": "path",
+        "url": "../path/to/MailWeb",
+        "options": {
+            "symlink": true
+        }
+    }
+],
+```
+5. Change the require section with `@dev` for the package:
+```php
+"require": {
+    "appoly/mail-web": "@dev"
+```
+6. Run `composer update` in this project, and it should now be linked to the dev version of MailWeb
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)

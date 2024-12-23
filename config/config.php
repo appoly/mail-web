@@ -17,4 +17,8 @@ return [
         'APP_NAME' => env('MAILWEB_RETURN_APP_NAME'),
         'APP_URL' => env('MAILWEB_RETURN_APP_URL'),
     ],
+    'MAILWEB_ATTACHMENTS' => [
+        'DISK' => env('MAILWEB_ATTACHMENTS_DISK'),
+        'PATH' => env('MAILWEB_ATTACHMENTS_PATH', 'mailweb/attachments'),
+    ],
 ];
