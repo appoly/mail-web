@@ -92,10 +92,39 @@ class MailWebListener
 
     private function prune(): void
     {
-        if ((int) config('mailweb.limit') === 0) {
+        $limit = (int) config('mailweb.limit'); // Should this be MailWeb.MAILWEB_LIMIT - go through this in separate ticket
+        // $limit = (int) config('MailWeb.MAILWEB_LIMIT');
+
+        if ($limit === 0) {
+            // keep all - so do not prune
             return;
         }
 
-        MailwebEmail::oldest()->limit((int) config('mailweb.limit'))->delete();
+        $emailIdsToDeleteKeyedById = MailwebEmail::latest()
+            ->withCount(['attachments as hasFileAttachments' => fn($q) => $q->whereNotNull('path')])
+            ->limit(5_000) // We need a limit to use offset, and to avoid memory issues. 1k is... probably enough, as this can just run more often if not?
+            ->offset($limit) // We keep only the amount specified, so offset by that number
+            ->pluck('hasFileAttachments', 'id') // Key of email ID, val of count of attachments
+            ->toArray();
+
+        $emailIdsWithAttachments = array_keys(array_filter($emailIdsToDeleteKeyedById, fn($count) => $count > 0));
+
+        // Attachment cleanup needs to be done slowly
+        if (count($emailIdsToDeleteKeyedById) > 0) {
+            dispatch(function () use ($emailIdsWithAttachments) {
+                // Chunk into batches of 100 for deletion
+                $storageDisk = config('MailWeb.MAILWEB_ATTACHMENTS.DISK');
+                if ($storageDisk) {
+                    $basePath = config('MailWeb.MAILWEB_ATTACHMENTS.PATH');
+
+                    foreach ($emailIdsWithAttachments as $emailId) {
+                        Storage::disk($storageDisk)->deleteDirectory($basePath . '/' . $emailId);
+                    }
+                }
+            });
+        }
+
+        MailwebEmail::whereIn('id', array_keys($emailIdsToDeleteKeyedById))->delete();
+
     }
 }
