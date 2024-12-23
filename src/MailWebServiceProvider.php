@@ -57,6 +57,9 @@ class MailWebServiceProvider extends ServiceProvider
         $router->macro('mailweb', function () use ($router) {
             $router->get('/mailweb', '\Appoly\MailWeb\Http\Controllers\MailWebController@index')->name('mailweb.index');
             $router->get('/mailweb/{mailwebEmail}', '\Appoly\MailWeb\Http\Controllers\MailWebController@show')->name('mailweb.show');
+            $router->get('/mailweb/{mailwebEmail}/{attachment}', '\Appoly\MailWeb\Http\Controllers\MailWebController@getAttachment')
+                ->scopeBindings() // Ensure the attachment belongs to the email
+                ->name('mailweb.get-attachment');
         });
     }
 
