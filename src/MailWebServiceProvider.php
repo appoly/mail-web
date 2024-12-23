@@ -9,6 +9,7 @@ use Appoly\MailWeb\Livewire\EmailView;
 use Illuminate\Support\ServiceProvider;
 use Appoly\MailWeb\Livewire\EmailListView;
 use Appoly\MailWeb\Livewire\SampleEmailAlert;
+use Appoly\MailWeb\Livewire\DownloadAttachment;
 use Appoly\MailWeb\View\Components\Forms\Input;
 use Appoly\MailWeb\Providers\MessageServiceProvider;
 
@@ -57,9 +58,6 @@ class MailWebServiceProvider extends ServiceProvider
         $router->macro('mailweb', function () use ($router) {
             $router->get('/mailweb', '\Appoly\MailWeb\Http\Controllers\MailWebController@index')->name('mailweb.index');
             $router->get('/mailweb/{mailwebEmail}', '\Appoly\MailWeb\Http\Controllers\MailWebController@show')->name('mailweb.show');
-            $router->get('/mailweb/{mailwebEmail}/{attachment}', '\Appoly\MailWeb\Http\Controllers\MailWebController@getAttachment')
-                ->scopeBindings() // Ensure the attachment belongs to the email
-                ->name('mailweb.get-attachment');
         });
     }
 
@@ -73,6 +71,7 @@ class MailWebServiceProvider extends ServiceProvider
     {
         Livewire::component('mailweb::email-list-view', EmailListView::class);
         Livewire::component('mailweb::email-view', EmailView::class);
+        Livewire::component('mailweb::download-attachment', DownloadAttachment::class);
         Livewire::component('mailweb::sample-email-alert', SampleEmailAlert::class);
     }
 

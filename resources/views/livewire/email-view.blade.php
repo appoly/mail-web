@@ -125,13 +125,7 @@
                     <div class="flex gap-4 ">
                         @foreach ($email->attachments as $attachment)
                             @if ($attachment->path)
-                                <x-mailweb::button type="button">
-                                    <a target="_blank" rel="noopener noreferrer"
-                                        href="{{ route('mailweb.get-attachment', [$email->id, $attachment->id]) }}"
-                                        class="text-sm text-blue-500">
-                                        {{ $attachment->name }}
-                                    </a>
-                                </x-mailweb::button>
+                                <livewire:mailweb::download-attachment :attachment="$attachment" :email="$email" :emailId="$email->id" :attachmentId="$attachment->id" />
                             @else
                                 <div
                                     class="flex items-center justify-center w-24 h-10 bg-gray-200 rounded-lg dark:bg-gray-800">
