@@ -2,6 +2,7 @@
 
 namespace Appoly\MailWeb;
 
+use Appoly\MailWeb\Console\Commands\PruneMailwebMails;
 use Livewire\Livewire;
 use Appoly\MailWeb\Facades\MailWeb;
 use Illuminate\Support\Facades\Blade;
@@ -20,6 +21,10 @@ class MailWebServiceProvider extends ServiceProvider
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'MailWeb');
         $this->app->register(MessageServiceProvider::class);
+
+        $this->commands([
+            PruneMailwebMails::class,
+        ]);
 
         // Register the main class to use with the facade
         $this->app->singleton('MailWeb', function () {
