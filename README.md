@@ -10,16 +10,17 @@
 </p>
 
 <p align="center">
-    <img width="1080" height="auto" src="https://www.appoly.co.uk/app/uploads/2024/03/Screenshot-2024-03-01-at-16.38.06.png">
+    <!-- TODO: Get a working image/gif for this section -->
+    <!-- <img width="1080" height="auto" src="https://www.appoly.co.uk/app/uploads/2024/03/Screenshot-2024-03-01-at-16.38.06.png"> -->
 </p>
 
 ## Features
+
 - Outgoing Email Capture: Intercept outgoing emails from your Laravel application seamlessly.
 - Tailwind UI: Enjoy a sleek and responsive user interface crafted with Tailwind CSS.
 - Email Viewing: Easily view captured emails within the Mail Web dashboard.
 - Shareable Links: Generate shareable links for email previews, facilitating collaboration and debugging.
 - Search Functionality: Quickly search through your emails to find the information you need.
-
 
 ## Installation
 
@@ -30,6 +31,8 @@ composer require appoly/mail-web
 ```
 
 ## Usage
+
+### Setup
 
 Run the migration
 
@@ -50,6 +53,7 @@ php artisan vendor:publish --tag=mailweb-config --force
 ```
 
 For ease, you can publish the assets by adding the following to your composer.json
+
 ```json
 "post-update-cmd": [
     "@php artisan vendor:publish --tag=mailweb-public --force"
@@ -103,7 +107,44 @@ To view emails then go to
 {url}\mailweb
 ```
 
+### Limiting the number of stored emails
+
+The number of emails stored is handled via a command that must be setup to run. You can choose how often this needs to run according to how many emails you receive. Below, we have showed it being set up to run daily.
+
+The remaining number is customisable via the `MAILWEB_LIMIT` config variable, which you can specify in your `.env`, or the default of 30 will be used.
+
+The recommended place to schedule commands is in `routes/console.php`:
+
+```php
+// routes/console.php
+use Illuminate\Support\Facades\Schedule;
+
+// ... Your other commands here
+Schedule::command('mailweb:prune')->daily();
+```
+
+Or on older laravel versions which have been upgraded manually, you may still be using `app/Console/Kernel.php`:
+
+```php
+    protected function schedule(Schedule $schedule)
+    {
+        // ... Your other commands here
+        $schedule->command('mailweb:prune')->dailyAt('01:00');
+    }
+```
+
+### Storing Attachments on a disk (eg. s3)
+
+To store attachments on a disk, the config variable `MAILWEB_ATTACHMENTS.DISK` must be set to the disk name, which should exist in your app's `config/filesystems.php` file. This is set via a `.env` variable `MAILWEB_ATTACHMENTS_DISK`.
+
+Eg. If you have a disk called `s3` setup, then adding `MAILWEB_ATTACHMENTS_DISK=s3` to your `.env` file will store attachments on the `s3` disk.
+
+The default path is `/mailweb/attachments/...`, and this can be customised but updating the `MAILWEB_ATTACHMENTS_PATH` env variable to whatever you wish.
+
+When mails are deleted, the attachments will be deleted as well if the disk and path have remained unchanged from when the attachment was created.
+
 ## Migrating to v5
+
 If you previously used MailWeb you will notice a new archived table. This is because we have changed to data structure making it easier to pull out the email data we need rather than storing the whole email object. We are working on a command to migrate any stored emails over but for the time being these emails will no longer be viewable.
 
 ## Contributing
@@ -118,6 +159,7 @@ There are multiple ways to set up a local composer project, one of which is as f
 2. Run `composer install`
 3. Note the path to the directory
 4. Go to another php/Laravel project and add the following items to your composer.json:
+
 ```php
 "repositories": [
     {
@@ -129,11 +171,14 @@ There are multiple ways to set up a local composer project, one of which is as f
     }
 ],
 ```
+
 5. Change the require section with `@dev` for the package:
+
 ```php
 "require": {
     "appoly/mail-web": "@dev"
 ```
+
 6. Run `composer update` in this project, and it should now be linked to the dev version of MailWeb
 
 ## License
