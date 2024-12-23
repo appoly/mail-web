@@ -13,6 +13,8 @@ class DownloadAttachment extends Component
     public MailwebEmail $email;
     public ?string $errorMessage = null;
 
+    public bool $isDownloading = false;
+
     // Initialize with the attachment ID and email ID
     public function mount($email, $attachment)
     {
@@ -28,8 +30,10 @@ class DownloadAttachment extends Component
     // Handle the download request
     public function download()
     {
+        $this->isDownloading = true;
         if ($this->attachment->mailweb_email_id !== $this->email->id) {
             $this->errorMessage = "Attachment does not belong to this email.";
+            $this->isDownloading = false;
             return;
         }
         $this->errorMessage = "";
@@ -59,6 +63,8 @@ class DownloadAttachment extends Component
             // Catch errors like attachment not found, etc.
             report($e);
             $this->errorMessage = "An error occurred while trying to download the attachment. Please check logs for more info.";
+        } finally {
+            $this->isDownloading = false;
         }
     }
 }
