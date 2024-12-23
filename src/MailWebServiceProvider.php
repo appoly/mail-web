@@ -2,6 +2,7 @@
 
 namespace Appoly\MailWeb;
 
+use Appoly\MailWeb\Console\Commands\PruneMailwebMails;
 use Livewire\Livewire;
 use Appoly\MailWeb\Facades\MailWeb;
 use Illuminate\Support\Facades\Blade;
@@ -9,6 +10,7 @@ use Appoly\MailWeb\Livewire\EmailView;
 use Illuminate\Support\ServiceProvider;
 use Appoly\MailWeb\Livewire\EmailListView;
 use Appoly\MailWeb\Livewire\SampleEmailAlert;
+use Appoly\MailWeb\Livewire\DownloadAttachment;
 use Appoly\MailWeb\View\Components\Forms\Input;
 use Appoly\MailWeb\Providers\MessageServiceProvider;
 
@@ -19,6 +21,10 @@ class MailWebServiceProvider extends ServiceProvider
         // Automatically apply the package configuration
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'MailWeb');
         $this->app->register(MessageServiceProvider::class);
+
+        $this->commands([
+            PruneMailwebMails::class,
+        ]);
 
         // Register the main class to use with the facade
         $this->app->singleton('MailWeb', function () {
@@ -70,6 +76,7 @@ class MailWebServiceProvider extends ServiceProvider
     {
         Livewire::component('mailweb::email-list-view', EmailListView::class);
         Livewire::component('mailweb::email-view', EmailView::class);
+        Livewire::component('mailweb::download-attachment', DownloadAttachment::class);
         Livewire::component('mailweb::sample-email-alert', SampleEmailAlert::class);
     }
 

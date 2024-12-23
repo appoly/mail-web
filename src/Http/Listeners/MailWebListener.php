@@ -5,6 +5,7 @@ namespace Appoly\MailWeb\Http\Listeners;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Mail\Events\MessageSending;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
+use Illuminate\Support\Facades\Storage;
 
 class MailWebListener
 {
@@ -23,7 +24,7 @@ class MailWebListener
      */
     public function handle(MessageSending $event): void
     {
-        if (! config('MailWeb.MAILWEB_ENABLED')) {
+        if (!config('MailWeb.MAILWEB_ENABLED')) {
             return;
         }
 
@@ -40,15 +41,41 @@ class MailWebListener
         ]);
 
         foreach ($event->message->getAttachments() as $attachment) {
-            $mailwebEmail->attachments()->create([
-                'name' => $attachment->getFilename(),
-                'path' => null,
-            ]);
+            if ($attachment instanceof \Symfony\Component\Mime\Part\DataPart) {
+                // Extract attachment details
+                $fileName = $attachment->getFilename();
+                $fileContent = $attachment->getBody();
+                $mimeType = $attachment->getMediaType() . '/' . $attachment->getMediaSubtype();
+
+                // Store the original name regardless of whether we end up backing up the file
+                $attachment = $mailwebEmail->attachments()->create([
+                    'name' => $fileName,
+                    'path' => null,
+                ]);
+
+                try {
+                    $storageDisk = config('MailWeb.MAILWEB_ATTACHMENTS.DISK');
+                    // If the config is enabled, we store the file
+                    if ($storageDisk) {
+                        $path = config('MailWeb.MAILWEB_ATTACHMENTS.PATH') . '/' . $attachment->mailweb_email_id . '/' . $attachment->id;
+                        Storage::disk($storageDisk)->put(
+                            path: $path,
+                            contents: $fileContent,
+                            options: ['ContentType' => $mimeType]
+                        );
+
+                        $attachment->update([
+                            'path' => $path,
+                        ]);
+                    }
+                } catch (\Throwable $e) {
+                    // We don't want to fail the entire process, so just log the error and move on
+                    report($e);
+                    return;
+                }
+
+            }
         }
-
-        // });
-
-        $this->prune();
     }
 
     private function getAddresses(array $addresses): array
@@ -59,14 +86,5 @@ class MailWebListener
                 'name' => $address->getName(),
             ];
         })->toArray();
-    }
-
-    private function prune(): void
-    {
-        if ((int) config('mailweb.limit') === 0) {
-            return;
-        }
-
-        MailwebEmail::oldest()->limit((int) config('mailweb.limit'))->delete();
     }
 }

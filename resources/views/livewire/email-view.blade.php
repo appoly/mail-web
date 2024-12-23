@@ -5,7 +5,9 @@
         @if (!$this->showOnly)
             <div class="flex justify-between gap-4 rounded-t-lg">
                 <div class="flex gap-4">
-                    <x-mailweb::toolbar-button wire:click="toggleEmailView" @class(['border-b-2 border-b-appoly-red/50' => $this->mode === 'email'])>
+                    <x-mailweb::toolbar-button wire:click="toggleEmailView" @class([
+                        'border-b-2 border-b-appoly-red/50' => $this->mode === 'email',
+                    ])>
                         <div class="flex gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
@@ -15,7 +17,9 @@
                             </svg> <span>Email</span>
                         </div>
                     </x-mailweb::toolbar-button>
-                    <x-mailweb::toolbar-button wire:click="toggleSource" @class(['border-b-2 border-b-appoly-red/50' => $this->mode === 'source'])>
+                    <x-mailweb::toolbar-button wire:click="toggleSource" @class([
+                        'border-b-2 border-b-appoly-red/50' => $this->mode === 'source',
+                    ])>
                         <div class="flex gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
@@ -27,7 +31,9 @@
                             <span>Source</span>
                         </div>
                     </x-mailweb::toolbar-button>
-                    <x-mailweb::toolbar-button wire:click="toggleText" @class(['border-b-2 border-b-appoly-red/50' => $this->mode === 'text'])>
+                    <x-mailweb::toolbar-button wire:click="toggleText" @class([
+                        'border-b-2 border-b-appoly-red/50' => $this->mode === 'text',
+                    ])>
                         <div class="flex gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"
@@ -118,12 +124,16 @@
                     <span class="mb-2 text-sm font-bold text-gray-700 dark:text-gray-300">Attachments:</span>
                     <div class="flex gap-4 ">
                         @foreach ($email->attachments as $attachment)
-                            <div
-                                class="flex items-center justify-center w-24 h-10 bg-gray-200 rounded-lg dark:bg-gray-800">
-                                <span class="text-sm text-gray-500 dark:text-gray-300">
-                                    {{ $attachment->name }}
-                                </span>
-                            </div>
+                            @if ($attachment->path)
+                                <livewire:mailweb::download-attachment :attachment="$attachment" :email="$email" :emailId="$email->id" :attachmentId="$attachment->id" />
+                            @else
+                                <div
+                                    class="flex items-center justify-center w-24 h-10 bg-gray-200 rounded-lg dark:bg-gray-800">
+                                    <span class="text-sm text-gray-500 dark:text-gray-300">
+                                        {{ $attachment->name }}
+                                    </span>
+                                </div>
+                            @endif
                         @endforeach
                     </div>
                 </div>
