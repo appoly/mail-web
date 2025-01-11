@@ -14,13 +14,24 @@
     <!-- <img width="1080" height="auto" src="https://www.appoly.co.uk/app/uploads/2024/03/Screenshot-2024-03-01-at-16.38.06.png"> -->
 </p>
 
+## Table of Contents
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Setup](#setup)
+  - [Limiting the number of stored emails](#limiting-the-number-of-stored-emails)
+  - [Storing Attachments on a Disk](#storing-attachments-on-a-disk)
+- [Migrating to v5](#migrating-to-v5)
+- [Contributing](#contributing)
+- [License](#license)
+
+
 ## Features
 
-- Outgoing Email Capture: Intercept outgoing emails from your Laravel application seamlessly.
-- Tailwind UI: Enjoy a sleek and responsive user interface crafted with Tailwind CSS.
-- Email Viewing: Easily view captured emails within the Mail Web dashboard.
-- Shareable Links: Generate shareable links for email previews, facilitating collaboration and debugging.
-- Search Functionality: Quickly search through your emails to find the information you need.
+- **Intercept Outgoing Emails:** Catch and view your application's emails in real-time for faster debugging.
+- **Tailwind-Powered UI:** Navigate with ease using a responsive, modern interface.
+- **Shareable Email Previews:** Collaborate with your team effortlessly by sharing email previews.
+- **Advanced Search:** Quickly locate emails with robust search functionality.
 
 ## Installation
 
@@ -94,6 +105,9 @@ Gate::define("view-mailweb", function ($user = null) {
     return true;
 });
 ```
+
+### Laravel 11 Notes
+In Laravel 11, the `AuthServiceProvider` is not included in new projects by default. Gates can be defined in the `AppServiceProvider` instead. 
 
 In your local environment, it's advised to set your mail driver to LOG to prevent SMTP errors.
 
