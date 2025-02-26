@@ -1,200 +1,161 @@
-<h1 align="center"> MailWeb</h1>
+<div align="center">
 
-<p align="center">
-    MailWeb is a Laravel package designed to help developers with emails. With MailWeb you can effortlessly catch and view your application's outgoing emails. This allows developers to quickly see, debug and share emails.
-</p>
-<p align="center">
-    <a href="https://packagist.org/packages/appoly/mail-web"><img src="https://poser.pugx.org/appoly/mail-web/downloads?format=flat-square" alt="Total Downloads"></a>
-    <a href="https://packagist.org/packages/appoly/mail-web"><img src="https://poser.pugx.org/appoly/mail-web/v/stable?format=flat-square" alt="Latest Stable Version"></a>
-    <a href="https://packagist.org/packages/appoly/mail-web"><img src="https://poser.pugx.org/appoly/mail-web/license?format=flat-square" alt="License"></a>
-</p>
+# MailWeb
 
-<p align="center">
-    <!-- TODO: Get a working image/gif for this section -->
-    <!-- <img width="1080" height="auto" src="https://www.appoly.co.uk/app/uploads/2024/03/Screenshot-2024-03-01-at-16.38.06.png"> -->
-</p>
+**A powerful Laravel email debugging and testing tool**
 
-## Table of Contents
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-  - [Setup](#setup)
-  - [Limiting the number of stored emails](#limiting-the-number-of-stored-emails)
-  - [Storing Attachments on a Disk](#storing-attachments-on-a-disk)
-- [Migrating to v5](#migrating-to-v5)
-- [Contributing](#contributing)
-- [License](#license)
+[![Total Downloads](https://poser.pugx.org/appoly/mail-web/downloads?format=flat-square)](https://packagist.org/packages/appoly/mail-web)
+[![Latest Stable Version](https://poser.pugx.org/appoly/mail-web/v/stable?format=flat-square)](https://packagist.org/packages/appoly/mail-web)
+[![License](https://poser.pugx.org/appoly/mail-web/license?format=flat-square)](https://packagist.org/packages/appoly/mail-web)
 
+</div>
 
-## Features
+## 🚀 Overview
 
-- **Intercept Outgoing Emails:** Catch and view your application's emails in real-time for faster debugging.
-- **Tailwind-Powered UI:** Navigate with ease using a responsive, modern interface.
-- **Shareable Email Previews:** Collaborate with your team effortlessly by sharing email previews.
-- **Advanced Search:** Quickly locate emails with robust search functionality.
+MailWeb is a robust Laravel package that revolutionizes email development and debugging. It seamlessly captures and displays your application's outgoing emails in real-time, making email testing and sharing effortless.
 
-## Installation
+## ✨ Features
 
-Use the package manager [composer](https://getcomposer.org/) to install Mail Web.
+- 📧 **Real-time Email Interception**: Catch and inspect outgoing emails instantly
+- 🎨 **Modern Tailwind UI**: Beautiful, responsive interface for easy navigation
+- 🔍 **Powerful Search**: Quickly find emails with advanced search capabilities
+- 🔄 **Email Sharing**: Share email previews with your team effortlessly
+- 📎 **Attachment Support**: Handle email attachments with flexible storage options
+- 🛡️ **Secure Access Control**: Granular control over who can access the dashboard
 
+## 📋 Requirements
+
+- PHP 8.1 or higher
+- Laravel 9.21|10.0|11.0|12.0
+- Livewire 3.2 or higher
+
+## 🔧 Installation
+
+1. Install via Composer:
 ```bash
 composer require appoly/mail-web
 ```
 
-## Usage
-
-### Setup
-
-Run the migration
-
+2. Run migrations:
 ```bash
 php artisan migrate
 ```
 
-Publish the assets to your project using
-
+3. Publish assets and config:
 ```bash
 php artisan vendor:publish --tag=mailweb-public --force
-```
-
-Publish the config to your project using
-
-```bash
 php artisan vendor:publish --tag=mailweb-config --force
 ```
 
-For ease, you can publish the assets by adding the following to your composer.json
+## ⚙️ Configuration
 
-```json
-"post-update-cmd": [
-    "@php artisan vendor:publish --tag=mailweb-public --force"
-]
-```
+### 1. Route Registration
 
-Register the routes using the mailweb macro
-
+Add to your routes file:
 ```php
 Route::mailweb();
 ```
 
-To use Mail Web you need to add a Gate to your AuthServiceProvider. If you would like to limit the users that can access the route then use
+### 2. Access Control
+
+Add to your `AppServiceProvider` (Laravel 11+) or `AuthServiceProvider`:
 
 ```php
+use Illuminate\Support\Facades\Gate;
+
 public function boot()
 {
-  Gate::define("view-mailweb", function ($user) {
-      return in_array($user->email, [
-          'user@appoly.co.uk',
-      ]);
-  });
+    Gate::define('view-mailweb', function ($user) {
+        return in_array($user->email, [
+            'admin@example.com',
+            // Add authorized emails
+        ]);
+    });
 }
 ```
 
-Should you want to allow access to all users then change the above code to
+### 3. Local Development
 
-```php
-Gate::define("view-mailweb", function ($user) {
-    return true;
-});
-```
-
-Although it can be dangerous, should you want to allow access to anyone (regardless of authentication) then change the above code to
-
-```php
-Gate::define("view-mailweb", function ($user = null) {
-    return true;
-});
-```
-
-### Laravel 11 Notes
-In Laravel 11, the `AuthServiceProvider` is not included in new projects by default. Gates can be defined in the `AppServiceProvider` instead. 
-
-In your local environment, it's advised to set your mail driver to LOG to prevent SMTP errors.
-
-```
+For local development, set in your `.env`:
+```env
 MAIL_MAILER=log
 ```
 
-To view emails then go to
+## 📝 Usage
 
+1. Access the dashboard at:
 ```
-{url}\mailweb
+{your-app-url}/mailweb
 ```
 
-### Limiting the number of stored emails
+2. Configure email storage limit in `.env`:
+```env
+MAILWEB_LIMIT=30  # Default value
+```
 
-The number of emails stored is handled via a command that must be setup to run. You can choose how often this needs to run according to how many emails you receive. Below, we have showed it being set up to run daily.
-
-The remaining number is customisable via the `MAILWEB_LIMIT` config variable, which you can specify in your `.env`, or the default of 30 will be used.
-
-The recommended place to schedule commands is in `routes/console.php`:
-
+3. Set up email pruning (recommended in `routes/console.php`):
 ```php
-// routes/console.php
 use Illuminate\Support\Facades\Schedule;
 
-// ... Your other commands here
 Schedule::command('mailweb:prune')->daily();
 ```
 
-Or on older laravel versions which have been upgraded manually, you may still be using `app/Console/Kernel.php`:
+## 💾 Attachment Storage
 
-```php
-    protected function schedule(Schedule $schedule)
-    {
-        // ... Your other commands here
-        $schedule->command('mailweb:prune')->dailyAt('01:00');
-    }
+Configure attachment storage in your `.env`:
+```env
+MAILWEB_ATTACHMENTS_DISK=s3  # Or any configured disk
+MAILWEB_ATTACHMENTS_PATH=/custom/path  # Optional, defaults to /mailweb/attachments
 ```
 
-### Storing Attachments on a disk (eg. s3)
+## 🔄 Version Migration
 
-To store attachments on a disk, the config variable `MAILWEB_ATTACHMENTS.DISK` must be set to the disk name, which should exist in your app's `config/filesystems.php` file. This is set via a `.env` variable `MAILWEB_ATTACHMENTS_DISK`.
+### Upgrading to v5
 
-Eg. If you have a disk called `s3` setup, then adding `MAILWEB_ATTACHMENTS_DISK=s3` to your `.env` file will store attachments on the `s3` disk.
+Version 5 introduces a new data structure with an archived table for better email data management. A migration tool for existing emails is in development.
 
-The default path is `/mailweb/attachments/...`, and this can be customised but updating the `MAILWEB_ATTACHMENTS_PATH` env variable to whatever you wish.
+## 🤝 Contributing
 
-When mails are deleted, the attachments will be deleted as well if the disk and path have remained unchanged from when the attachment was created.
+We welcome contributions! Please follow these steps:
 
-## Migrating to v5
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Open a Pull Request
 
-If you previously used MailWeb you will notice a new archived table. This is because we have changed to data structure making it easier to pull out the email data we need rather than storing the whole email object. We are working on a command to migrate any stored emails over but for the time being these emails will no longer be viewable.
+### Local Development Setup
 
-## Contributing
+1. Clone the repository
+2. Install dependencies:
+```bash
+composer install
+```
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-### Setup
-
-There are multiple ways to set up a local composer project, one of which is as follows:
-
-1. Clone this repository
-2. Run `composer install`
-3. Note the path to the directory
-4. Go to another php/Laravel project and add the following items to your composer.json:
-
-```php
-"repositories": [
-    {
-        "type": "path",
-        "url": "../path/to/MailWeb",
-        "options": {
-            "symlink": true
+3. Link to your test project - add to your test project's `composer.json`:
+```json
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../path/to/MailWeb",
+            "options": {
+                "symlink": true
+            }
         }
+    ],
+    "require": {
+        "appoly/mail-web": "@dev"
     }
-],
+}
 ```
 
-5. Change the require section with `@dev` for the package:
+## 📄 License
 
-```php
-"require": {
-    "appoly/mail-web": "@dev"
-```
+This project is licensed under the [MIT License](https://choosealicense.com/licenses/mit/).
 
-6. Run `composer update` in this project, and it should now be linked to the dev version of MailWeb
+---
 
-## License
-
-[MIT](https://choosealicense.com/licenses/mit/)
+<div align="center">
+Made with ❤️ by <a href="https://appoly.co.uk">Appoly</a>
+</div>
