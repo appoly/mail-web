@@ -1,4 +1,37 @@
-<!-- EmailList.vue -->
+<script setup lang="ts">
+import { CheckCircle2, AlertCircle, Clock } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Email } from '@/types/email'
+
+defineProps<{
+    emails: Array<Email>,
+    selectedEmail: Email | null,
+    isLoading: boolean,
+    error: Error | null,
+    isMobile: boolean
+}>()
+
+defineEmits(['update:selectedEmail'])
+
+const getStatusIcon = (status: string): { icon: any; class: string } | null => {
+    switch (status) {
+        case 'sent':
+            return { icon: CheckCircle2, class: 'h-4 w-4 text-green-500' }
+        case 'failed':
+            return { icon: AlertCircle, class: 'h-4 w-4 text-destructive' }
+        case 'queued':
+            return { icon: Clock, class: 'h-4 w-4 text-amber-500' }
+        default:
+            return null
+    }
+}
+
+const formatDate = (date) => {
+    return new Date(date).toLocaleDateString()
+}
+</script>
+
 <template>
     <div :class="['w-full flex flex-col h-full', { 'lg:w-80': !isMobile }]">
         <div v-if="error" class="w-full lg:w-80 p-4 flex flex-col h-full">
@@ -32,7 +65,7 @@
                         <div class="flex flex-col w-full gap-1">
                             <div class="flex items-center justify-between w-full">
                                 <span class="font-medium truncate">{{ email.subject }}</span>
-                                <component :is="getStatusIcon(email.status)" />
+                                <component :is="getStatusIcon(email.status)?.icon" :class="getStatusIcon(email.status)?.class" />
                             </div>
                             <div class="flex items-center justify-between w-full text-xs text-muted-foreground">
                                 <span class="truncate">{{ email.from }}</span>
@@ -50,45 +83,3 @@
         </template>
     </div>
 </template>
-
-<script setup>
-import { CheckCircle2, AlertCircle, Clock } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
-
-defineProps({
-    emails: {
-        type: Array,
-        required: true
-    },
-    selectedEmail: {
-        type: [Object, null],
-        default: null
-    },
-    isLoading: Boolean,
-    error: {
-        type: [Error, null],
-        default: null
-    },
-    isMobile: Boolean
-})
-
-defineEmits(['update:selectedEmail'])
-
-const getStatusIcon = (status) => {
-    switch (status) {
-        case 'sent':
-            return CheckCircle2({ class: 'h-4 w-4 text-green-500' })
-        case 'failed':
-            return AlertCircle({ class: 'h-4 w-4 text-destructive' })
-        case 'queued':
-            return Clock({ class: 'h-4 w-4 text-amber-500' })
-        default:
-            return null
-    }
-}
-
-const formatDate = (date) => {
-    return new Date(date).toLocaleDateString()
-}
-</script>

@@ -1,4 +1,23 @@
-<!-- Sidebar.vue -->
+<script setup lang="ts">
+import { Sheet, SheetContent } from '@/components/ui/sheet'
+import SidebarContent from './SidebarContent.vue'
+
+// defineProps({
+//     searchQuery: String,
+//     filters: Object,
+//     isOpen: Boolean,
+//     isMobile: Boolean
+// })
+defineProps<{
+    searchQuery: string
+    filters: Record<string, any>
+    isOpen: boolean
+    isMobile: boolean
+}>()
+
+defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen'])
+</script>
+
 <template>
     <div>
         <Sheet v-if="isMobile" :open="isOpen" @update:open="$emit('update:isOpen', $event)">
@@ -20,16 +39,3 @@
     </div>
 </template>
 
-<script setup>
-import { Sheet, SheetContent } from '@/components/ui/sheet'
-import SidebarContent from './SidebarContent.vue'
-
-defineProps({
-    searchQuery: String,
-    filters: Object,
-    isOpen: Boolean,
-    isMobile: Boolean
-})
-
-defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen'])
-</script>

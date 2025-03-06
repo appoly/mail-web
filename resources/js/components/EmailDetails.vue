@@ -1,3 +1,30 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { ChevronDown, ChevronUp, Paperclip } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import { Badge } from '@/components/ui/badge'
+import {
+    Accordion,
+    AccordionItem,
+    AccordionTrigger,
+    AccordionContent,
+} from '@/components/ui/accordion'
+import { EmailDetails as Email } from '@/types/email'
+
+defineProps<{
+    email: Email
+    isMobile: boolean
+}>()
+
+const isExpanded = ref(false)
+const activeAccordion = ref<string | undefined>(undefined)
+
+const formatDate = (date: string): string => {
+    return new Date(date).toLocaleDateString()
+}
+</script>
+
 <template>
     <div class="flex-1 overflow-auto">
         <!-- Header -->
@@ -113,42 +140,3 @@
     </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue'
-import { ChevronDown, ChevronUp, Paperclip } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
-import { Badge } from '@/components/ui/badge'
-import {
-    Accordion,
-    AccordionItem,
-    AccordionTrigger,
-    AccordionContent,
-} from '@/components/ui/accordion'
-
-interface Email {
-    id: string
-    subject: string
-    from: string
-    to: string
-    cc?: string
-    bcc?: string
-    date: string
-    status: string
-    headers?: string
-    attachments?: { filename: string; size: string }[]
-    events?: { type: string; description: string; timestamp: string }[]
-}
-
-defineProps<{
-    email: Email
-    isMobile: boolean
-}>()
-
-const isExpanded = ref(false)
-const activeAccordion = ref<string | undefined>(undefined)
-
-const formatDate = (date: string): string => {
-    return new Date(date).toLocaleDateString()
-}
-</script>

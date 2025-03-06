@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { Menu } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
@@ -7,9 +7,10 @@ import EmailList from '@/components/EmailList.vue';
 import EmailPreview from '@/components/EmailPreview.vue';
 import EmailDetails from '@/components/EmailDetails.vue';
 import SlidingPanel from '@/components/SlidingPanel.vue';
+import { Email } from '@/types/email';
 
 // Sample data for emails
-const emails = [
+const emails: Email[] = [
     {
         id: 1,
         subject: 'Welcome to MailWeb!',
@@ -78,46 +79,48 @@ const emails = [
 ];
 
 // Reactive state
-const selectedEmail = ref(emails[0]);
-const searchQuery = ref('');
-const sidebarOpen = ref(false);
-const isMobile = ref(false);
-const isLoading = ref(false);
-const error = ref('');
-const filters = ref({});
+const selectedEmail = ref<Email | null>(null);
+const searchQuery = ref<string>('');
+const sidebarOpen = ref<boolean>(false);
+const isMobile = ref<boolean>(false);
+const isLoading = ref<boolean>(false);
+const error = ref<string>('');
+const filters = ref<Record<string, any>>({});
 
 // Computed filtered emails
-const filteredEmails = computed(() =>
+const filteredEmails = computed<Email[]>(() =>
     emails.filter(email =>
         email.subject.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         email.from.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         email.to.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        email.preview.toLowerCase().includes(searchQuery.value.toLowerCase())
+        (email.preview?.toLowerCase().includes(searchQuery.value.toLowerCase()) ?? false)
     )
 );
 
 // Methods
-const handleShare = () => {
-    navigator.clipboard.writeText(`https://mailweb.example.com/share/${selectedEmail.value.id}`);
-    // toast({
-    //   title: "Share link copied!",
-    //   description: "Email preview link has been copied to clipboard",
-    // });
+const handleShare = (): void => {
+    if (selectedEmail.value) {
+        navigator.clipboard.writeText(`https://mailweb.example.com/share/${selectedEmail.value.id}`);
+        // toast({
+        //   title: "Share link copied!",
+        //   description: "Email preview link has been copied to clipboard",
+        // });
+    }
 };
 
-const handleDelete = () => {
+const handleDelete = (): void => {
     // toast({
     //   title: "Email deleted",
     //   description: "The email has been moved to trash",
     // });
 };
 
-const checkMobile = () => {
+const checkMobile = (): void => {
     isMobile.value = window.innerWidth < 1024;
 };
 
 // Lifecycle hooks
-onMounted(() => {
+onMounted((): void => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
 });

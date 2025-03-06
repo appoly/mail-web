@@ -1,4 +1,35 @@
-<!-- SidebarContent.vue -->
+<script setup lang="ts">
+import { ref } from 'vue'
+import { Search, Mail, Filter, RefreshCw, Settings, HelpCircle, X } from 'lucide-vue-next'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+
+// defineProps({
+//     searchQuery: String,
+//     filters: Object,
+//     isMobile: Boolean
+// })
+
+defineProps<{
+    searchQuery: string
+    filters: Record<string, any>
+    isMobile: boolean
+}>()
+
+defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar'])
+
+const isRefreshing = ref<boolean>(false)
+
+const handleRefresh = () : void => {
+    isRefreshing.value = true
+    setTimeout(() => {
+        isRefreshing.value = false
+    }, 1000)
+}
+</script>
+
 <template>
     <div class="flex flex-col h-full">
         <div class="p-4 border-b">
@@ -63,31 +94,6 @@
             </div>
         </div>
 
-        <nav class="p-2 flex-1 overflow-auto">
-            <div class="space-y-1">
-                <Button variant="ghost" class="w-full justify-start">
-                    <Inbox class="mr-2 h-4 w-4" />
-                    All Emails
-                </Button>
-                <Button variant="ghost" class="w-full justify-start">
-                    <Send class="mr-2 h-4 w-4" />
-                    Sent
-                </Button>
-                <Button variant="ghost" class="w-full justify-start">
-                    <CheckCircle2 class="mr-2 h-4 w-4" />
-                    Delivered
-                </Button>
-                <Button variant="ghost" class="w-full justify-start">
-                    <AlertCircle class="mr-2 h-4 w-4" />
-                    Failed
-                </Button>
-                <Button variant="ghost" class="w-full justify-start">
-                    <Calendar class="mr-2 h-4 w-4" />
-                    Scheduled
-                </Button>
-            </div>
-        </nav>
-
         <div class="p-4 border-t mt-auto">
             <TooltipProvider>
                 <div class="flex items-center justify-between">
@@ -125,28 +131,3 @@
     </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
-import { Search, Mail, Filter, RefreshCw, Settings, HelpCircle, Inbox, Send, AlertCircle, CheckCircle2, Calendar, X } from 'lucide-vue-next'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-
-defineProps({
-    searchQuery: String,
-    filters: Object,
-    isMobile: Boolean
-})
-
-defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar'])
-
-const isRefreshing = ref(false)
-
-const handleRefresh = () => {
-    isRefreshing.value = true
-    setTimeout(() => {
-        isRefreshing.value = false
-    }, 1000)
-}
-</script>

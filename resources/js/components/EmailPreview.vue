@@ -1,3 +1,80 @@
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { Eye, Code, Smartphone, Tablet, Monitor, Download, Copy, ExternalLink, Check } from 'lucide-vue-next'
+import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Separator } from '@/components/ui/separator'
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { EmailPreview as Email } from '@/types/email'
+
+const props = defineProps<{
+    email: Email
+    isMobile: boolean
+}>()
+
+const viewMode = ref<'html' | 'text' | 'raw'>('html')
+const previewWidth = ref<'mobile' | 'tablet' | 'desktop'>('desktop')
+const copied = ref(false)
+const iframeRef = ref<HTMLIFrameElement | null>(null)
+
+const getPreviewWidth = () => {
+    switch (previewWidth.value) {
+        case 'mobile':
+            return '375px'
+        case 'tablet':
+            return '768px'
+        case 'desktop':
+            return '100%'
+        default:
+            return '100%'
+    }
+}
+
+const previewStyle = computed(() => ({
+    width: props.isMobile ? '100%' : getPreviewWidth(),
+    maxWidth: '100%',
+    transition: 'width 0.3s ease-in-out'
+}))
+
+const handleCopyHtml = () => {
+    if (props.email.content) {
+        navigator.clipboard.writeText(props.email.content)
+        copied.value = true
+        setTimeout(() => (copied.value = false), 2000)
+    }
+}
+
+const handleDownload = () => {
+    const element = document.createElement('a')
+    const file = new Blob([viewMode.value === 'html' ? props.email.content : ''], { type: 'text/plain' })
+    element.href = URL.createObjectURL(file)
+    element.download = `email-${props.email.id}.${viewMode.value === 'html' ? 'html' : 'txt'}`
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
+}
+
+const updateIframe = () => {
+    // wait 2 seconds
+        // Using nextTick to ensure DOM is updated before accessing the iframe
+        nextTick(() => {
+            console.log('Iframe reference:', iframeRef.value)
+            if (iframeRef.value && viewMode.value === 'html') {
+                const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow?.document
+                if (iframeDoc) {
+                    iframeDoc.open()
+                    console.log('Email content:', props.email.content)
+                    iframeDoc.write(props.email.content)
+                    iframeDoc.close()
+                }
+            }
+        })
+}
+
+watch([() => props.email, viewMode], updateIframe, { immediate: true })
+onMounted(updateIframe)
+</script>
+
 <template>
     <div class="flex flex-col h-full overflow-hidden">
         <!-- Header -->
@@ -74,7 +151,7 @@
         </div>
 
         <!-- Tabs -->
-        <Tabs v-model:active="viewMode" class="flex-1 flex flex-col overflow-hidden">
+        <Tabs v-model:active="viewMode" class="">
             <div class="border-b px-2 sm:px-4">
                 <TabsList class="h-9">
                     <TabsTrigger value="html" class="text-xs sm:text-sm">
@@ -116,89 +193,3 @@
     </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
-import { Eye, Code, Smartphone, Tablet, Monitor, Download, Copy, ExternalLink, Check } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
-import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
-
-interface Email {
-    id: number | string
-    subject: string
-    from: string
-    to: string
-    date: string
-    read: boolean
-    attachments: any[]
-    content: string
-}
-
-const props = defineProps<{
-    email: Email
-    isMobile: boolean
-}>()
-
-const viewMode = ref<'html' | 'text' | 'raw'>('html')
-const previewWidth = ref<'mobile' | 'tablet' | 'desktop'>('desktop')
-const copied = ref(false)
-const iframeRef = ref<HTMLIFrameElement | null>(null)
-
-const getPreviewWidth = () => {
-    switch (previewWidth.value) {
-        case 'mobile':
-            return '375px'
-        case 'tablet':
-            return '768px'
-        case 'desktop':
-            return '100%'
-        default:
-            return '100%'
-    }
-}
-
-const previewStyle = computed(() => ({
-    width: props.isMobile ? '100%' : getPreviewWidth(),
-    maxWidth: '100%',
-    transition: 'width 0.3s ease-in-out'
-}))
-
-const handleCopyHtml = () => {
-    if (props.email.content) {
-        navigator.clipboard.writeText(props.email.content)
-        copied.value = true
-        setTimeout(() => (copied.value = false), 2000)
-    }
-}
-
-const handleDownload = () => {
-    const element = document.createElement('a')
-    const file = new Blob([viewMode.value === 'html' ? props.email.content : ''], { type: 'text/plain' })
-    element.href = URL.createObjectURL(file)
-    element.download = `email-${props.email.id}.${viewMode.value === 'html' ? 'html' : 'txt'}`
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
-}
-
-const updateIframe = () => {
-    // wait 2 seconds
-        // Using nextTick to ensure DOM is updated before accessing the iframe
-        nextTick(() => {
-            console.log('Iframe reference:', iframeRef.value)
-            if (iframeRef.value && viewMode.value === 'html') {
-                const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow?.document
-                if (iframeDoc) {
-                    iframeDoc.open()
-                    console.log('Email content:', props.email.content)
-                    iframeDoc.write(props.email.content)
-                    iframeDoc.close()
-                }
-            }
-        })
-}
-
-watch([() => props.email, viewMode], updateIframe, { immediate: true })
-onMounted(updateIframe)
-</script>
