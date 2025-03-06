@@ -56,19 +56,19 @@ const handleDownload = () => {
 
 const updateIframe = () => {
     // wait 2 seconds
-        // Using nextTick to ensure DOM is updated before accessing the iframe
-        nextTick(() => {
-            console.log('Iframe reference:', iframeRef.value)
-            if (iframeRef.value && viewMode.value === 'html') {
-                const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow?.document
-                if (iframeDoc) {
-                    iframeDoc.open()
-                    console.log('Email content:', props.email.content)
-                    iframeDoc.write(props.email.content)
-                    iframeDoc.close()
-                }
+    // Using nextTick to ensure DOM is updated before accessing the iframe
+    nextTick(() => {
+        console.log('Iframe reference:', iframeRef.value)
+        if (iframeRef.value && viewMode.value === 'html') {
+            const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow?.document
+            if (iframeDoc) {
+                iframeDoc.open()
+                console.log('Email content:', props.email.content)
+                iframeDoc.write(props.email.content)
+                iframeDoc.close()
             }
-        })
+        }
+    })
 }
 
 watch([() => props.email, viewMode], updateIframe, { immediate: true })
@@ -151,45 +151,46 @@ onMounted(updateIframe)
         </div>
 
         <!-- Tabs -->
-        <Tabs v-model:active="viewMode" class="">
-            <div class="border-b px-2 sm:px-4">
-                <TabsList class="h-9">
-                    <TabsTrigger value="html" class="text-xs sm:text-sm">
+        <Tabs v-model:active="viewMode">
+            <TabsList class="h-9">
+                <TabsTrigger value="html">
+                    <div class="flex gap-2">
                         <Eye class="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Preview
-                    </TabsTrigger>
-                    <TabsTrigger value="text" class="text-xs sm:text-sm">
+                    </div>
+                </TabsTrigger>
+                <TabsTrigger value="text">
+                    <div class="flex gap-2">
                         <Code class="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Text
-                    </TabsTrigger>
-                    <TabsTrigger v-if="!isMobile" value="raw" class="text-xs sm:text-sm">
+                    </div>
+                </TabsTrigger>
+                <TabsTrigger v-if="!isMobile" value="raw">
+                    <div class="flex gap-2">
                         <Code class="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                         Raw
-                    </TabsTrigger>
-                </TabsList>
-            </div>
-
-            <div class="flex-1 overflow-auto">
-                <TabsContent value="html" class="h-full m-0 p-0">
-                    <div class="h-full flex justify-center overflow-auto bg-gray-100 dark:bg-gray-900 transition-all duration-300"
-                        :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1rem' }">
-                        <div class="bg-white dark:bg-gray-800 h-full transition-all duration-300 shadow-sm"
-                            :style="previewStyle">
-                            <iframe ref="iframeRef" title="Email Preview" class="w-full h-full border-0"
-                                sandbox="allow-same-origin" />
-                        </div>
                     </div>
-                </TabsContent>
+                </TabsTrigger>
+            </TabsList>
 
-                <TabsContent value="text" class="h-full m-0 p-4 overflow-auto">
-                    <pre class="whitespace-pre-wrap font-mono text-sm">{{ email.content }}</pre>
-                </TabsContent>
+            <TabsContent value="html" class="h-full m-0 p-0">
+                <div class="h-full flex justify-center overflow-auto bg-gray-100 dark:bg-gray-900 transition-all duration-300"
+                    :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1rem' }">
+                    <div class="bg-white dark:bg-gray-800 h-full transition-all duration-300 shadow-sm"
+                        :style="previewStyle">
+                        <iframe ref="iframeRef" title="Email Preview" class="w-full h-full border-0"
+                            sandbox="allow-same-origin" />
+                    </div>
+                </div>
+            </TabsContent>
 
-                <TabsContent v-if="!isMobile" value="raw" class="h-full m-0 p-4 overflow-auto">
-                    <pre class="whitespace-pre-wrap font-mono text-sm">{{ JSON.stringify(email, null, 2) }}</pre>
-                </TabsContent>
-            </div>
+            <TabsContent value="text" class="h-full m-0 p-4 overflow-auto">
+                <pre class="whitespace-pre-wrap font-mono text-sm">{{ email.content }}</pre>
+            </TabsContent>
+
+            <TabsContent v-if="!isMobile" value="raw" class="h-full m-0 p-4 overflow-auto">
+                <pre class="whitespace-pre-wrap font-mono text-sm">{{ JSON.stringify(email, null, 2) }}</pre>
+            </TabsContent>
         </Tabs>
     </div>
 </template>
-
