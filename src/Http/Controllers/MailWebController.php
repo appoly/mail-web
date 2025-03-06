@@ -2,30 +2,61 @@
 
 namespace Appoly\MailWeb\Http\Controllers;
 
-use Appoly\MailWeb\Http\Models\MailwebEmailAttachment;
+use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
-use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Controller for handling Mail Web related requests.
+ */
 class MailWebController
 {
-    public function index()
+    /**
+     * Check if the current user has permission to access Mail Web.
+     *
+     * @param  string  $message  Custom error message (optional)
+     */
+    private function authorizeMailWebAccess(string $message = 'Unauthorized access to Mail Web'): void
     {
         if (Gate::denies('view-mailweb', auth()->user())) {
-            abort(403);
+            abort(Response::HTTP_FORBIDDEN, $message);
         }
+    }
+
+    /**
+     * Display the Mail Web dashboard.
+     */
+    public function index(): View
+    {
+        $this->authorizeMailWebAccess();
 
         return view('mailweb::dashboard');
     }
 
-    public function show(MailwebEmail $mailwebEmail)
+    /**
+     * Fetch all emails for the dashboard.
+     */
+    public function fetchEmails(): JsonResponse
     {
+        $this->authorizeMailWebAccess();
 
-        if (Gate::denies('view-mailweb', auth()->user())) {
-            abort(403);
-        }
+        return response()->json(MailwebEmail::all());
+    }
 
-        abort_if(! $mailwebEmail->share_enabled, 403);
+    /**
+     * Show a specific email.
+     */
+    public function show(MailwebEmail $mailwebEmail): View
+    {
+        $this->authorizeMailWebAccess();
+
+        abort_if(
+            ! $mailwebEmail->share_enabled,
+            Response::HTTP_FORBIDDEN,
+            'This email is not shared or available for viewing'
+        );
 
         return view('mailweb::email', [
             'email' => $mailwebEmail,

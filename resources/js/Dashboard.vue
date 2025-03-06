@@ -8,77 +8,9 @@ import EmailPreview from '@/components/EmailPreview.vue';
 import EmailDetails from '@/components/EmailDetails.vue';
 import SlidingPanel from '@/components/SlidingPanel.vue';
 import { Email } from '@/types/email';
+import axios from 'axios';
 
-// Sample data for emails
-const emails: Email[] = [
-    {
-        id: 1,
-        subject: 'Welcome to MailWeb!',
-        from: 'support@mailweb.dev',
-        to: 'user@example.com',
-        date: '2025-06-10T09:30:00',
-        preview: 'Thank you for installing MailWeb. Here are some tips to get started...',
-        read: true,
-        attachments: [],
-        content: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #3b82f6;">Welcome to MailWeb!</h1>
-        <p>Thank you for installing our package. We're excited to help you streamline your email development and debugging process.</p>
-        <!-- Rest of the content same as React version -->
-      </div>
-    `
-    },
-    {
-        id: 2,
-        subject: 'News from MailWeb',
-        from: 'news@mailweb.dev',
-        to: 'user@example.com',
-        date: '2025-06-11T09:30:00',
-        preview: 'We released a new version of MailWeb with some exciting changes. Check it out!',
-        read: true,
-        attachments: [],
-        content: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #3b82f6;">News from MailWeb</h1>
-        <p>We're excited to announce that we released a new version of MailWeb with some exciting changes. Check it out!</p>
-      </div>
-    `
-    },
-    {
-        id: 3,
-        subject: 'Important: Update your MailWeb package',
-        from: 'support@mailweb.dev',
-        to: 'user@example.com',
-        date: '2025-06-11T09:30:00',
-        preview: 'A security issue was discovered in MailWeb. Update your package now to stay safe!',
-        read: false,
-        attachments: [],
-        content: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #3b82f6;">Important: Update your MailWeb package</h1>
-        <p>A security issue was discovered in MailWeb. Update your package now to stay safe!</p>
-      </div>
-    `
-    },
-    {
-        id: 4,
-        subject: 'Your MailWeb account has been created',
-        from: 'support@mailweb.dev',
-        to: 'user@example.com',
-        date: '2025-06-10T09:30:00',
-        preview: 'Your account has been created. Please verify your email address to unlock all features.',
-        read: false,
-        attachments: [],
-        content: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h1 style="color: #3b82f6;">Your MailWeb account has been created</h1>
-        <p>Your account has been created. Please verify your email address to unlock all features.</p>
-      </div>
-    `
-    },
-];
-
-// Reactive state
+const emails = ref<Email[]>([]);
 const selectedEmail = ref<Email | null>(null);
 const searchQuery = ref<string>('');
 const sidebarOpen = ref<boolean>(false);
@@ -87,9 +19,22 @@ const isLoading = ref<boolean>(false);
 const error = ref<string>('');
 const filters = ref<Record<string, any>>({});
 
+const fetchEmails = (): void => {
+    isLoading.value = true;
+    axios.get('/mailweb/emails')
+        .then((response) => {
+            emails.value = response.data;
+            isLoading.value = false;
+        })
+        .catch((err) => {
+            error.value = err.message;
+            isLoading.value = false;
+        });
+};
+
 // Computed filtered emails
 const filteredEmails = computed<Email[]>(() =>
-    emails.filter(email =>
+    emails.value.filter(email =>
         email.subject.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         email.from.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
         email.to.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
@@ -123,6 +68,7 @@ const checkMobile = (): void => {
 onMounted((): void => {
     checkMobile();
     window.addEventListener('resize', checkMobile);
+    fetchEmails();
 });
 </script>
 

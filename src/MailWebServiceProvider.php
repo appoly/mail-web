@@ -2,7 +2,6 @@
 
 namespace Appoly\MailWeb;
 
-use Appoly\MailWeb\Console\Commands\PruneMailwebMails;
 use Livewire\Livewire;
 use Appoly\MailWeb\Facades\MailWeb;
 use Illuminate\Support\Facades\Blade;
@@ -13,6 +12,7 @@ use Appoly\MailWeb\Livewire\SampleEmailAlert;
 use Appoly\MailWeb\Livewire\DownloadAttachment;
 use Appoly\MailWeb\View\Components\Forms\Input;
 use Appoly\MailWeb\Providers\MessageServiceProvider;
+use Appoly\MailWeb\Console\Commands\PruneMailwebMails;
 
 class MailWebServiceProvider extends ServiceProvider
 {
@@ -62,6 +62,7 @@ class MailWebServiceProvider extends ServiceProvider
 
         $router->macro('mailweb', function () use ($router) {
             $router->get('/mailweb', '\Appoly\MailWeb\Http\Controllers\MailWebController@index')->name('mailweb.index');
+            $router->get('/mailweb/emails', '\Appoly\MailWeb\Http\Controllers\MailWebController@fetchEmails')->name('mailweb.fetch');
             $router->get('/mailweb/{mailwebEmail}', '\Appoly\MailWeb\Http\Controllers\MailWebController@show')->name('mailweb.show');
         });
     }
