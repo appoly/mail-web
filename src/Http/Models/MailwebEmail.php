@@ -12,6 +12,10 @@ class MailwebEmail extends Model
 
     protected $guarded = ['id'];
 
+    protected $appends = [
+        'share_url',
+    ];
+
     protected $dates = [
         'created_at',
     ];
@@ -35,6 +39,11 @@ class MailwebEmail extends Model
             ->orWhere('body_html', 'like', "%$search%");
     }
 
+    public function scopeShareEnabled($query)
+    {
+        return $query->where('share_enabled', true);
+    }
+
     public function getSnippetAttribute()
     {
         // truncate $this->body_text to 100 characters with ...
@@ -44,5 +53,10 @@ class MailwebEmail extends Model
     public function getAttachmentCountAttribute()
     {
         return $this->attachments->count();
+    }
+
+    public function getShareUrlAttribute()
+    {
+        return $this->share_enabled ? route('mailweb.share', $this) : null;
     }
 }

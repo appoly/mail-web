@@ -5,7 +5,6 @@ namespace Appoly\MailWeb;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Appoly\MailWeb\Facades\MailWeb;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Notification;
@@ -61,6 +60,8 @@ class MailWebServiceProvider extends ServiceProvider
             $router->get('/mailweb', '\Appoly\MailWeb\Http\Controllers\MailWebController@index')->name('mailweb.index');
             $router->get('/mailweb/emails', '\Appoly\MailWeb\Http\Controllers\MailWebController@fetchEmails')->name('mailweb.fetch');
             $router->get('/mailweb/emails/{id}', '\Appoly\MailWeb\Http\Controllers\MailWebController@fetchEmail')->name('mailweb.fetch-email');
+            $router->post('/mailweb/emails/{id}/toggle-share', '\Appoly\MailWeb\Http\Controllers\MailWebController@toggleShare')->name('mailweb.toggle-share');
+            $router->get('/mailweb/share/{mailwebEmail}', '\Appoly\MailWeb\Http\Controllers\MailWebController@show')->name('mailweb.share');
             $router->get('/mailweb/send-test-email', function (Request $request) {
                 // Temporarily set mail driver to log
                 $originalMailDriver = Config::get('mail.default');
@@ -88,10 +89,7 @@ class MailWebServiceProvider extends ServiceProvider
                     );
                 }
             })->name('mailweb.send-test-email');
-            $router->get('/mailweb/{mailwebEmail}', '\Appoly\MailWeb\Http\Controllers\MailWebController@show')->name('mailweb.show');
-
-            // Add route for sending test email - using GET to avoid CSRF issues
-
+            $router->get('/mailweb/share/{mailwebEmail}', '\Appoly\MailWeb\Http\Controllers\MailWebController@show')->name('mailweb.share');
         });
     }
 

@@ -16,6 +16,7 @@ export interface EmailDetails {
     body_text: string
     read: number
     share_enabled: number
+    share_url?: string
     created_at: string
     updated_at: string
     headers?: string
@@ -33,6 +34,7 @@ export interface EmailPreview {
     body_text: string
     read: number
     share_enabled: number
+    share_url?: string
     created_at: string
     updated_at: string
     attachments?: any[]
@@ -53,6 +55,7 @@ export interface Email {
     created_at: string
     updated_at: string
     headers?: string
+    share_url?: string
     attachments?: any[]
     events?: { type: string; description: string; timestamp: string }[]
 }

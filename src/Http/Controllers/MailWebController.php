@@ -68,6 +68,7 @@ class MailWebController
                     'share_enabled' => $email->share_enabled,
                     'created_at' => $email->created_at,
                     'updated_at' => $email->updated_at,
+                    'share_url' => $email->share_enabled ? route('mailweb.share', $email) : null,
                 ];
             });
 
@@ -87,7 +88,7 @@ class MailWebController
             'This email is not shared or available for viewing'
         );
 
-        return view('mailweb::email', [
+        return view('mailweb::email-share', [
             'email' => $mailwebEmail,
         ]);
     }
@@ -108,5 +109,23 @@ class MailWebController
         }
 
         return response()->json($email);
+    }
+
+    /**
+     * Toggle the share_enabled status for an email.
+     */
+    public function toggleShare(string $id): JsonResponse
+    {
+        $this->authorizeMailWebAccess();
+
+        $email = MailwebEmail::findOrFail($id);
+        $email->share_enabled = ! $email->share_enabled;
+        $email->save();
+
+        return response()->json([
+            'success' => true,
+            'share_enabled' => $email->share_enabled,
+            'share_url' => $email->share_enabled ? route('mailweb.share', $email) : null,
+        ]);
     }
 }
