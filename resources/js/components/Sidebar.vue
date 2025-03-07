@@ -9,7 +9,7 @@ defineProps<{
     isMobile: boolean
 }>()
 
-defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen'])
+defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen', 'update:settings'])
 </script>
 
 <template>
@@ -20,6 +20,7 @@ defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen'])
                     <SidebarContent :search-query="searchQuery" :filters="filters" :is-mobile="isMobile"
                         @update:search-query="$emit('update:searchQuery', $event)"
                         @update:filters="$emit('update:filters', $event)"
+                        @update:settings="$emit('update:settings', $event)"
                         @close-sidebar="$emit('update:isOpen', false)" />
                 </div>
             </SheetContent>
@@ -28,7 +29,8 @@ defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen'])
         <div v-else class="w-64 border-r bg-card flex-col h-full">
             <SidebarContent :search-query="searchQuery" :filters="filters" :is-mobile="isMobile"
                 @update:search-query="$emit('update:searchQuery', $event)"
-                @update:filters="$emit('update:filters', $event)" />
+                @update:filters="$emit('update:filters', $event)"
+                @update:settings="$emit('update:settings', $event)" />
         </div>
     </div>
 </template>

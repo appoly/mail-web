@@ -9,6 +9,7 @@ import EmailDetails from '@/components/EmailDetails.vue';
 import SlidingPanel from '@/components/SlidingPanel.vue';
 import { Email, EmailAddress } from '@/types/email';
 import axios from 'axios';
+import { formatDistanceToNow, parseISO } from 'date-fns';
 
 const emails = ref<Email[]>([]);
 const selectedEmail = ref<Email | null>(null);
@@ -25,6 +26,10 @@ const currentPage = ref<number>(1);
 const totalEmails = ref<number>(0);
 const lastPage = ref<number>(1);
 const perPage = ref<number>(25);
+const userSettings = ref({
+    paginationAmount: 25,
+    dateFormat: 'timestamp'
+});
 
 const fetchEmails = (resetList = true): void => {
     if (resetList) {
@@ -36,7 +41,7 @@ const fetchEmails = (resetList = true): void => {
     
     const params = {
         page: currentPage.value,
-        per_page: perPage.value,
+        per_page: userSettings.value.paginationAmount,
         search: searchQuery.value || undefined
     };
     
@@ -66,13 +71,40 @@ const loadMoreEmails = (): void => {
     }
 };
 
-// Provide fetchEmails function to child components
+// Format date based on user settings
+const formatDate = (dateString: string): string => {
+    const date = new Date(dateString);
+    
+    switch (userSettings.value.dateFormat) {
+        case 'uk':
+            return date.toLocaleDateString('en-GB');
+        case 'us':
+            return date.toLocaleDateString('en-US');
+        case 'days-ago':
+            return formatDistanceToNow(parseISO(dateString), { addSuffix: true });
+        case 'timestamp':
+        default:
+            return date.toISOString();
+    }
+};
+
+// Watch for date format changes to trigger UI updates
+watch(() => userSettings.value.dateFormat, () => {
+    // This will force components using the formatDate function to re-render
+    // We're using a simple approach by providing a new function reference
+    provide('formatDate', (dateString: string) => formatDate(dateString));
+});
+
+// Provide fetchEmails function and formatDate to child components
 provide('fetchEmails', fetchEmails);
+provide('formatDate', formatDate);
 
 // Helper function to format email addresses for search
 const formatEmailAddressesForSearch = (addresses: EmailAddress[]): string => {
     return addresses.map(addr => `${addr.name} ${addr.address}`).join(' ');
 };
+
+
 
 // We'll use server-side filtering instead of client-side
 const filteredEmails = computed<Email[]>(() => emails.value);
@@ -86,6 +118,13 @@ watch(searchQuery, (newValue, oldValue) => {
         }, 300);
         
         return () => clearTimeout(debounceTimeout);
+    }
+}, { immediate: false });
+
+// Watch for settings changes
+watch(() => userSettings.value.paginationAmount, (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+        fetchEmails(true);
     }
 }, { immediate: false });
 
@@ -112,6 +151,13 @@ watch(selectedEmail, (newEmail) => {
         selectedEmailWithFullContent.value = null;
     }
 });
+
+// Update user settings
+const updateSettings = (newSettings: any): void => {
+    userSettings.value = { ...userSettings.value, ...newSettings };
+    // Force update of formatDate when settings change
+    provide('formatDate', (dateString: string) => formatDate(dateString));
+};
 
 // Methods
 const handleShare = (): void => {
@@ -156,7 +202,7 @@ onMounted((): void => {
         </div>
 
         <Sidebar v-model:searchQuery="searchQuery" v-model:filters="filters" v-model:isOpen="sidebarOpen"
-            :isMobile="isMobile" />
+            :isMobile="isMobile" @update:settings="updateSettings" />
 
         <div class="flex flex-col flex-1 h-[calc(100vh-57px)] lg:h-screen overflow-hidden">
             <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">

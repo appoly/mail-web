@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from 'vue'
-import { Eye, Code, Smartphone, Tablet, Monitor, Download, Copy, ExternalLink, Check } from 'lucide-vue-next'
+import { ref, computed, watch, onMounted, nextTick, inject } from 'vue'
+import { Eye, Code, Smartphone, Tablet, Monitor, Download, Copy, ExternalLink, Check, Clock } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
@@ -12,7 +12,8 @@ const props = defineProps<{
     isLoading?: boolean
 }>()
 
-// Helper function to format email addresses
+const formatDate = inject('formatDate') as (dateString: string) => string
+
 const formatEmailAddresses = (addresses: EmailAddress[]): string => {
     return addresses.map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
 }
@@ -87,6 +88,20 @@ onMounted(updateIframe)
                 <p class="text-sm text-muted-foreground truncate">
                     From: {{ formatEmailAddresses(email.from) }} • To: {{ formatEmailAddresses(email.to) }}
                 </p>
+                <div class="flex items-center text-xs text-muted-foreground mt-1">
+                    <Clock class="h-3 w-3 mr-1" />
+                    <span>{{ formatDate(email.created_at) }}</span>
+                    <Tooltip>
+                        <TooltipTrigger as-child>
+                            <span class="ml-1 cursor-help underline decoration-dotted">
+                                ({{ formatDate(email.created_at) }})
+                            </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                            Full timestamp
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
             </div>
 
             <div v-if="!isMobile" class="flex items-center gap-1 sm:gap-2">

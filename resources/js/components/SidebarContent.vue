@@ -1,10 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
-import { Search, Mail, Filter, RefreshCw, Settings, HelpCircle, X, Send, Play, Pause } from 'lucide-vue-next'
+import { Search, Mail, Filter, RefreshCw, Settings, X, Send, Play, Pause, ArrowLeft } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog'
+import axios from 'axios'
+
+import Github from '@/components/icons/Github.vue'
 
 const props = defineProps<{
     searchQuery: string
@@ -12,7 +22,7 @@ const props = defineProps<{
     isMobile: boolean
 }>()
 
-const emit = defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar'])
+const emit = defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar', 'update:settings'])
 
 // Inject the fetchEmails function from Dashboard
 const fetchEmails = inject('fetchEmails') as () => void
@@ -22,26 +32,42 @@ const isSending = ref<boolean>(false)
 const isPolling = ref<boolean>(false)
 const pollingInterval = ref<number | null>(null)
 
+// Settings
+const showSettingsDialog = ref<boolean>(false)
+const paginationOptions = [10, 25, 50, 100]
+const dateFormatOptions = [
+    { value: 'timestamp', label: 'Timestamp' },
+    { value: 'uk', label: 'UK (DD/MM/YYYY)' },
+    { value: 'us', label: 'US (MM/DD/YYYY)' },
+    { value: 'days-ago', label: 'X Days ago' }
+]
+
+// Default settings
+const settings = ref({
+    paginationAmount: 25,
+    dateFormat: 'timestamp'
+})
+
 // Poll for new emails every 10 seconds
 const POLLING_INTERVAL_MS = 10000
 
-const startPolling = () : void => {
+const startPolling = (): void => {
     if (pollingInterval.value !== null) return
-    
+
     // Immediately fetch emails
     handleRefresh()
-    
+
     // Start polling
     pollingInterval.value = window.setInterval(() => {
         if (document.visibilityState === 'visible') {
             handleRefresh()
         }
     }, POLLING_INTERVAL_MS)
-    
+
     isPolling.value = true
 }
 
-const stopPolling = () : void => {
+const stopPolling = (): void => {
     if (pollingInterval.value !== null) {
         window.clearInterval(pollingInterval.value)
         pollingInterval.value = null
@@ -49,7 +75,7 @@ const stopPolling = () : void => {
     isPolling.value = false
 }
 
-const togglePolling = () : void => {
+const togglePolling = (): void => {
     if (isPolling.value) {
         stopPolling()
     } else {
@@ -57,7 +83,7 @@ const togglePolling = () : void => {
     }
 }
 
-const handleRefresh = () : void => {
+const handleRefresh = (): void => {
     isRefreshing.value = true
     if (fetchEmails) {
         fetchEmails()
@@ -68,15 +94,41 @@ const handleRefresh = () : void => {
 }
 
 // Handle visibility change to pause polling when tab is not visible
-const handleVisibilityChange = () : void => {
+const handleVisibilityChange = (): void => {
     if (document.visibilityState === 'hidden' && isPolling.value) {
         // Don't stop the interval, just don't fetch when hidden
     }
 }
 
+// Load settings from local storage
+const loadSettings = (): void => {
+    const savedSettings = localStorage.getItem('mailweb-settings')
+    if (savedSettings) {
+        try {
+            const parsedSettings = JSON.parse(savedSettings)
+            settings.value = {
+                ...settings.value,
+                ...parsedSettings
+            }
+            // Emit the loaded settings to parent components
+            emit('update:settings', settings.value)
+        } catch (e) {
+            console.error('Failed to parse settings from localStorage:', e)
+        }
+    }
+}
+
+// Save settings to local storage
+const saveSettings = (): void => {
+    localStorage.setItem('mailweb-settings', JSON.stringify(settings.value))
+    emit('update:settings', settings.value)
+    showSettingsDialog.value = false
+}
+
 // Clean up interval when component is unmounted
 onMounted(() => {
     document.addEventListener('visibilitychange', handleVisibilityChange)
+    loadSettings()
 })
 
 onUnmounted(() => {
@@ -84,9 +136,7 @@ onUnmounted(() => {
     document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
-import axios from 'axios'
-
-const sendTestEmail = async () : Promise<void> => {
+const sendTestEmail = async (): Promise<void> => {
     isSending.value = true
     try {
         const response = await axios.get('/mailweb/send-test-email', {
@@ -94,7 +144,7 @@ const sendTestEmail = async () : Promise<void> => {
                 'Accept': 'application/json'
             }
         })
-        
+
         if (response.status === 200) {
             alert('Test email sent successfully! Check your logs.')
         } else {
@@ -118,6 +168,7 @@ const sendTestEmail = async () : Promise<void> => {
                     <Mail class="h-5 w-5 text-primary" />
                     <h1 class="text-xl font-bold">Mailweb</h1>
                 </div>
+
                 <Button v-if="isMobile" variant="ghost" size="icon" @click="$emit('close-sidebar')">
                     <X class="h-5 w-5" />
                     <span class="sr-only">Close</span>
@@ -174,59 +225,103 @@ const sendTestEmail = async () : Promise<void> => {
             </div>
         </div>
 
-        <div class="p-4 border-t mt-auto">
-            <TooltipProvider>
-                <div class="flex items-center justify-between">
-                    <Tooltip>
-                        <TooltipTrigger as-child>
-                            <Button 
-                                :variant="isPolling ? 'default' : 'ghost'" 
-                                size="icon" 
-                                @click="togglePolling"
-                                class="relative"
-                            >
-                                <Play v-if="!isPolling" class="h-4 w-4" />
-                                <Pause v-else class="h-4 w-4" />
-                                <RefreshCw 
-                                    v-if="isRefreshing" 
-                                    class="h-4 w-4 animate-spin absolute" 
-                                />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>{{ isPolling ? 'Stop' : 'Start' }} Auto-Refresh</TooltipContent>
-                    </Tooltip>
+        <div class="mt-auto">
+            <div class="p-4 border-t">
+                <a href="/" class="text-primary text-xs hover:underline">
+                    <ArrowLeft class="inline-block w-4 h-4" /> Return to app
+                </a>
+            </div> 
 
-                    <template v-if="!isMobile">
+            <div class="p-4 border-t">
+                <TooltipProvider>
+                    <div class="flex items-center justify-between">
                         <Tooltip>
                             <TooltipTrigger as-child>
-                                <Button variant="ghost" size="icon">
-                                    <Settings class="h-4 w-4" />
+                                <Button :variant="isPolling ? 'default' : 'ghost'" size="icon" @click="togglePolling"
+                                    class="relative">
+                                    <Play v-if="!isPolling" class="h-4 w-4" />
+                                    <Pause v-else class="h-4 w-4" />
+                                    <RefreshCw v-if="isRefreshing" class="h-4 w-4 animate-spin absolute" />
                                 </Button>
                             </TooltipTrigger>
-                            <TooltipContent>Settings</TooltipContent>
+                            <TooltipContent>{{ isPolling ? 'Stop' : 'Start' }} Auto-Refresh</TooltipContent>
                         </Tooltip>
 
-                        <Tooltip>
-                            <TooltipTrigger as-child>
-                                <Button variant="ghost" size="icon">
-                                    <HelpCircle class="h-4 w-4" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Help</TooltipContent>
-                        </Tooltip>
-                        
-                        <Tooltip>
-                            <TooltipTrigger as-child>
-                                <Button variant="ghost" size="icon" @click="sendTestEmail" :disabled="isSending">
-                                    <Send :class="['h-4 w-4', { 'animate-pulse': isSending }]" />
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>Send Test Email</TooltipContent>
-                        </Tooltip>
-                    </template>
-                </div>
-            </TooltipProvider>
+                        <template v-if="!isMobile">
+                            <Tooltip>
+                                <TooltipTrigger as-child>
+                                    <Button variant="ghost" size="icon" @click="showSettingsDialog = true">
+                                        <Settings class="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Settings</TooltipContent>
+                            </Tooltip>
+
+
+
+                            <Tooltip>
+                                <TooltipTrigger as-child>
+                                    <Button variant="ghost" size="icon" @click="sendTestEmail" :disabled="isSending">
+                                        <Send :class="['h-4 w-4', { 'animate-pulse': isSending }]" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>Send Test Email</TooltipContent>
+                            </Tooltip>
+
+                            <Tooltip>
+                                <TooltipTrigger as-child>
+                                    <Button as="a" href="https://github.com/appoly/mail-web" target="_blank"
+                                        rel="noopener noreferrer" variant="ghost" size="icon">
+                                        <Github class="h-4 w-4" />
+                                    </Button>
+                                </TooltipTrigger>
+                                <TooltipContent>GitHub Repository</TooltipContent>
+                            </Tooltip>
+                        </template>
+                    </div>
+                </TooltipProvider>
+            </div>
         </div>
     </div>
-</template>
 
+    <!-- Settings Dialog -->
+    <Dialog :open="showSettingsDialog" @update:open="showSettingsDialog = $event">
+        <DialogContent class="sm:max-w-[425px]">
+            <DialogHeader>
+                <DialogTitle>Settings</DialogTitle>
+            </DialogHeader>
+            <div class="grid gap-4 py-4">
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Pagination Amount</label>
+                    <Select v-model="settings.paginationAmount">
+                        <SelectTrigger>
+                            <SelectValue :placeholder="`${settings.paginationAmount} items per page`" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="option in paginationOptions" :key="option" :value="option">
+                                {{ option }} items per page
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-medium">Date Format</label>
+                    <Select v-model="settings.dateFormat">
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select date format" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem v-for="option in dateFormatOptions" :key="option.value" :value="option.value">
+                                {{ option.label }}
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+            </div>
+            <DialogFooter>
+                <Button variant="outline" @click="showSettingsDialog = false">Cancel</Button>
+                <Button @click="saveSettings">Save Changes</Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+</template>

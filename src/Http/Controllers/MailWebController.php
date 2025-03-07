@@ -47,24 +47,14 @@ class MailWebController
         $page = $request->input('page', 1);
         $search = $request->input('search');
 
-        $query = MailwebEmail::query();
-
-        // Apply search if provided
-        if ($search) {
-            $query->search($search);
-        }
-
-        // Order by most recent first
-        $query->orderBy('created_at', 'desc');
-
-        // Select only the fields needed for the list view (exclude HTML content)
-        $query->select([
-            'id', 'from', 'to', 'cc', 'bcc', 'subject', 'body_text',
-            'read', 'share_enabled', 'created_at', 'updated_at',
-        ]);
-
-        // Get paginated results
-        $emails = $query->paginate($perPage, ['*'], 'page', $page)
+        $emails = MailwebEmail::query()
+            ->when($search, fn ($q) => $q->search($search))
+            ->orderBy('created_at', 'desc')
+            ->select([
+                'id', 'from', 'to', 'cc', 'bcc', 'subject', 'body_text',
+                'read', 'share_enabled', 'created_at', 'updated_at',
+            ])
+            ->paginate($perPage, ['*'], 'page', $page)
             ->through(function ($email) {
                 return [
                     'id' => $email->id,

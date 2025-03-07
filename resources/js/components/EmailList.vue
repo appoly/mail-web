@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
 import { AlertCircle, Loader2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -32,14 +32,7 @@ const formatEmailAddresses = (addresses: EmailAddress[]): string => {
     return addresses.map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
 }
 
-// Helper function to format date
-const formatDate = (dateString: string): string => {
-    try {
-        return formatDistanceToNow(parseISO(dateString), { addSuffix: true })
-    } catch (e) {
-        return dateString
-    }
-}
+const formatDate = inject('formatDate') as (dateString: string) => string
 
 // Helper function to truncate text
 const truncateText = (text: string, maxLength: number = 60): string => {
