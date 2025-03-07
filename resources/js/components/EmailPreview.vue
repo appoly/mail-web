@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick, inject } from 'vue'
-import { Eye, Code, Smartphone, Tablet, Monitor, Download, Copy, Share2, Check, Clock, QrCode } from 'lucide-vue-next'
+import { ref, computed, watch, onMounted, nextTick, inject, defineEmits } from 'vue'
+import { Eye, Code, Smartphone, Tablet, Monitor, Download, Copy, Share2, Check, Clock, QrCode, Trash2 } from 'lucide-vue-next'
 import axios from 'axios'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Switch } from '@/components/ui/switch'
 import type { EmailPreview, EmailAddress } from '@/types/email'
+
+const emit = defineEmits(['delete-email'])
 
 // Props with TypeScript interface
 interface Props {
@@ -23,7 +26,6 @@ const formatDate = inject<(dateString: string) => string>('formatDate')!
 // Reactive state
 const viewMode = ref<'html' | 'text' | 'raw'>('html')
 const previewWidth = ref<'mobile' | 'tablet' | 'desktop'>('desktop')
-const copied = ref(false) // Unused, but kept for potential future use
 const shareUrlCopied = ref(false)
 const iframeRef = ref<HTMLIFrameElement | null>(null)
 const showShareDialog = ref(false)
@@ -156,6 +158,17 @@ const updateIframe = (): void => {
     })
 }
 
+const deleteEmail = async (): Promise<void> => {
+    if (confirm('Are you sure you want to delete this email?')) {
+        try {
+            await axios.delete(`/mailweb/emails/${props.email.id}`)
+            emit('delete-email', props.email.id)
+        } catch (error) {
+            console.error('Error deleting email:', error)
+        }
+    }
+}
+
 // Lifecycle hooks
 watch(() => props.email, updateIframe, { immediate: true })
 onMounted(updateIframe)
@@ -173,14 +186,16 @@ onMounted(updateIframe)
                 <div class="flex items-center text-xs text-muted-foreground mt-1">
                     <Clock class="h-3 w-3 mr-1" />
                     <span>{{ formatDate(email.created_at) }}</span>
-                    <Tooltip>
-                        <TooltipTrigger as-child>
-                            <span class="ml-1 cursor-help underline decoration-dotted">
-                                ({{ formatDate(email.created_at) }})
-                            </span>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">Full timestamp</TooltipContent>
-                    </Tooltip>
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <span class="ml-1 cursor-help underline decoration-dotted">
+                                    ({{ formatDate(email.created_at) }})
+                                </span>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom">Full timestamp</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
             </div>
 
@@ -194,7 +209,9 @@ onMounted(updateIframe)
                         </TooltipTrigger>
                         <TooltipContent>Mobile View</TooltipContent>
                     </Tooltip>
+                </TooltipProvider>
 
+                <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger as-child>
                             <Button variant="outline" size="icon" @click="previewWidth = 'tablet'">
@@ -203,7 +220,9 @@ onMounted(updateIframe)
                         </TooltipTrigger>
                         <TooltipContent>Tablet View</TooltipContent>
                     </Tooltip>
+                </TooltipProvider>
 
+                <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger as-child>
                             <Button variant="outline" size="icon" @click="previewWidth = 'desktop'">
@@ -212,9 +231,11 @@ onMounted(updateIframe)
                         </TooltipTrigger>
                         <TooltipContent>Desktop View</TooltipContent>
                     </Tooltip>
+                </TooltipProvider>
 
-                    <Separator orientation="vertical" class="h-6 mx-1 hidden sm:block" />
+                <Separator orientation="vertical" class="h-6 mx-1 hidden sm:block" />
 
+                <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger as-child>
                             <Button variant="outline" size="icon" @click="handleDownload">
@@ -223,7 +244,9 @@ onMounted(updateIframe)
                         </TooltipTrigger>
                         <TooltipContent>Download</TooltipContent>
                     </Tooltip>
+                </TooltipProvider>
 
+                <TooltipProvider>
                     <Tooltip>
                         <TooltipTrigger as-child>
                             <Button variant="outline" size="icon" @click="handleShare">
@@ -231,6 +254,17 @@ onMounted(updateIframe)
                             </Button>
                         </TooltipTrigger>
                         <TooltipContent>Share Email</TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger as-child>
+                            <Button variant="destructive" size="icon" @click="deleteEmail">
+                                <Trash2 class="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Delete Email</TooltipContent>
                     </Tooltip>
                 </TooltipProvider>
             </div>
@@ -322,12 +356,8 @@ onMounted(updateIframe)
                             <Share2 class="h-5 w-5 text-primary" />
                             <span class="font-medium text-sm">Email Sharing</span>
                         </div>
-                        <button
-                            :class="[email.share_enabled ? 'bg-primary' : 'bg-gray-200 dark:bg-gray-700', 'relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2']"
-                            @click="toggleShareEnabled" :disabled="isToggling">
-                            <span
-                                :class="[email.share_enabled ? 'translate-x-4' : 'translate-x-1', 'inline-block h-3 w-3 transform rounded-full bg-white transition-transform']"></span>
-                        </button>
+                        <Switch :model-value="email.share_enabled" @update:model-value="toggleShareEnabled"
+                            :disabled="isToggling" />
                     </div>
 
                     <div v-if="email.share_enabled" class="flex flex-col space-y-4">

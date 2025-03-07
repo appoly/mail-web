@@ -4,10 +4,14 @@ namespace Appoly\MailWeb\Http\Controllers;
 
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Config;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
+use Illuminate\Support\Facades\Notification;
 use Symfony\Component\HttpFoundation\Response;
+use Appoly\MailWeb\Notifications\MailwebSampleNotification;
 
 /**
  * Controller for handling Mail Web related requests.
@@ -127,5 +131,79 @@ class MailWebController
             'share_enabled' => $email->share_enabled,
             'share_url' => $email->share_enabled ? route('mailweb.share', $email) : null,
         ]);
+    }
+
+    /**
+     * Delete all emails from the system.
+     */
+    public function deleteAll(): JsonResponse
+    {
+        $this->authorizeMailWebAccess();
+
+        try {
+            // Delete all emails
+            $count = MailwebEmail::query()->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'All emails have been deleted successfully',
+                'count' => $count,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete all emails',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function delete($id): JsonResponse
+    {
+        $this->authorizeMailWebAccess();
+        try {
+            $email = MailwebEmail::findOrFail($id);
+            $email->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Email deleted successfully',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete email',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function sendTestEmail(Request $request)
+    {
+        // Temporarily set mail driver to log
+        $originalMailDriver = Config::get('mail.default');
+        Config::set('mail.default', 'log');
+
+        // Get template ID from request or use random template
+        $templateId = $request->input('template_id');
+
+        try {
+            // Send notification to example@appoly.co.uk
+            Notification::route('mail', 'example@appoly.co.uk')
+                ->notify(new MailwebSampleNotification($templateId));
+
+            // Reset mail driver
+            Config::set('mail.default', $originalMailDriver);
+
+            return new JsonResponse(['success' => true, 'message' => 'Test email sent to logs']);
+        } catch (\Exception $e) {
+            // Reset mail driver in case of error
+            Config::set('mail.default', $originalMailDriver);
+
+            return new JsonResponse(
+                ['success' => false, 'message' => 'Failed to send test email', 'error' => $e->getMessage()],
+                500
+            );
+        }
     }
 }

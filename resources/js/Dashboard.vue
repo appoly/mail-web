@@ -144,6 +144,12 @@ const checkMobile = (): void => {
     isMobile.value = window.innerWidth < 1024;
 };
 
+const handleDeleteEmail = (emailId: string): void => {
+    emails.value = emails.value.filter(email => email.id !== emailId);
+    selectedEmail.value = null;
+    selectedEmailWithFullContent.value = null;
+}
+
 // Lifecycle hooks
 onMounted((): void => {
     checkMobile();
@@ -188,8 +194,7 @@ onMounted((): void => {
                                     :email="selectedEmailWithFullContent || selectedEmail" 
                                     :isLoading="isLoadingEmailContent"
                                     :isMobile="isMobile" 
-                                    @share="handleShare"
-                                    @delete="handleDelete" 
+                                    @delete-email="handleDeleteEmail"
                                 />
                             </div>
                             <div v-else class="flex items-center justify-center h-full p-6 text-center bg-muted/30">
@@ -219,8 +224,7 @@ onMounted((): void => {
                                 :email="selectedEmailWithFullContent || selectedEmail" 
                                 :isLoading="isLoadingEmailContent"
                                 :isMobile="isMobile" 
-                                @share="handleShare"
-                                @delete="handleDelete" 
+                                @delete-email="handleDeleteEmail" 
                             />
                         </div>
                     </template>

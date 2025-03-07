@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
-import { Search, Mail, Filter, RefreshCw, Settings, X, Send, Play, Pause, ArrowLeft } from 'lucide-vue-next'
+import { Search, Mail, Filter, RefreshCw, Settings, X, Send, Play, Pause, ArrowLeft, Trash2 } from 'lucide-vue-next'
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -40,11 +40,13 @@ const fetchEmails = inject('fetchEmails') as () => void
 
 const isRefreshing = ref<boolean>(false)
 const isSending = ref<boolean>(false)
+const isDeleting = ref<boolean>(false)
 const isPolling = ref<boolean>(false)
 const pollingInterval = ref<number | null>(null)
 
 // Settings
 const showSettingsDialog = ref<boolean>(false)
+const showDeleteAllDialog = ref<boolean>(false)
 const paginationOptions: number[] = [10, 25, 50, 100]
 const dateFormatOptions = [
     { value: 'timestamp', label: 'Timestamp' },
@@ -159,6 +161,34 @@ const sendTestEmail = async (): Promise<void> => {
         isSending.value = false
     }
 }
+
+const deleteAllEmails = async (): Promise<void> => {
+    isDeleting.value = true
+    try {
+        const response = await axios.delete('/mailweb/emails/delete-all', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+
+        if (response.status === 200) {
+            alert('All emails have been deleted successfully!')
+            // Refresh the email list
+            if (fetchEmails) {
+                fetchEmails()
+            }
+        } else {
+            alert('Failed to delete all emails. Please check the console for details.')
+            console.error('Failed to delete all emails:', response.data)
+        }
+    } catch (error) {
+        alert('Error deleting all emails')
+        console.error('Error deleting all emails:', error)
+    } finally {
+        isDeleting.value = false
+        showDeleteAllDialog.value = false
+    }
+}
 </script>
 
 <template>
@@ -186,11 +216,11 @@ const sendTestEmail = async (): Promise<void> => {
                 <a href="/" class="text-primary text-xs hover:underline">
                     <ArrowLeft class="inline-block w-4 h-4" /> Return to app
                 </a>
-            </div> 
+            </div>
 
             <div class="p-4 border-t">
-                <TooltipProvider>
-                    <div class="flex items-center justify-between">
+                <div class="flex items-center justify-between">
+                    <TooltipProvider>
                         <Tooltip>
                             <TooltipTrigger as-child>
                                 <Button :variant="isPolling ? 'default' : 'ghost'" size="icon" @click="togglePolling"
@@ -202,8 +232,9 @@ const sendTestEmail = async (): Promise<void> => {
                             </TooltipTrigger>
                             <TooltipContent>{{ isPolling ? 'Stop' : 'Start' }} Auto-Refresh</TooltipContent>
                         </Tooltip>
-
-                        <template v-if="!isMobile">
+                    </TooltipProvider>
+                    <template v-if="!isMobile">
+                        <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger as-child>
                                     <Button variant="ghost" size="icon" @click="showSettingsDialog = true">
@@ -212,9 +243,9 @@ const sendTestEmail = async (): Promise<void> => {
                                 </TooltipTrigger>
                                 <TooltipContent>Settings</TooltipContent>
                             </Tooltip>
+                        </TooltipProvider>
 
-
-
+                        <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger as-child>
                                     <Button variant="ghost" size="icon" @click="sendTestEmail" :disabled="isSending">
@@ -223,7 +254,8 @@ const sendTestEmail = async (): Promise<void> => {
                                 </TooltipTrigger>
                                 <TooltipContent>Send Test Email</TooltipContent>
                             </Tooltip>
-
+                        </TooltipProvider>
+                        <TooltipProvider>
                             <Tooltip>
                                 <TooltipTrigger as-child>
                                     <Button as="a" href="https://github.com/appoly/mail-web" target="_blank"
@@ -233,9 +265,9 @@ const sendTestEmail = async (): Promise<void> => {
                                 </TooltipTrigger>
                                 <TooltipContent>GitHub Repository</TooltipContent>
                             </Tooltip>
-                        </template>
-                    </div>
-                </TooltipProvider>
+                        </TooltipProvider>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -273,10 +305,36 @@ const sendTestEmail = async (): Promise<void> => {
                         </SelectContent>
                     </Select>
                 </div>
+                <div class="my-4">
+                    <Button variant="destructive" @click="showDeleteAllDialog = true" class="w-full">
+                        <Trash2 class="h-4 w-4" /> Delete All Emails
+                    </Button>
+                </div>
             </div>
             <DialogFooter>
                 <Button variant="outline" @click="showSettingsDialog = false">Cancel</Button>
                 <Button @click="saveSettings">Save Changes</Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+
+    <!-- Delete All Confirmation Dialog -->
+    <Dialog :open="showDeleteAllDialog" @update:open="showDeleteAllDialog = $event">
+        <DialogContent class="sm:max-w-[425px]">
+            <DialogHeader>
+                <DialogTitle class="text-destructive">Delete All Emails</DialogTitle>
+            </DialogHeader>
+            <div class="py-4">
+                <p class="text-sm text-muted-foreground">
+                    Are you sure you want to delete all emails? This action cannot be undone.
+                </p>
+            </div>
+            <DialogFooter>
+                <Button variant="outline" @click="showDeleteAllDialog = false">Cancel</Button>
+                <Button variant="destructive" @click="deleteAllEmails()" :disabled="isDeleting">
+                    <span v-if="isDeleting">Deleting...</span>
+                    <span v-else>Delete All</span>
+                </Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>
