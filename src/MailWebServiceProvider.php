@@ -60,6 +60,7 @@ class MailWebServiceProvider extends ServiceProvider
         $router->macro('mailweb', function () use ($router) {
             $router->get('/mailweb', '\Appoly\MailWeb\Http\Controllers\MailWebController@index')->name('mailweb.index');
             $router->get('/mailweb/emails', '\Appoly\MailWeb\Http\Controllers\MailWebController@fetchEmails')->name('mailweb.fetch');
+            $router->get('/mailweb/emails/{id}', '\Appoly\MailWeb\Http\Controllers\MailWebController@fetchEmail')->name('mailweb.fetch-email');
             $router->get('/mailweb/send-test-email', function (Request $request) {
                 // Temporarily set mail driver to log
                 $originalMailDriver = Config::get('mail.default');

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, provide } from 'vue';
+import { ref, computed, onMounted, provide, watch } from 'vue';
 import { Menu } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar.vue';
@@ -12,24 +12,58 @@ import axios from 'axios';
 
 const emails = ref<Email[]>([]);
 const selectedEmail = ref<Email | null>(null);
+const selectedEmailWithFullContent = ref<Email | null>(null);
+const isLoadingEmailContent = ref<boolean>(false);
 const searchQuery = ref<string>('');
 const sidebarOpen = ref<boolean>(false);
 const isMobile = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
+const isLoadingMore = ref<boolean>(false);
 const error = ref<string>('');
 const filters = ref<Record<string, any>>({});
+const currentPage = ref<number>(1);
+const totalEmails = ref<number>(0);
+const lastPage = ref<number>(1);
+const perPage = ref<number>(25);
 
-const fetchEmails = (): void => {
-    isLoading.value = true;
-    axios.get('/mailweb/emails')
+const fetchEmails = (resetList = true): void => {
+    if (resetList) {
+        isLoading.value = true;
+        currentPage.value = 1;
+    } else {
+        isLoadingMore.value = true;
+    }
+    
+    const params = {
+        page: currentPage.value,
+        per_page: perPage.value,
+        search: searchQuery.value || undefined
+    };
+    
+    axios.get('/mailweb/emails', { params })
         .then((response) => {
-            emails.value = response.data;
+            if (resetList) {
+                emails.value = response.data.data;
+            } else {
+                emails.value = [...emails.value, ...response.data.data];
+            }
+            totalEmails.value = response.data.total;
+            lastPage.value = response.data.last_page;
             isLoading.value = false;
+            isLoadingMore.value = false;
         })
         .catch((err) => {
             error.value = err.message;
             isLoading.value = false;
+            isLoadingMore.value = false;
         });
+};
+
+const loadMoreEmails = (): void => {
+    if (currentPage.value < lastPage.value && !isLoadingMore.value) {
+        currentPage.value++;
+        fetchEmails(false);
+    }
 };
 
 // Provide fetchEmails function to child components
@@ -40,20 +74,44 @@ const formatEmailAddressesForSearch = (addresses: EmailAddress[]): string => {
     return addresses.map(addr => `${addr.name} ${addr.address}`).join(' ');
 };
 
-// Computed filtered emails
-const filteredEmails = computed<Email[]>(() =>
-    emails.value.filter(email => {
-        const query = searchQuery.value.toLowerCase();
-        const fromText = formatEmailAddressesForSearch(email.from).toLowerCase();
-        const toText = formatEmailAddressesForSearch(email.to).toLowerCase();
-        const bodyText = email.body_text.toLowerCase();
+// We'll use server-side filtering instead of client-side
+const filteredEmails = computed<Email[]>(() => emails.value);
+
+// Watch for search query changes to trigger new search
+watch(searchQuery, (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+        // Debounce search to avoid too many requests
+        const debounceTimeout = setTimeout(() => {
+            fetchEmails(true);
+        }, 300);
         
-        return email.subject.toLowerCase().includes(query) ||
-            fromText.includes(query) ||
-            toText.includes(query) ||
-            bodyText.includes(query);
-    })
-);
+        return () => clearTimeout(debounceTimeout);
+    }
+}, { immediate: false });
+
+// Method to fetch full email content when an email is selected
+const fetchEmailContent = (emailId: string): void => {
+    isLoadingEmailContent.value = true;
+    
+    axios.get(`/mailweb/emails/${emailId}`)
+        .then((response) => {
+            selectedEmailWithFullContent.value = response.data;
+            isLoadingEmailContent.value = false;
+        })
+        .catch((err) => {
+            error.value = err.message;
+            isLoadingEmailContent.value = false;
+        });
+};
+
+// Watch for changes in selected email to fetch full content
+watch(selectedEmail, (newEmail) => {
+    if (newEmail) {
+        fetchEmailContent(newEmail.id);
+    } else {
+        selectedEmailWithFullContent.value = null;
+    }
+});
 
 // Methods
 const handleShare = (): void => {
@@ -104,13 +162,27 @@ onMounted((): void => {
             <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
                 <template v-if="isMobile">
                     <SlidingPanel>
-                        <EmailList :emails="filteredEmails" v-model:selectedEmail="selectedEmail" :isLoading="isLoading"
-                            :error="error" :isMobile="isMobile" />
+                        <EmailList 
+                            :emails="filteredEmails" 
+                            v-model:selectedEmail="selectedEmail" 
+                            :isLoading="isLoading"
+                            :isLoadingMore="isLoadingMore"
+                            :error="error" 
+                            :isMobile="isMobile" 
+                            :totalEmails="totalEmails"
+                            :hasMoreEmails="currentPage < lastPage"
+                            @loadMore="loadMoreEmails"
+                        />
                         <template #preview>
                             <div v-if="selectedEmail" class="h-full overflow-y-auto">
-                                <EmailPreview :email="selectedEmail" :isMobile="isMobile" @share="handleShare"
-                                    @delete="handleDelete" />
-                                <!-- <EmailDetails :email="selectedEmail" :isMobile="isMobile" /> -->
+                                <EmailPreview 
+                                    :email="selectedEmailWithFullContent || selectedEmail" 
+                                    :isLoading="isLoadingEmailContent"
+                                    :isMobile="isMobile" 
+                                    @share="handleShare"
+                                    @delete="handleDelete" 
+                                />
+                                <!-- <EmailDetails :email="selectedEmailWithFullContent || selectedEmail" :isMobile="isMobile" /> -->
                             </div>
                             <div v-else class="flex items-center justify-center h-full p-6 text-center bg-muted/30">
                                 <div>
@@ -122,13 +194,27 @@ onMounted((): void => {
                     </SlidingPanel>
                 </template>
                 <template v-else>
-                    <EmailList :emails="filteredEmails" v-model:selectedEmail="selectedEmail" :isLoading="isLoading"
-                        :error="error" :isMobile="isMobile" />
+                    <EmailList 
+                        :emails="filteredEmails" 
+                        v-model:selectedEmail="selectedEmail" 
+                        :isLoading="isLoading"
+                        :isLoadingMore="isLoadingMore"
+                        :error="error" 
+                        :isMobile="isMobile" 
+                        :totalEmails="totalEmails"
+                        :hasMoreEmails="currentPage < lastPage"
+                        @loadMore="loadMoreEmails"
+                    />
                     <template v-if="selectedEmail">
                         <div class="flex flex-col flex-1 overflow-hidden">
-                            <EmailPreview :email="selectedEmail" :isMobile="isMobile" @share="handleShare"
-                                @delete="handleDelete" />
-                            <!-- <EmailDetails :email="selectedEmail" :isMobile="isMobile" /> -->
+                            <EmailPreview 
+                                :email="selectedEmailWithFullContent || selectedEmail" 
+                                :isLoading="isLoadingEmailContent"
+                                :isMobile="isMobile" 
+                                @share="handleShare"
+                                @delete="handleDelete" 
+                            />
+                            <!-- <EmailDetails :email="selectedEmailWithFullContent || selectedEmail" :isMobile="isMobile" /> -->
                         </div>
                     </template>
                     <template v-else>

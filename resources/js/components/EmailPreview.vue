@@ -9,6 +9,7 @@ import { EmailPreview as Email, EmailAddress } from '@/types/email'
 const props = defineProps<{
     email: Email
     isMobile: boolean
+    isLoading?: boolean
 }>()
 
 // Helper function to format email addresses
@@ -62,12 +63,10 @@ const handleDownload = () => {
 const updateIframe = () => {
     // Using nextTick to ensure DOM is updated before accessing the iframe
     nextTick(() => {
-        console.log('Iframe reference:', iframeRef.value)
-        if (iframeRef.value) {
+        if (iframeRef.value && props.email.body_html) {
             const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow?.document
             if (iframeDoc) {
                 iframeDoc.open()
-                console.log('Email content:', props.email.body_html)
                 iframeDoc.write(props.email.body_html)
                 iframeDoc.close()
             }
@@ -189,7 +188,19 @@ onMounted(updateIframe)
             <div class="flex-1 overflow-hidden">
                 <!-- HTML Preview -->
                 <div v-show="viewMode === 'html'" class="h-full">
-                    <div class="h-full flex justify-center overflow-auto bg-gray-100 dark:bg-gray-900 transition-all duration-300"
+                    <!-- Loading state -->
+                    <div v-if="props.isLoading" class="h-full flex items-center justify-center">
+                        <div class="flex flex-col items-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+                            <p class="text-sm text-muted-foreground">Loading email content...</p>
+                        </div>
+                    </div>
+                    <!-- No HTML content available -->
+                    <div v-else-if="!props.email.body_html" class="h-full flex items-center justify-center">
+                        <p class="text-muted-foreground">No HTML content available</p>
+                    </div>
+                    <!-- HTML content -->
+                    <div v-else class="h-full flex justify-center overflow-auto bg-gray-100 dark:bg-gray-900 transition-all duration-300"
                         :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1rem' }">
                         <div class="bg-white dark:bg-gray-800 h-full transition-all duration-300 shadow-sm"
                             :style="previewStyle">
@@ -201,12 +212,28 @@ onMounted(updateIframe)
 
                 <!-- Text View -->
                 <div v-show="viewMode === 'text'" class="h-full p-4 overflow-auto">
-                    <pre class="whitespace-pre-wrap font-mono text-sm">{{ email.body_text }}</pre>
+                    <!-- Loading state -->
+                    <div v-if="props.isLoading" class="h-full flex items-center justify-center">
+                        <div class="flex flex-col items-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+                            <p class="text-sm text-muted-foreground">Loading email content...</p>
+                        </div>
+                    </div>
+                    <!-- Content -->
+                    <pre v-else class="whitespace-pre-wrap font-mono text-sm">{{ email.body_text }}</pre>
                 </div>
 
                 <!-- Raw View -->
                 <div v-show="viewMode === 'raw' && !isMobile" class="h-full p-4 overflow-auto">
-                    <pre class="whitespace-pre-wrap font-mono text-sm">{{ JSON.stringify(email, null, 2) }}</pre>
+                    <!-- Loading state -->
+                    <div v-if="props.isLoading" class="h-full flex items-center justify-center">
+                        <div class="flex flex-col items-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+                            <p class="text-sm text-muted-foreground">Loading email content...</p>
+                        </div>
+                    </div>
+                    <!-- Content -->
+                    <pre v-else class="whitespace-pre-wrap font-mono text-sm">{{ JSON.stringify(email, null, 2) }}</pre>
                 </div>
             </div>
         </div>

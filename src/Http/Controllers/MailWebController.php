@@ -3,6 +3,7 @@
 namespace Appoly\MailWeb\Http\Controllers;
 
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
@@ -36,13 +37,51 @@ class MailWebController
     }
 
     /**
-     * Fetch all emails for the dashboard.
+     * Fetch emails for the dashboard with pagination.
      */
-    public function fetchEmails(): JsonResponse
+    public function fetchEmails(\Illuminate\Http\Request $request): JsonResponse
     {
         $this->authorizeMailWebAccess();
 
-        return response()->json(MailwebEmail::all());
+        $perPage = $request->input('per_page', 25);
+        $page = $request->input('page', 1);
+        $search = $request->input('search');
+
+        $query = MailwebEmail::query();
+
+        // Apply search if provided
+        if ($search) {
+            $query->search($search);
+        }
+
+        // Order by most recent first
+        $query->orderBy('created_at', 'desc');
+
+        // Select only the fields needed for the list view (exclude HTML content)
+        $query->select([
+            'id', 'from', 'to', 'cc', 'bcc', 'subject', 'body_text',
+            'read', 'share_enabled', 'created_at', 'updated_at',
+        ]);
+
+        // Get paginated results
+        $emails = $query->paginate($perPage, ['*'], 'page', $page)
+            ->through(function ($email) {
+                return [
+                    'id' => $email->id,
+                    'from' => $email->from,
+                    'to' => $email->to,
+                    'cc' => $email->cc,
+                    'bcc' => $email->bcc,
+                    'subject' => $email->subject,
+                    'body_text' => Str::of($email->body_text)->limit(60),
+                    'read' => $email->read,
+                    'share_enabled' => $email->share_enabled,
+                    'created_at' => $email->created_at,
+                    'updated_at' => $email->updated_at,
+                ];
+            });
+
+        return response()->json($emails);
     }
 
     /**
@@ -61,5 +100,23 @@ class MailWebController
         return view('mailweb::email', [
             'email' => $mailwebEmail,
         ]);
+    }
+
+    /**
+     * Fetch a single email with full content.
+     */
+    public function fetchEmail(string $id): JsonResponse
+    {
+        $this->authorizeMailWebAccess();
+
+        $email = MailwebEmail::with('attachments')->findOrFail($id);
+
+        // Mark the email as read
+        if (! $email->read) {
+            $email->read = 1;
+            $email->save();
+        }
+
+        return response()->json($email);
     }
 }

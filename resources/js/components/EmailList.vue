@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { AlertCircle } from 'lucide-vue-next'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { AlertCircle, Loader2 } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -7,15 +8,24 @@ import { Separator } from '@/components/ui/separator'
 import { Email, EmailAddress } from '@/types/email'
 import { formatDistanceToNow, parseISO } from 'date-fns'
 
-defineProps<{
+const props = defineProps<{
     emails: Array<Email>,
     selectedEmail: Email | null,
     isLoading: boolean,
+    isLoadingMore?: boolean,
     error: Error | null,
-    isMobile: boolean
+    isMobile: boolean,
+    totalEmails?: number,
+    hasMoreEmails?: boolean
 }>()
 
-defineEmits(['update:selectedEmail'])
+const emit = defineEmits(['update:selectedEmail', 'loadMore'])
+
+const scrollRef = ref<HTMLElement | null>(null)
+const isIntersecting = ref(false)
+
+// Setup intersection observer for infinite scrolling
+let observer: IntersectionObserver | null = null
 
 // Helper function to format email addresses
 const formatEmailAddresses = (addresses: EmailAddress[]): string => {
@@ -37,6 +47,54 @@ const truncateText = (text: string, maxLength: number = 60): string => {
     if (text.length <= maxLength) return text;
     return text.substring(0, 57) + '...';
 }
+
+// Setup intersection observer for infinite scrolling
+const setupIntersectionObserver = () => {
+    if (!window.IntersectionObserver) return;
+    
+    observer = new IntersectionObserver(
+        (entries) => {
+            const target = entries[0];
+            isIntersecting.value = target.isIntersecting;
+            
+            if (isIntersecting.value && props.hasMoreEmails && !props.isLoadingMore && !props.isLoading) {
+                emit('loadMore');
+            }
+        },
+        { threshold: 0.1 }
+    );
+    
+    // Observe the scroll target element
+    const scrollTarget = document.getElementById('scroll-target');
+    if (scrollTarget) {
+        observer.observe(scrollTarget);
+    }
+};
+
+// Lifecycle hooks
+onMounted(() => {
+    setupIntersectionObserver();
+});
+
+onUnmounted(() => {
+    if (observer) {
+        observer.disconnect();
+    }
+});
+
+// Watch for changes in emails to re-setup observer
+watch(
+    () => props.emails.length,
+    () => {
+        // Wait for DOM update
+        setTimeout(() => {
+            if (observer) {
+                observer.disconnect();
+            }
+            setupIntersectionObserver();
+        }, 100);
+    }
+);
 </script>
 
 <template>
@@ -50,7 +108,9 @@ const truncateText = (text: string, maxLength: number = 60): string => {
         <template v-else>
             <div class="flex items-center justify-between p-4">
                 <h2 class="text-lg font-semibold">Emails</h2>
-                <div class="text-sm text-muted-foreground">{{ emails.length }} emails</div>
+                <div class="text-sm text-muted-foreground">
+                    {{ props.totalEmails ? `${emails.length} of ${props.totalEmails}` : emails.length }} emails
+                </div>
             </div>
             <Separator />
             
@@ -76,7 +136,7 @@ const truncateText = (text: string, maxLength: number = 60): string => {
                 <p>No emails found</p>
             </div>
 
-            <ScrollArea v-else class="flex-1">
+            <ScrollArea v-else class="flex-1" ref="scrollRef">
                 <div class="flex flex-col">
                     <div
                         v-for="email in emails"
@@ -85,7 +145,7 @@ const truncateText = (text: string, maxLength: number = 60): string => {
                             'flex cursor-pointer flex-col gap-1 border-b p-4 hover:bg-muted/50',
                             selectedEmail?.id === email.id ? 'bg-muted' : ''
                         ]"
-                        @click="$emit('update:selectedEmail', email)"
+                        @click="emit('update:selectedEmail', email)"
                     >
                         <div class="flex items-center justify-between">
                             <div class="font-medium">{{ formatEmailAddresses(email.to) }}</div>
@@ -95,6 +155,19 @@ const truncateText = (text: string, maxLength: number = 60): string => {
                         </div>
                         <div class="text-sm font-medium">{{ email.subject }}</div>
                         <div class="text-xs text-muted-foreground">{{ truncateText(email.body_text) }}</div>
+                    </div>
+                    
+                    <!-- Infinite scroll loading indicator -->
+                    <div v-if="props.isLoadingMore" class="p-4 flex justify-center">
+                        <Loader2 class="h-6 w-6 animate-spin text-primary" />
+                    </div>
+                    
+                    <!-- Intersection observer target -->
+                    <div v-if="props.hasMoreEmails" class="h-1" id="scroll-target"></div>
+                    
+                    <!-- End of list indicator -->
+                    <div v-if="emails.length > 0 && !props.hasMoreEmails" class="p-4 text-center text-sm text-muted-foreground">
+                        End of emails
                     </div>
                 </div>
             </ScrollArea>
