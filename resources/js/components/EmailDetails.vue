@@ -10,7 +10,7 @@ import {
     AccordionTrigger,
     AccordionContent,
 } from '@/components/ui/accordion'
-import { EmailDetails as Email } from '@/types/email'
+import { EmailDetails as Email, EmailAddress } from '@/types/email'
 
 defineProps<{
     email: Email
@@ -20,8 +20,18 @@ defineProps<{
 const isExpanded = ref(false)
 const activeAccordion = ref<string | undefined>(undefined)
 
+// Helper function to format email addresses
+const formatEmailAddresses = (addresses: EmailAddress[]): string => {
+    return addresses.map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
+}
+
 const formatDate = (date: string): string => {
     return new Date(date).toLocaleDateString()
+}
+
+// Helper function to determine read status
+const getReadStatus = (read: number): string => {
+    return read === 1 ? 'Read' : 'Unread'
 }
 </script>
 
@@ -48,22 +58,22 @@ const formatDate = (date: string): string => {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <h4 class="text-sm font-medium mb-1">From</h4>
-                    <p class="text-sm break-words">{{ email.from }}</p>
+                    <p class="text-sm break-words">{{ formatEmailAddresses(email.from) }}</p>
                 </div>
 
                 <div>
                     <h4 class="text-sm font-medium mb-1">To</h4>
-                    <p class="text-sm break-words">{{ email.to }}</p>
+                    <p class="text-sm break-words">{{ formatEmailAddresses(email.to) }}</p>
                 </div>
 
-                <div v-if="email.cc">
+                <div v-if="email.cc && email.cc.length > 0">
                     <h4 class="text-sm font-medium mb-1">CC</h4>
-                    <p class="text-sm break-words">{{ email.cc }}</p>
+                    <p class="text-sm break-words">{{ formatEmailAddresses(email.cc) }}</p>
                 </div>
 
-                <div v-if="email.bcc">
+                <div v-if="email.bcc && email.bcc.length > 0">
                     <h4 class="text-sm font-medium mb-1">BCC</h4>
-                    <p class="text-sm break-words">{{ email.bcc }}</p>
+                    <p class="text-sm break-words">{{ formatEmailAddresses(email.bcc) }}</p>
                 </div>
 
                 <div>
@@ -73,14 +83,20 @@ const formatDate = (date: string): string => {
 
                 <div>
                     <h4 class="text-sm font-medium mb-1">Date</h4>
-                    <p class="text-sm">{{ formatDate(email.date) }}</p>
+                    <p class="text-sm">{{ formatDate(email.created_at) }}</p>
                 </div>
 
                 <div>
                     <h4 class="text-sm font-medium mb-1">Status</h4>
-                    <Badge :variant="email.status === 'sent' ? 'default' : email.status === 'failed' ? 'destructive' : 'outline'
-                        ">
-                        {{ email.status.charAt(0).toUpperCase() + email.status.slice(1) }}
+                    <Badge :variant="email.read === 1 ? 'default' : 'outline'">
+                        {{ getReadStatus(email.read) }}
+                    </Badge>
+                </div>
+                
+                <div>
+                    <h4 class="text-sm font-medium mb-1">Sharing</h4>
+                    <Badge :variant="email.share_enabled === 1 ? 'default' : 'outline'">
+                        {{ email.share_enabled === 1 ? 'Enabled' : 'Disabled' }}
                     </Badge>
                 </div>
             </div>

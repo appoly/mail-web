@@ -7,7 +7,7 @@ import EmailList from '@/components/EmailList.vue';
 import EmailPreview from '@/components/EmailPreview.vue';
 import EmailDetails from '@/components/EmailDetails.vue';
 import SlidingPanel from '@/components/SlidingPanel.vue';
-import { Email } from '@/types/email';
+import { Email, EmailAddress } from '@/types/email';
 import axios from 'axios';
 
 const emails = ref<Email[]>([]);
@@ -32,14 +32,24 @@ const fetchEmails = (): void => {
         });
 };
 
+// Helper function to format email addresses for search
+const formatEmailAddressesForSearch = (addresses: EmailAddress[]): string => {
+    return addresses.map(addr => `${addr.name} ${addr.address}`).join(' ');
+};
+
 // Computed filtered emails
 const filteredEmails = computed<Email[]>(() =>
-    emails.value.filter(email =>
-        email.subject.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        email.from.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        email.to.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-        (email.preview?.toLowerCase().includes(searchQuery.value.toLowerCase()) ?? false)
-    )
+    emails.value.filter(email => {
+        const query = searchQuery.value.toLowerCase();
+        const fromText = formatEmailAddressesForSearch(email.from).toLowerCase();
+        const toText = formatEmailAddressesForSearch(email.to).toLowerCase();
+        const bodyText = email.body_text.toLowerCase();
+        
+        return email.subject.toLowerCase().includes(query) ||
+            fromText.includes(query) ||
+            toText.includes(query) ||
+            bodyText.includes(query);
+    })
 );
 
 // Methods

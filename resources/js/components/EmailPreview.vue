@@ -5,12 +5,17 @@ import { Button } from '@/components/ui/button'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
-import { EmailPreview as Email } from '@/types/email'
+import { EmailPreview as Email, EmailAddress } from '@/types/email'
 
 const props = defineProps<{
     email: Email
     isMobile: boolean
 }>()
+
+// Helper function to format email addresses
+const formatEmailAddresses = (addresses: EmailAddress[]): string => {
+    return addresses.map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
+}
 
 const viewMode = ref<'html' | 'text' | 'raw'>('html')
 const previewWidth = ref<'mobile' | 'tablet' | 'desktop'>('desktop')
@@ -37,8 +42,8 @@ const previewStyle = computed(() => ({
 }))
 
 const handleCopyHtml = () => {
-    if (props.email.content) {
-        navigator.clipboard.writeText(props.email.content)
+    if (props.email.body_html) {
+        navigator.clipboard.writeText(props.email.body_html)
         copied.value = true
         setTimeout(() => (copied.value = false), 2000)
     }
@@ -46,7 +51,8 @@ const handleCopyHtml = () => {
 
 const handleDownload = () => {
     const element = document.createElement('a')
-    const file = new Blob([viewMode.value === 'html' ? props.email.content : ''], { type: 'text/plain' })
+    const content = viewMode.value === 'html' ? props.email.body_html : props.email.body_text
+    const file = new Blob([content], { type: 'text/plain' })
     element.href = URL.createObjectURL(file)
     element.download = `email-${props.email.id}.${viewMode.value === 'html' ? 'html' : 'txt'}`
     document.body.appendChild(element)
@@ -55,7 +61,6 @@ const handleDownload = () => {
 }
 
 const updateIframe = () => {
-    // wait 2 seconds
     // Using nextTick to ensure DOM is updated before accessing the iframe
     nextTick(() => {
         console.log('Iframe reference:', iframeRef.value)
@@ -63,8 +68,8 @@ const updateIframe = () => {
             const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow?.document
             if (iframeDoc) {
                 iframeDoc.open()
-                console.log('Email content:', props.email.content)
-                iframeDoc.write(props.email.content)
+                console.log('Email content:', props.email.body_html)
+                iframeDoc.write(props.email.body_html)
                 iframeDoc.close()
             }
         }
@@ -82,7 +87,7 @@ onMounted(updateIframe)
             <div class="overflow-hidden">
                 <h2 class="text-lg font-semibold truncate">{{ email.subject }}</h2>
                 <p class="text-sm text-muted-foreground truncate">
-                    From: {{ email.from }} • To: {{ email.to }}
+                    From: {{ formatEmailAddresses(email.from) }} • To: {{ formatEmailAddresses(email.to) }}
                 </p>
             </div>
 
@@ -185,7 +190,7 @@ onMounted(updateIframe)
             </TabsContent>
 
             <TabsContent value="text" class="h-full m-0 p-4 overflow-auto">
-                <pre class="whitespace-pre-wrap font-mono text-sm">{{ email.content }}</pre>
+                <pre class="whitespace-pre-wrap font-mono text-sm">{{ email.body_text }}</pre>
             </TabsContent>
 
             <TabsContent v-if="!isMobile" value="raw" class="h-full m-0 p-4 overflow-auto">

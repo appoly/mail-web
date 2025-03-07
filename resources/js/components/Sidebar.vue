@@ -2,12 +2,6 @@
 import { Sheet, SheetContent } from '@/components/ui/sheet'
 import SidebarContent from './SidebarContent.vue'
 
-// defineProps({
-//     searchQuery: String,
-//     filters: Object,
-//     isOpen: Boolean,
-//     isMobile: Boolean
-// })
 defineProps<{
     searchQuery: string
     filters: Record<string, any>
