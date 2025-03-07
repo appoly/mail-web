@@ -2,7 +2,6 @@
 import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { Eye, Code, Smartphone, Tablet, Monitor, Download, Copy, ExternalLink, Check } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { EmailPreview as Email, EmailAddress } from '@/types/email'
@@ -64,7 +63,7 @@ const updateIframe = () => {
     // Using nextTick to ensure DOM is updated before accessing the iframe
     nextTick(() => {
         console.log('Iframe reference:', iframeRef.value)
-        if (iframeRef.value && viewMode.value === 'html') {
+        if (iframeRef.value) {
             const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow?.document
             if (iframeDoc) {
                 iframeDoc.open()
@@ -76,12 +75,12 @@ const updateIframe = () => {
     })
 }
 
-watch([() => props.email, viewMode], updateIframe, { immediate: true })
+watch(() => props.email, updateIframe, { immediate: true })
 onMounted(updateIframe)
 </script>
 
 <template>
-    <div class="flex flex-col h-full overflow-hidden">
+    <div class="flex flex-col h-[calc(100vh-57px)] lg:h-screen overflow-hidden">
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2 sm:p-4 border-b gap-2">
             <div class="overflow-hidden">
@@ -155,47 +154,61 @@ onMounted(updateIframe)
             </div>
         </div>
 
-        <!-- Tabs -->
-        <Tabs v-model:active="viewMode">
-            <TabsList class="h-9">
-                <TabsTrigger value="html">
-                    <div class="flex gap-2">
-                        <Eye class="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        Preview
-                    </div>
-                </TabsTrigger>
-                <TabsTrigger value="text">
-                    <div class="flex gap-2">
-                        <Code class="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        Text
-                    </div>
-                </TabsTrigger>
-                <TabsTrigger v-if="!isMobile" value="raw">
-                    <div class="flex gap-2">
-                        <Code class="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        Raw
-                    </div>
-                </TabsTrigger>
-            </TabsList>
+        <!-- Custom Tabs -->
+        <div class="flex flex-col h-full">
+            <!-- Tab Navigation -->
+            <div class="border-b flex">
+                <button 
+                    class="px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors"
+                    :class="viewMode === 'html' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'"
+                    @click="viewMode = 'html'"
+                >
+                    <Eye class="h-3 w-3 sm:h-4 sm:w-4" />
+                    Preview
+                </button>
+                <button 
+                    class="px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors"
+                    :class="viewMode === 'text' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'"
+                    @click="viewMode = 'text'"
+                >
+                    <Code class="h-3 w-3 sm:h-4 sm:w-4" />
+                    Text
+                </button>
+                <button 
+                    v-if="!isMobile"
+                    class="px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors"
+                    :class="viewMode === 'raw' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'"
+                    @click="viewMode = 'raw'"
+                >
+                    <Code class="h-3 w-3 sm:h-4 sm:w-4" />
+                    Raw
+                </button>
+            </div>
 
-            <TabsContent value="html" class="h-full m-0 p-0">
-                <div class="h-full flex justify-center overflow-auto bg-gray-100 dark:bg-gray-900 transition-all duration-300"
-                    :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1rem' }">
-                    <div class="bg-white dark:bg-gray-800 h-full transition-all duration-300 shadow-sm"
-                        :style="previewStyle">
-                        <iframe ref="iframeRef" title="Email Preview" class="w-full h-full border-0"
-                            sandbox="allow-same-origin" />
+            <!-- Tab Content -->
+            <div class="flex-1 overflow-hidden">
+                <!-- HTML Preview -->
+                <div v-show="viewMode === 'html'" class="h-full">
+                    <div class="h-full flex justify-center overflow-auto bg-gray-100 dark:bg-gray-900 transition-all duration-300"
+                        :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1rem' }">
+                        <div class="bg-white dark:bg-gray-800 h-full transition-all duration-300 shadow-sm"
+                            :style="previewStyle">
+                            <iframe ref="iframeRef" title="Email Preview" class="w-full h-full border-0"
+                                sandbox="allow-same-origin" />
+                        </div>
                     </div>
                 </div>
-            </TabsContent>
 
-            <TabsContent value="text" class="h-full m-0 p-4 overflow-auto">
-                <pre class="whitespace-pre-wrap font-mono text-sm">{{ email.body_text }}</pre>
-            </TabsContent>
+                <!-- Text View -->
+                <div v-show="viewMode === 'text'" class="h-full p-4 overflow-auto">
+                    <pre class="whitespace-pre-wrap font-mono text-sm">{{ email.body_text }}</pre>
+                </div>
 
-            <TabsContent v-if="!isMobile" value="raw" class="h-full m-0 p-4 overflow-auto">
-                <pre class="whitespace-pre-wrap font-mono text-sm">{{ JSON.stringify(email, null, 2) }}</pre>
-            </TabsContent>
-        </Tabs>
+                <!-- Raw View -->
+                <div v-show="viewMode === 'raw' && !isMobile" class="h-full p-4 overflow-auto">
+                    <pre class="whitespace-pre-wrap font-mono text-sm">{{ JSON.stringify(email, null, 2) }}</pre>
+                </div>
+            </div>
+        </div>
     </div>
 </template>

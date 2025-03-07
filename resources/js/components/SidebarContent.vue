@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Search, Mail, Filter, RefreshCw, Settings, HelpCircle, X } from 'lucide-vue-next'
+import { Search, Mail, Filter, RefreshCw, Settings, HelpCircle, X, Send } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -21,12 +21,38 @@ defineProps<{
 defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar'])
 
 const isRefreshing = ref<boolean>(false)
+const isSending = ref<boolean>(false)
 
 const handleRefresh = () : void => {
     isRefreshing.value = true
     setTimeout(() => {
         isRefreshing.value = false
     }, 1000)
+}
+
+import axios from 'axios'
+
+const sendTestEmail = async () : Promise<void> => {
+    isSending.value = true
+    try {
+        const response = await axios.get('/mailweb/send-test-email', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+        
+        if (response.status === 200) {
+            alert('Test email sent successfully! Check your logs.')
+        } else {
+            alert('Failed to send test email. Please check the console for details.')
+            console.error('Failed to send test email:', response.data)
+        }
+    } catch (error) {
+        alert('Error sending test email')
+        console.error('Error sending test email:', error)
+    } finally {
+        isSending.value = false
+    }
 }
 </script>
 
@@ -123,6 +149,15 @@ const handleRefresh = () : void => {
                                 </Button>
                             </TooltipTrigger>
                             <TooltipContent>Help</TooltipContent>
+                        </Tooltip>
+                        
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button variant="ghost" size="icon" @click="sendTestEmail" :disabled="isSending">
+                                    <Send :class="['h-4 w-4', { 'animate-pulse': isSending }]" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Send Test Email</TooltipContent>
                         </Tooltip>
                     </template>
                 </div>
