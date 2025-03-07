@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, provide } from 'vue';
 import { Menu } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar.vue';
@@ -31,6 +31,9 @@ const fetchEmails = (): void => {
             isLoading.value = false;
         });
 };
+
+// Provide fetchEmails function to child components
+provide('fetchEmails', fetchEmails);
 
 // Helper function to format email addresses for search
 const formatEmailAddressesForSearch = (addresses: EmailAddress[]): string => {

@@ -1,34 +1,88 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Search, Mail, Filter, RefreshCw, Settings, HelpCircle, X, Send } from 'lucide-vue-next'
+import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
+import { Search, Mail, Filter, RefreshCw, Settings, HelpCircle, X, Send, Play, Pause } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
-// defineProps({
-//     searchQuery: String,
-//     filters: Object,
-//     isMobile: Boolean
-// })
-
-defineProps<{
+const props = defineProps<{
     searchQuery: string
     filters: Record<string, any>
     isMobile: boolean
 }>()
 
-defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar'])
+const emit = defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar'])
+
+// Inject the fetchEmails function from Dashboard
+const fetchEmails = inject('fetchEmails') as () => void
 
 const isRefreshing = ref<boolean>(false)
 const isSending = ref<boolean>(false)
+const isPolling = ref<boolean>(false)
+const pollingInterval = ref<number | null>(null)
+
+// Poll for new emails every 10 seconds
+const POLLING_INTERVAL_MS = 10000
+
+const startPolling = () : void => {
+    if (pollingInterval.value !== null) return
+    
+    // Immediately fetch emails
+    handleRefresh()
+    
+    // Start polling
+    pollingInterval.value = window.setInterval(() => {
+        if (document.visibilityState === 'visible') {
+            handleRefresh()
+        }
+    }, POLLING_INTERVAL_MS)
+    
+    isPolling.value = true
+}
+
+const stopPolling = () : void => {
+    if (pollingInterval.value !== null) {
+        window.clearInterval(pollingInterval.value)
+        pollingInterval.value = null
+    }
+    isPolling.value = false
+}
+
+const togglePolling = () : void => {
+    if (isPolling.value) {
+        stopPolling()
+    } else {
+        startPolling()
+    }
+}
 
 const handleRefresh = () : void => {
     isRefreshing.value = true
+    if (fetchEmails) {
+        fetchEmails()
+    }
     setTimeout(() => {
         isRefreshing.value = false
     }, 1000)
 }
+
+// Handle visibility change to pause polling when tab is not visible
+const handleVisibilityChange = () : void => {
+    if (document.visibilityState === 'hidden' && isPolling.value) {
+        // Don't stop the interval, just don't fetch when hidden
+    }
+}
+
+// Clean up interval when component is unmounted
+onMounted(() => {
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+})
+
+onUnmounted(() => {
+    stopPolling()
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
+})
 
 import axios from 'axios'
 
@@ -125,11 +179,21 @@ const sendTestEmail = async () : Promise<void> => {
                 <div class="flex items-center justify-between">
                     <Tooltip>
                         <TooltipTrigger as-child>
-                            <Button variant="ghost" size="icon" @click="handleRefresh">
-                                <RefreshCw :class="['h-4 w-4', { 'animate-spin': isRefreshing }]" />
+                            <Button 
+                                :variant="isPolling ? 'default' : 'ghost'" 
+                                size="icon" 
+                                @click="togglePolling"
+                                class="relative"
+                            >
+                                <Play v-if="!isPolling" class="h-4 w-4" />
+                                <Pause v-else class="h-4 w-4" />
+                                <RefreshCw 
+                                    v-if="isRefreshing" 
+                                    class="h-4 w-4 animate-spin absolute" 
+                                />
                             </Button>
                         </TooltipTrigger>
-                        <TooltipContent>Refresh</TooltipContent>
+                        <TooltipContent>{{ isPolling ? 'Stop' : 'Start' }} Auto-Refresh</TooltipContent>
                     </Tooltip>
 
                     <template v-if="!isMobile">

@@ -54,11 +54,21 @@ const truncateText = (text: string, maxLength: number = 60): string => {
             </div>
             <Separator />
             
-            <div v-if="isLoading" class="p-4 space-y-4">
-                <div v-for="(_, i) in 10" :key="i" class="space-y-2">
-                    <Skeleton class="h-4 w-3/4" />
-                    <Skeleton class="h-4 w-1/2" />
-                    <Skeleton class="h-4 w-1/4" />
+            <div v-if="isLoading" class="flex flex-col">
+                <div v-for="(_, i) in 10" :key="i" class="flex cursor-pointer flex-col gap-1 border-b p-4">
+                    <!-- Email header with recipient and timestamp -->
+                    <div class="flex items-center justify-between">
+                        <Skeleton class="h-4 w-40" />
+                        <Skeleton class="h-3 w-16" />
+                    </div>
+                    <!-- Email subject -->
+                    <div class="mt-1">
+                        <Skeleton class="h-4 w-3/4" />
+                    </div>
+                    <!-- Email preview text -->
+                    <div class="mt-1">
+                        <Skeleton class="h-3 w-full" />
+                    </div>
                 </div>
             </div>
 
