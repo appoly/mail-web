@@ -5,9 +5,8 @@ import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/Sidebar.vue';
 import EmailList from '@/components/EmailList.vue';
 import EmailPreview from '@/components/EmailPreview.vue';
-import EmailDetails from '@/components/EmailDetails.vue';
 import SlidingPanel from '@/components/SlidingPanel.vue';
-import { Email, EmailAddress } from '@/types/email';
+import { Email } from '@/types/email';
 import axios from 'axios';
 import { formatDistanceToNow, parseISO } from 'date-fns';
 
@@ -21,11 +20,9 @@ const isMobile = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
 const isLoadingMore = ref<boolean>(false);
 const error = ref<string>('');
-const filters = ref<Record<string, any>>({});
 const currentPage = ref<number>(1);
 const totalEmails = ref<number>(0);
 const lastPage = ref<number>(1);
-const perPage = ref<number>(25);
 const userSettings = ref({
     paginationAmount: 25,
     dateFormat: 'timestamp'
@@ -88,23 +85,9 @@ const formatDate = (dateString: string): string => {
     }
 };
 
-// Watch for date format changes to trigger UI updates
-watch(() => userSettings.value.dateFormat, () => {
-    // This will force components using the formatDate function to re-render
-    // We're using a simple approach by providing a new function reference
-    provide('formatDate', (dateString: string) => formatDate(dateString));
-});
-
 // Provide fetchEmails function and formatDate to child components
 provide('fetchEmails', fetchEmails);
 provide('formatDate', formatDate);
-
-// Helper function to format email addresses for search
-const formatEmailAddressesForSearch = (addresses: EmailAddress[]): string => {
-    return addresses.map(addr => `${addr.name} ${addr.address}`).join(' ');
-};
-
-
 
 // We'll use server-side filtering instead of client-side
 const filteredEmails = computed<Email[]>(() => emails.value);
@@ -155,26 +138,6 @@ watch(selectedEmail, (newEmail) => {
 // Update user settings
 const updateSettings = (newSettings: any): void => {
     userSettings.value = { ...userSettings.value, ...newSettings };
-    // Force update of formatDate when settings change
-    provide('formatDate', (dateString: string) => formatDate(dateString));
-};
-
-// Methods
-const handleShare = (): void => {
-    if (selectedEmail.value) {
-        navigator.clipboard.writeText(`https://mailweb.example.com/share/${selectedEmail.value.id}`);
-        // toast({
-        //   title: "Share link copied!",
-        //   description: "Email preview link has been copied to clipboard",
-        // });
-    }
-};
-
-const handleDelete = (): void => {
-    // toast({
-    //   title: "Email deleted",
-    //   description: "The email has been moved to trash",
-    // });
 };
 
 const checkMobile = (): void => {
@@ -201,7 +164,7 @@ onMounted((): void => {
             </div>
         </div>
 
-        <Sidebar v-model:searchQuery="searchQuery" v-model:filters="filters" v-model:isOpen="sidebarOpen"
+        <Sidebar v-model:searchQuery="searchQuery" v-model:isOpen="sidebarOpen"
             :isMobile="isMobile" @update:settings="updateSettings" />
 
         <div class="flex flex-col flex-1 h-[calc(100vh-57px)] lg:h-screen overflow-hidden">
@@ -228,7 +191,6 @@ onMounted((): void => {
                                     @share="handleShare"
                                     @delete="handleDelete" 
                                 />
-                                <!-- <EmailDetails :email="selectedEmailWithFullContent || selectedEmail" :isMobile="isMobile" /> -->
                             </div>
                             <div v-else class="flex items-center justify-center h-full p-6 text-center bg-muted/30">
                                 <div>
@@ -260,7 +222,6 @@ onMounted((): void => {
                                 @share="handleShare"
                                 @delete="handleDelete" 
                             />
-                            <!-- <EmailDetails :email="selectedEmailWithFullContent || selectedEmail" :isMobile="isMobile" /> -->
                         </div>
                     </template>
                     <template v-else>

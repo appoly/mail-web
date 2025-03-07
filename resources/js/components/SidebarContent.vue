@@ -1,20 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
 import { Search, Mail, Filter, RefreshCw, Settings, X, Send, Play, Pause, ArrowLeft } from 'lucide-vue-next'
+
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@/components/ui/dialog'
-import axios from 'axios'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, } from '@/components/ui/dialog'
 
 import Github from '@/components/icons/Github.vue'
+
+import axios from 'axios'
 
 const props = defineProps<{
     searchQuery: string
@@ -34,16 +30,14 @@ const pollingInterval = ref<number | null>(null)
 
 // Settings
 const showSettingsDialog = ref<boolean>(false)
-const paginationOptions = [10, 25, 50, 100]
+const paginationOptions: number[] = [10, 25, 50, 100]
 const dateFormatOptions = [
     { value: 'timestamp', label: 'Timestamp' },
     { value: 'uk', label: 'UK (DD/MM/YYYY)' },
     { value: 'us', label: 'US (MM/DD/YYYY)' },
     { value: 'days-ago', label: 'X Days ago' }
 ]
-
-// Default settings
-const settings = ref({
+const settings: Record<string, any> = ref({
     paginationAmount: 25,
     dateFormat: 'timestamp'
 })
@@ -93,12 +87,6 @@ const handleRefresh = (): void => {
     }, 1000)
 }
 
-// Handle visibility change to pause polling when tab is not visible
-const handleVisibilityChange = (): void => {
-    if (document.visibilityState === 'hidden' && isPolling.value) {
-        // Don't stop the interval, just don't fetch when hidden
-    }
-}
 
 // Load settings from local storage
 const loadSettings = (): void => {
@@ -127,13 +115,11 @@ const saveSettings = (): void => {
 
 // Clean up interval when component is unmounted
 onMounted(() => {
-    document.addEventListener('visibilitychange', handleVisibilityChange)
     loadSettings()
 })
 
 onUnmounted(() => {
     stopPolling()
-    document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 
 const sendTestEmail = async (): Promise<void> => {
@@ -178,50 +164,6 @@ const sendTestEmail = async (): Promise<void> => {
                 <Search class="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input placeholder="Search emails..." class="pl-8" :value="searchQuery"
                     @input="$emit('update:searchQuery', $event.target.value)" />
-            </div>
-        </div>
-
-        <div v-if="!isMobile" class="p-4 border-b">
-            <div class="flex items-center justify-between mb-2">
-                <h2 class="text-sm font-medium">Filters</h2>
-                <Button variant="ghost" size="sm" class="h-8 px-2">
-                    <Filter class="h-4 w-4" />
-                </Button>
-            </div>
-
-            <div class="space-y-3">
-                <div class="space-y-1">
-                    <label class="text-xs font-medium">Status</label>
-                    <Select :value="filters.status"
-                        @update:value="$emit('update:filters', { ...filters, status: $event })">
-                        <SelectTrigger class="h-8">
-                            <SelectValue placeholder="All" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            <SelectItem value="sent">Sent</SelectItem>
-                            <SelectItem value="queued">Queued</SelectItem>
-                            <SelectItem value="failed">Failed</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div class="space-y-1">
-                    <label class="text-xs font-medium">Time Range</label>
-                    <Select :value="filters.timeRange"
-                        @update:value="$emit('update:filters', { ...filters, timeRange: $event })">
-                        <SelectTrigger class="h-8">
-                            <SelectValue placeholder="All time" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All time</SelectItem>
-                            <SelectItem value="today">Today</SelectItem>
-                            <SelectItem value="yesterday">Yesterday</SelectItem>
-                            <SelectItem value="week">This week</SelectItem>
-                            <SelectItem value="month">This month</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
             </div>
         </div>
 
