@@ -18,6 +18,21 @@ const props = defineProps<{
     isMobile: boolean
 }>()
 
+// Local state for search query to improve responsiveness
+const localSearchQuery = ref(props.searchQuery)
+
+// Watch for changes to localSearchQuery and emit updates to parent
+watch(localSearchQuery, (newValue) => {
+    emit('update:searchQuery', newValue)
+})
+
+// Watch for changes to props.searchQuery to keep local state in sync
+watch(() => props.searchQuery, (newValue) => {
+    if (newValue !== localSearchQuery.value) {
+        localSearchQuery.value = newValue
+    }
+})
+
 const emit = defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar', 'update:settings'])
 
 // Inject the fetchEmails function from Dashboard
@@ -162,8 +177,7 @@ const sendTestEmail = async (): Promise<void> => {
             </div>
             <div class="relative">
                 <Search class="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Search emails..." class="pl-8" :value="searchQuery"
-                    @input="$emit('update:searchQuery', $event.target.value)" />
+                <Input placeholder="Search emails..." class="pl-8" v-model="localSearchQuery" />
             </div>
         </div>
 
