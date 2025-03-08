@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, } from '@/components/ui/dialog'
-
+import toast from 'vue3-hot-toast'
 import Github from '@/components/icons/Github.vue'
 
 import axios from 'axios'
@@ -44,6 +44,10 @@ const isDeleting = ref<boolean>(false)
 const isPolling = ref<boolean>(false)
 const pollingInterval = ref<number | null>(null)
 
+// Shared state for pagination events and polling
+const paginationTriggered = inject('paginationTriggered', null) as any
+const isPollingActive = inject('isPollingActive', true) as boolean
+
 // Settings
 const showSettingsDialog = ref<boolean>(false)
 const showDeleteAllDialog = ref<boolean>(false)
@@ -59,11 +63,16 @@ const settings: Record<string, any> = ref({
     dateFormat: 'timestamp'
 })
 
-// Poll for new emails every 10 seconds
-const POLLING_INTERVAL_MS = 10000
+// Poll for new emails every 5 seconds
+const POLLING_INTERVAL_MS = 5000
 
 const startPolling = (): void => {
     if (pollingInterval.value !== null) return
+
+    // Reset pagination trigger if it exists
+    if (paginationTriggered) {
+        paginationTriggered.value = false
+    }
 
     // Immediately fetch emails
     handleRefresh()
@@ -76,6 +85,9 @@ const startPolling = (): void => {
     }, POLLING_INTERVAL_MS)
 
     isPolling.value = true
+    if (isPollingActive) {
+        isPollingActive.value = true
+    }
 }
 
 const stopPolling = (): void => {
@@ -84,6 +96,9 @@ const stopPolling = (): void => {
         pollingInterval.value = null
     }
     isPolling.value = false
+    if (isPollingActive) {
+        isPollingActive.value = false
+    }
 }
 
 const togglePolling = (): void => {
@@ -133,6 +148,20 @@ const saveSettings = (): void => {
 // Clean up interval when component is unmounted
 onMounted(() => {
     loadSettings()
+
+    if(isPollingActive) {
+        startPolling()
+    }
+    
+    // Watch for changes to paginationTriggered to stop polling when pagination is triggered
+    if (paginationTriggered) {
+        watch(paginationTriggered, (triggered) => {
+            if (triggered && isPolling.value) {
+                stopPolling()
+                toast.success('Polling has been turned off due to pagination being triggered')
+            }
+        })
+    }
 })
 
 onUnmounted(() => {
@@ -149,13 +178,12 @@ const sendTestEmail = async (): Promise<void> => {
         })
 
         if (response.status === 200) {
-            alert('Test email sent successfully! Check your logs.')
+            toast.success('Test email sent successfully')
         } else {
-            alert('Failed to send test email. Please check the console for details.')
-            console.error('Failed to send test email:', response.data)
+            toast.error('Failed to send test email')
         }
     } catch (error) {
-        alert('Error sending test email')
+        toast.error('Failed to send test email')
         console.error('Error sending test email:', error)
     } finally {
         isSending.value = false
@@ -172,13 +200,13 @@ const deleteAllEmails = async (): Promise<void> => {
         })
 
         if (response.status === 200) {
-            alert('All emails have been deleted successfully!')
+            toast.success('All emails have been deleted successfully!')
             // Refresh the email list
             if (fetchEmails) {
                 fetchEmails()
             }
         } else {
-            alert('Failed to delete all emails. Please check the console for details.')
+            toast.error('Failed to delete all emails')
             console.error('Failed to delete all emails:', response.data)
         }
     } catch (error) {

@@ -33,6 +33,10 @@ const formatEmailAddresses = (addresses: EmailAddress[]): string => {
 }
 
 const formatDate = inject('formatDate') as (dateString: string) => string
+const paginationTriggered = inject('paginationTriggered', null) as any
+const isPollingActive = inject('isPollingActive', null) as any
+
+
 
 // Helper function to truncate text
 const truncateText = (text: string, maxLength: number = 60): string => {
@@ -49,8 +53,13 @@ const setupIntersectionObserver = () => {
         (entries) => {
             const target = entries[0];
             isIntersecting.value = target.isIntersecting;
-            
             if (isIntersecting.value && props.hasMoreEmails && !props.isLoadingMore && !props.isLoading) {
+                // If polling is active, set the pagination trigger before loading more
+                if (isPollingActive && paginationTriggered) {
+                    if (isPollingActive.value === true) {
+                        paginationTriggered.value = true;
+                    }
+                }
                 emit('loadMore');
             }
         },
@@ -88,6 +97,13 @@ watch(
         }, 100);
     }
 );
+
+watch(isPollingActive, (newValue) => {
+    if (observer) {
+        observer.disconnect();
+    }
+    setupIntersectionObserver();
+})
 </script>
 
 <template>

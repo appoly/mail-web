@@ -9,6 +9,8 @@ import SlidingPanel from '@/components/SlidingPanel.vue';
 import { Email } from '@/types/email';
 import axios from 'axios';
 import { formatDistanceToNow, parseISO } from 'date-fns';
+import toast, { Toaster } from 'vue3-hot-toast'
+
 
 const emails = ref<Email[]>([]);
 const selectedEmail = ref<Email | null>(null);
@@ -19,7 +21,7 @@ const sidebarOpen = ref<boolean>(false);
 const isMobile = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
 const isLoadingMore = ref<boolean>(false);
-const error = ref<string>('');
+const error = ref<Error | null>(null);
 const currentPage = ref<number>(1);
 const totalEmails = ref<number>(0);
 const lastPage = ref<number>(1);
@@ -28,10 +30,18 @@ const userSettings = ref({
     dateFormat: 'timestamp'
 });
 
+// Create a ref to track pagination events
+const paginationTriggered = ref(false);
+
+// Create a ref to track polling state for components to access
+const isPollingActive = ref(false);
+
 const fetchEmails = (resetList = true): void => {
     if (resetList) {
         isLoading.value = true;
         currentPage.value = 1;
+        // Reset pagination trigger when doing a fresh fetch
+        paginationTriggered.value = false;
     } else {
         isLoadingMore.value = true;
     }
@@ -63,6 +73,9 @@ const fetchEmails = (resetList = true): void => {
 
 const loadMoreEmails = (): void => {
     if (currentPage.value < lastPage.value && !isLoadingMore.value) {
+        // Signal that pagination has been triggered
+        paginationTriggered.value = true;
+        
         currentPage.value++;
         fetchEmails(false);
     }
@@ -85,9 +98,11 @@ const formatDate = (dateString: string): string => {
     }
 };
 
-// Provide fetchEmails function and formatDate to child components
+// Provide fetchEmails function, formatDate, pagination event, and polling state to child components
 provide('fetchEmails', fetchEmails);
 provide('formatDate', formatDate);
+provide('paginationTriggered', paginationTriggered);
+provide('isPollingActive', isPollingActive);
 
 // We'll use server-side filtering instead of client-side
 const filteredEmails = computed<Email[]>(() => emails.value);
@@ -148,6 +163,8 @@ const handleDeleteEmail = (emailId: string): void => {
     emails.value = emails.value.filter(email => email.id !== emailId);
     selectedEmail.value = null;
     selectedEmailWithFullContent.value = null;
+
+    toast.success('Email deleted successfully');
 }
 
 // Lifecycle hooks
@@ -240,4 +257,5 @@ onMounted((): void => {
             </div>
         </div>
     </div>
+    <Toaster />
 </template>

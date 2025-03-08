@@ -18,7 +18,8 @@
         "lucide-vue-next": "^0.476.0",
         "reka-ui": "^2.0.2",
         "tailwind-merge": "^3.0.2",
-        "tailwindcss-animate": "^1.0.7"
+        "tailwindcss-animate": "^1.0.7",
+        "vue3-hot-toast": "^0.0.5"
     },
     "devDependencies": {
         "@vitejs/plugin-vue": "^5.2.1",
