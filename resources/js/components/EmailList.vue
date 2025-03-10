@@ -32,18 +32,13 @@ const isIntersecting = ref(false)
 let observer: IntersectionObserver | null = null
 
 // Helper function to format email addresses with limit
-const formatEmailAddresses = (addresses: EmailAddress[]): string => {
-    if (addresses.length <= 2) {
-        return addresses.map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
-    } else {
-        const visibleAddresses = addresses.slice(0, 2).map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
-        return visibleAddresses
-    }
+const formatEmailAddress = (address: EmailAddress): string => {
+    return address.name ? `${address.name} <${address.address}>` : address.address
 }
 
 // Get full email addresses for tooltip
 const getFullEmailAddresses = (addresses: EmailAddress[]): string => {
-    return addresses.map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
+    return addresses.map(addr => formatEmailAddress(addr)).join(', ')
 }
 
 const formatDate = inject('formatDate') as (dateString: string) => string
@@ -179,12 +174,12 @@ watch(isPollingActive, (newValue) => {
                     >
                         <div class="flex items-center justify-between">
                             <div class="font-medium flex items-center">
-                                {{ formatEmailAddresses(email.to) }}
-                                <TooltipProvider v-if="email.to.length > 2">
+                                {{ formatEmailAddress(email.to[0]) }}
+                                <TooltipProvider v-if="email.to.length > 1">
                                     <Tooltip>
                                         <TooltipTrigger>
                                             <span class="text-xs text-muted-foreground ml-1 cursor-pointer hover:text-primary">
-                                                + {{ email.to.length - 2 }} more
+                                                + {{ email.to.length - 1 }} more
                                             </span>
                                         </TooltipTrigger>
                                         <TooltipContent>
