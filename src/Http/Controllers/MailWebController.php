@@ -140,6 +140,14 @@ class MailWebController
     {
         $this->authorizeMailWebAccess();
 
+        // Check if delete all feature is enabled
+        if (! config('MailWeb.MAILWEB_DELETE_ALL_ENABLED', false)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Delete all emails feature is disabled',
+            ], 403);
+        }
+
         try {
             // Delete all emails
             $count = MailwebEmail::query()->delete();

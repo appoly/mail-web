@@ -1,6 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
-import { Search, Mail, Filter, RefreshCw, Settings, X, Send, Play, Pause, ArrowLeft, Trash2 } from 'lucide-vue-next'
+// Declare mailwebConfig on window object
+declare global {
+    interface Window {
+        mailwebConfig?: {
+            deleteAllEnabled: boolean
+        }
+    }
+}
+
+import { ref, onMounted, onUnmounted, watch, inject, nextTick } from 'vue'
+import { Search, Mail, Filter, RefreshCw, Settings, X, Send, Play, Pause, ArrowLeft, Trash2, AlertCircle } from 'lucide-vue-next'
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -51,6 +60,7 @@ const isPollingActive = inject('isPollingActive', true) as boolean
 // Settings
 const showSettingsDialog = ref<boolean>(false)
 const showDeleteAllDialog = ref<boolean>(false)
+const showDeleteAllDisabledDialog = ref<boolean>(false)
 const paginationOptions: number[] = [10, 25, 50, 100]
 const dateFormatOptions = [
     { value: 'timestamp', label: 'Timestamp' },
@@ -61,6 +71,16 @@ const dateFormatOptions = [
 const settings: Record<string, any> = ref({
     paginationAmount: 25,
     dateFormat: 'days-ago'
+})
+
+// Check if delete all feature is enabled from window.mailwebConfig
+const isDeleteAllEnabled = ref<boolean>(false)
+
+// Initialize isDeleteAllEnabled from window config
+onMounted(() => {
+    if (window.mailwebConfig && typeof window.mailwebConfig.deleteAllEnabled === 'boolean') {
+        isDeleteAllEnabled.value = window.mailwebConfig.deleteAllEnabled
+    }
 })
 
 // Poll for new emails every 5 seconds
@@ -149,10 +169,10 @@ const saveSettings = (): void => {
 onMounted(() => {
     loadSettings()
 
-    if(isPollingActive) {
+    if (isPollingActive) {
         startPolling()
     }
-    
+
     // Watch for changes to paginationTriggered to stop polling when pagination is triggered
     if (paginationTriggered) {
         watch(paginationTriggered, (triggered) => {
@@ -191,6 +211,13 @@ const sendTestEmail = async (): Promise<void> => {
 }
 
 const deleteAllEmails = async (): Promise<void> => {
+    // Check if delete all is enabled
+    if (!isDeleteAllEnabled.value) {
+        showDeleteAllDialog.value = false
+        showDeleteAllDisabledDialog.value = true
+        return
+    }
+
     isDeleting.value = true
     try {
         const response = await axios.delete('/mailweb/emails/delete-all', {
@@ -209,9 +236,14 @@ const deleteAllEmails = async (): Promise<void> => {
             toast.error('Failed to delete all emails')
             console.error('Failed to delete all emails:', response.data)
         }
-    } catch (error) {
-        alert('Error deleting all emails')
-        console.error('Error deleting all emails:', error)
+    } catch (error: any) {
+        if (error.response && error.response.status === 403) {
+            toast.error('Delete all emails feature is disabled')
+            showDeleteAllDisabledDialog.value = true
+        } else {
+            toast.error('Error deleting all emails')
+            console.error('Error deleting all emails:', error)
+        }
     } finally {
         isDeleting.value = false
         showDeleteAllDialog.value = false
@@ -333,8 +365,10 @@ const deleteAllEmails = async (): Promise<void> => {
                         </SelectContent>
                     </Select>
                 </div>
-                <div class="my-4">
-                    <Button variant="destructive" @click="showDeleteAllDialog = true" class="w-full">
+                <div class="my-4" v-if="isDeleteAllEnabled">
+                    <Button variant="destructive"
+                        @click="isDeleteAllEnabled ? showDeleteAllDialog = true : showDeleteAllDisabledDialog = true"
+                        class="w-full">
                         <Trash2 class="h-4 w-4" /> Delete All Emails
                     </Button>
                 </div>
@@ -363,6 +397,31 @@ const deleteAllEmails = async (): Promise<void> => {
                     <span v-if="isDeleting">Deleting...</span>
                     <span v-else>Delete All</span>
                 </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+
+    <!-- Delete All Disabled Dialog -->
+    <Dialog :open="showDeleteAllDisabledDialog" @update:open="showDeleteAllDisabledDialog = $event">
+        <DialogContent class="sm:max-w-[425px]">
+            <DialogHeader>
+                <DialogTitle class="flex items-center gap-2">
+                    <AlertCircle class="h-5 w-5 text-amber-500" />
+                    Feature Disabled
+                </DialogTitle>
+            </DialogHeader>
+            <div class="py-4">
+                <p class="text-sm text-muted-foreground">
+                    The "Delete All Emails" feature is currently disabled by your administrator.
+                </p>
+                <p class="text-sm text-muted-foreground mt-2">
+                    To enable this feature, set <code>MAILWEB_DELETE_ALL_ENABLED=true</code> in your environment
+                    variables
+                    or update the config file.
+                </p>
+            </div>
+            <DialogFooter>
+                <Button variant="outline" @click="showDeleteAllDisabledDialog = false">Close</Button>
             </DialogFooter>
         </DialogContent>
     </Dialog>
