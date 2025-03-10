@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator'
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
+import EmailAttachments from './EmailAttachments.vue'
 import type { EmailPreview, EmailAddress } from '@/types/email'
 
 const emit = defineEmits(['delete-email'])
@@ -180,23 +181,13 @@ onMounted(updateIframe)
         <div class="flex flex-col sm:flex-row sm:items-center justify-between p-2 sm:p-4 border-b gap-2">
             <div class="overflow-hidden">
                 <h2 class="text-lg font-semibold truncate">{{ email.subject }}</h2>
-                <p class="text-sm text-muted-foreground truncate">
-                    From: {{ formatEmailAddresses(email.from) }} • To: {{ formatEmailAddresses(email.to) }}
-                </p>
+                <p class="text-sm text-muted-foreground">From: {{ formatEmailAddresses(email.from) }}</p>
+                <p class="text-sm text-muted-foreground">To: {{ formatEmailAddresses(email.to) }}</p>
                 <div class="flex items-center text-xs text-muted-foreground mt-1">
                     <Clock class="h-3 w-3 mr-1" />
                     <span>{{ formatDate(email.created_at) }}</span>
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger as-child>
-                                <span class="ml-1 cursor-help underline decoration-dotted">
-                                    ({{ formatDate(email.created_at) }})
-                                </span>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">Full timestamp</TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
                 </div>
+                <EmailAttachments v-if="email.attachments" :attachments="email.attachments" />
             </div>
 
             <div v-if="!isMobile" class="flex items-center gap-1 sm:gap-2">

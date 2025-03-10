@@ -4,24 +4,10 @@ export interface EmailAddress {
     address: string
 }
 
-// Email interface for EmailDetails component
-export interface EmailDetails {
+export interface EmailAttachment {
     id: string
-    subject: string
-    from: EmailAddress[]
-    to: EmailAddress[]
-    cc?: EmailAddress[]
-    bcc?: EmailAddress[]
-    body_html: string
-    body_text: string
-    read: number
-    share_enabled: number
-    share_url?: string
-    created_at: string
-    updated_at: string
-    headers?: string
-    attachments?: { filename: string; size: string }[]
-    events?: { type: string; description: string; timestamp: string }[]
+    name: string
+    path: string
 }
 
 // Email interface for EmailPreview component
@@ -37,7 +23,7 @@ export interface EmailPreview {
     share_url?: string
     created_at: string
     updated_at: string
-    attachments?: any[]
+    attachments?: EmailAttachment[]
 }
 
 // Generic Email interface that can be used across components
@@ -56,6 +42,5 @@ export interface Email {
     updated_at: string
     headers?: string
     share_url?: string
-    attachments?: any[]
-    events?: { type: string; description: string; timestamp: string }[]
+    attachments_count?: number
 }

@@ -58,6 +58,7 @@ class MailWebController
                 'id', 'from', 'to', 'cc', 'bcc', 'subject', 'body_text',
                 'read', 'share_enabled', 'created_at', 'updated_at',
             ])
+            ->withCount('attachments')
             ->paginate($perPage, ['*'], 'page', $page)
             ->through(function ($email) {
                 return [
@@ -73,6 +74,7 @@ class MailWebController
                     'created_at' => $email->created_at,
                     'updated_at' => $email->updated_at,
                     'share_url' => $email->share_enabled ? route('mailweb.share', $email) : null,
+                    'attachments_count' => $email->attachments_count,
                 ];
             });
 

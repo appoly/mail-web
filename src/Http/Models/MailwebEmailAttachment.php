@@ -9,7 +9,7 @@ class MailwebEmailAttachment extends Model
 {
     use HasUuids;
 
-    protected $guarded = ['id'];
+    protected $fillable = ['mailweb_email_id', 'name', 'path'];
 
     public function mailwebEmail()
     {
