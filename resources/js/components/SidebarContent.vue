@@ -60,7 +60,7 @@ const dateFormatOptions = [
 ]
 const settings: Record<string, any> = ref({
     paginationAmount: 25,
-    dateFormat: 'timestamp'
+    dateFormat: 'days-ago'
 })
 
 // Poll for new emails every 5 seconds

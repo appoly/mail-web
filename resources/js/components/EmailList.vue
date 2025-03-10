@@ -7,6 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Email, EmailAddress } from '@/types/email'
 import { formatDistanceToNow, parseISO } from 'date-fns'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 const props = defineProps<{
     emails: Array<Email>,
@@ -19,6 +20,9 @@ const props = defineProps<{
     hasMoreEmails?: boolean
 }>()
 
+// Track if this is the first load
+const isFirstLoad = ref(true)
+
 const emit = defineEmits(['update:selectedEmail', 'loadMore'])
 
 const scrollRef = ref<HTMLElement | null>(null)
@@ -27,8 +31,18 @@ const isIntersecting = ref(false)
 // Setup intersection observer for infinite scrolling
 let observer: IntersectionObserver | null = null
 
-// Helper function to format email addresses
+// Helper function to format email addresses with limit
 const formatEmailAddresses = (addresses: EmailAddress[]): string => {
+    if (addresses.length <= 2) {
+        return addresses.map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
+    } else {
+        const visibleAddresses = addresses.slice(0, 2).map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
+        return visibleAddresses
+    }
+}
+
+// Get full email addresses for tooltip
+const getFullEmailAddresses = (addresses: EmailAddress[]): string => {
     return addresses.map(addr => addr.name ? `${addr.name} <${addr.address}>` : addr.address).join(', ')
 }
 
@@ -76,6 +90,8 @@ const setupIntersectionObserver = () => {
 // Lifecycle hooks
 onMounted(() => {
     setupIntersectionObserver();
+    // Reset first load when component is mounted
+    isFirstLoad.value = true;
 });
 
 onUnmounted(() => {
@@ -94,6 +110,11 @@ watch(
                 observer.disconnect();
             }
             setupIntersectionObserver();
+            
+            // Set isFirstLoad to false after emails are loaded
+            if (props.emails.length > 0) {
+                isFirstLoad.value = false;
+            }
         }, 100);
     }
 );
@@ -123,7 +144,7 @@ watch(isPollingActive, (newValue) => {
             </div>
             <Separator />
             
-            <div v-if="isLoading" class="flex flex-col">
+            <div v-if="isLoading && isFirstLoad" class="flex flex-col">
                 <div v-for="(_, i) in 10" :key="i" class="flex cursor-pointer flex-col gap-1 border-b p-4">
                     <!-- Email header with recipient and timestamp -->
                     <div class="flex items-center justify-between">
@@ -141,7 +162,7 @@ watch(isPollingActive, (newValue) => {
                 </div>
             </div>
 
-            <div v-else-if="emails.length === 0" class="p-8 text-center text-muted-foreground">
+            <div v-else-if="!isLoading && emails.length === 0" class="p-8 text-center text-muted-foreground">
                 <p>No emails found</p>
             </div>
 
@@ -157,7 +178,23 @@ watch(isPollingActive, (newValue) => {
                         @click="emit('update:selectedEmail', email)"
                     >
                         <div class="flex items-center justify-between">
-                            <div class="font-medium">{{ formatEmailAddresses(email.to) }}</div>
+                            <div class="font-medium flex items-center">
+                                {{ formatEmailAddresses(email.to) }}
+                                <TooltipProvider v-if="email.to.length > 2">
+                                    <Tooltip>
+                                        <TooltipTrigger>
+                                            <span class="text-xs text-muted-foreground ml-1 cursor-pointer hover:text-primary">
+                                                + {{ email.to.length - 2 }} more
+                                            </span>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <div class="text-xs max-w-[250px] break-words">
+                                                {{ getFullEmailAddresses(email.to) }}
+                                            </div>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
                             <div class="text-xs text-muted-foreground">
                                 {{ formatDate(email.created_at) }}
                             </div>
@@ -165,6 +202,8 @@ watch(isPollingActive, (newValue) => {
                         <div class="text-sm font-medium">{{ email.subject }}</div>
                         <div class="text-xs text-muted-foreground">{{ truncateText(email.body_text) }}</div>
                     </div>
+                    
+
                     
                     <!-- Infinite scroll loading indicator -->
                     <div v-if="props.isLoadingMore" class="p-4 flex justify-center">
