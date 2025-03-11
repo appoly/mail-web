@@ -3,7 +3,12 @@
 declare global {
     interface Window {
         mailwebConfig?: {
-            deleteAllEnabled: boolean
+            deleteAllEnabled: boolean,
+            sendSampleButton: boolean,
+            return: {
+                appName: string,
+                appUrl: string
+            }
         }
     }
 }
@@ -79,6 +84,9 @@ const returnConfig = ref({
     appUrl: ''
 })
 
+// Send sample button config from window.mailwebConfig
+const isSendSampleButtonEnabled = ref<boolean>(false)
+
 // Check if delete all feature is enabled from window.mailwebConfig
 const isDeleteAllEnabled = ref<boolean>(false)
 
@@ -90,6 +98,9 @@ onMounted(() => {
     if (window.mailwebConfig && window.mailwebConfig.return) {
         returnConfig.value = window.mailwebConfig.return
     } 
+    if (window.mailwebConfig && typeof window.mailwebConfig.sendSampleButton === 'boolean') {
+        isSendSampleButtonEnabled.value = window.mailwebConfig.sendSampleButton
+    }
 })
 
 // Poll for new emails every 5 seconds
@@ -314,7 +325,7 @@ const deleteAllEmails = async (): Promise<void> => {
                             </Tooltip>
                         </TooltipProvider>
 
-                        <TooltipProvider>
+                        <TooltipProvider v-if="isSendSampleButtonEnabled">
                             <Tooltip>
                                 <TooltipTrigger as-child>
                                     <Button variant="ghost" size="icon" @click="sendTestEmail" :disabled="isSending">

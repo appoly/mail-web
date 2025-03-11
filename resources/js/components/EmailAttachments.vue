@@ -9,10 +9,14 @@
     const handleAttachmentClick = (attachment: EmailAttachment) => {
         console.log(attachment)
     }
+
+    const getFileType = (filename: string) => {
+        return filename.split('.').pop() || 'unknown'
+    }
 </script>
 
 <template>
-    <div class="mt-6">
+    <div>
         <div class="flex items-center gap-2 mb-2">
             <span class="text-sm font-medium">Attachments ({{ attachments.length }})</span>
         </div>
@@ -26,7 +30,10 @@
                     <div class="flex items-center gap-3">
                         <AttachmentIcon :filename="attachment.name" />
                         <div class="overflow-hidden">
-                            <div class="text-sm font-medium truncate">{{ attachment.name }}</div>
+                            <div class="text-sm font-medium truncate" :title="attachment.name">{{ attachment.name }}</div>
+                            <div class="text-xs text-gray-500 flex items-center gap-1">
+                                <span class="uppercase">{{ getFileType(attachment.name) }}</span>
+                            </div>
                             <!-- <div class="text-xs text-gray-500 flex items-center gap-1">
                                 <span class="capitalize">txt</span> • 100kb
                             </div> -->

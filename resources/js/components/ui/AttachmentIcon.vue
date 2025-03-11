@@ -57,5 +57,8 @@ const fileColorClass = computed(() => getFileIconAndColor(props.filename).color)
 </script>
 
 <template>
-    <component :is="fileIcon" :class="fileColorClass" class="w-5 h-5" />
+    <!-- Add a fixed-size wrapper div to ensure consistent dimensions -->
+    <div class="flex items-center justify-center w-6 h-6">
+        <component :is="fileIcon" :class="[fileColorClass, 'w-5 h-5']" />
+    </div>
 </template>

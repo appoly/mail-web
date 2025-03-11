@@ -187,7 +187,6 @@ onMounted(updateIframe)
                     <Clock class="h-3 w-3 mr-1" />
                     <span>{{ formatDate(email.created_at) }}</span>
                 </div>
-                <EmailAttachments v-if="email.attachments" :attachments="email.attachments" />
             </div>
 
             <div v-if="!isMobile" class="flex items-center gap-1 sm:gap-2">
@@ -259,6 +258,9 @@ onMounted(updateIframe)
                     </Tooltip>
                 </TooltipProvider>
             </div>
+        </div>
+        <div class="p-2 sm:p-4 border-b" v-if="email.attachments && email.attachments.length > 0">
+            <EmailAttachments :attachments="email.attachments" />
         </div>
 
         <!-- Custom Tabs -->

@@ -6,6 +6,7 @@
     <script>
         window.mailwebConfig = {
             deleteAllEnabled: {{ config('MailWeb.MAILWEB_DELETE_ALL_ENABLED', false) ? 'true' : 'false' }},
+            sendSampleButton: {{ config('MailWeb.MAILWEB_SEND_SAMPLE_BUTTON', true) ? 'true' : 'false' }},
             return: {
                 appName: "{{ config('MailWeb.MAILWEB_RETURN.APP_NAME') ?? config('app.name') ?? 'App' }}",
                 appUrl: "{{ config('MailWeb.MAILWEB_RETURN.APP_URL') ?? '/' }}"
