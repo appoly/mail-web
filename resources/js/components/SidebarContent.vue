@@ -73,6 +73,12 @@ const settings: Record<string, any> = ref({
     dateFormat: 'days-ago'
 })
 
+// Return config from window.mailwebConfig
+const returnConfig = ref({
+    appName: '',
+    appUrl: ''
+})
+
 // Check if delete all feature is enabled from window.mailwebConfig
 const isDeleteAllEnabled = ref<boolean>(false)
 
@@ -81,6 +87,9 @@ onMounted(() => {
     if (window.mailwebConfig && typeof window.mailwebConfig.deleteAllEnabled === 'boolean') {
         isDeleteAllEnabled.value = window.mailwebConfig.deleteAllEnabled
     }
+    if (window.mailwebConfig && window.mailwebConfig.return) {
+        returnConfig.value = window.mailwebConfig.return
+    } 
 })
 
 // Poll for new emails every 5 seconds
@@ -273,8 +282,8 @@ const deleteAllEmails = async (): Promise<void> => {
 
         <div class="mt-auto">
             <div class="p-4 border-t">
-                <a href="/" class="text-primary text-xs hover:underline">
-                    <ArrowLeft class="inline-block w-4 h-4" /> Return to app
+                <a :href="returnConfig.appUrl || '/'" class="text-primary text-xs hover:underline">
+                    <ArrowLeft class="inline-block w-4 h-4" /> Return to {{ returnConfig.appName || 'App' }}
                 </a>
             </div>
 
@@ -323,7 +332,7 @@ const deleteAllEmails = async (): Promise<void> => {
                                         <Github class="h-4 w-4" />
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent>GitHub Repository</TooltipContent>
+                                <TooltipContent>GitHub</TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
                     </template>

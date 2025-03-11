@@ -5,7 +5,11 @@
     <link rel="stylesheet" href="{{ asset('/vendor/mailweb/mailweb.css') }}">
     <script>
         window.mailwebConfig = {
-            deleteAllEnabled: {{ config('MailWeb.MAILWEB_DELETE_ALL_ENABLED', false) ? 'true' : 'false' }}
+            deleteAllEnabled: {{ config('MailWeb.MAILWEB_DELETE_ALL_ENABLED', false) ? 'true' : 'false' }},
+            return: {
+                appName: "{{ config('MailWeb.MAILWEB_RETURN.APP_NAME') ?? config('app.name') ?? 'App' }}",
+                appUrl: "{{ config('MailWeb.MAILWEB_RETURN.APP_URL') ?? '/' }}"
+            }
         };
     </script>
 </head>
