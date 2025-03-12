@@ -306,7 +306,7 @@ onMounted(updateIframe)
                         <div class="bg-white dark:bg-gray-800 h-full transition-all duration-300 shadow-sm"
                             :style="previewStyle">
                             <iframe ref="iframeRef" title="Email Preview" class="w-full h-full border-0"
-                                sandbox="allow-same-origin" />
+                                sandbox="allow-same-origin allow-popups" />
                         </div>
                     </div>
                 </div>
