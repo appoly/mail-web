@@ -13,13 +13,7 @@
 <title>Mail Web</title>
 <link rel="shortcut icon" type="image/x-icon" href="{{ asset('/vendor/mailweb/icons/favicon.ico') }}">
 
-@if (class_exists('Illuminate\Foundation\Vite'))
-    {{ Vite::useHotFile(public_path('vendor/mailweb'))->useBuildDirectory('/vendor/mailweb')->withEntryPoints(['resources/css/mailweb.css', 'resources/js/mailweb.js']) }}
-@else
-    <link href="{{ mix('/css/mailweb.css', 'vendor/mailweb') }}" rel="stylesheet">
-    <script src="{{ mix('/js/mailweb.js', 'vendor/mailweb') }}" defer></script>
-@endif
-
+{{ Vite::useHotFile(public_path('vendor/mailweb'))->useBuildDirectory('/vendor/mailweb')->withEntryPoints(['resources/css/mailweb.css', 'resources/js/mailweb.js']) }}
 @livewireStyles
 </head>
 
@@ -73,9 +67,7 @@
     </div>
 
     @livewireScripts
-    @if (!class_exists('Illuminate\Foundation\Vite'))
-        <script src="{{ asset('/vendor/mailweb/app.js') }}" defer></script>
-    @endif
+    <script src="{{ asset('/vendor/mailweb/app.js') }}" defer></script>
 </body>
 
 </html>
