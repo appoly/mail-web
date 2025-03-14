@@ -1,17 +1,14 @@
 <script setup lang="ts">
 import { useMailwebConfig } from '@/composables/useMailwebConfig'
-
-import { ref, onMounted, onUnmounted, watch, inject, nextTick } from 'vue'
-import { Search, Mail, Filter, RefreshCw, Settings, X, Play, Pause, ArrowLeft, Trash2, AlertCircle } from 'lucide-vue-next'
-
+import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
+import { Search, Mail, RefreshCw, Settings, X, Play, Pause, ArrowLeft } from 'lucide-vue-next'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, } from '@/components/ui/dialog'
 import toast from 'vue3-hot-toast'
 import Github from '@/components/icons/Github.vue'
 import AnimatedSendButton from './partials/AnimatedSendButton.vue'
+import SettingsDialog from './partials/SettingsDialog.vue'
 import axios from 'axios'
 
 const props = defineProps<{
@@ -20,136 +17,34 @@ const props = defineProps<{
     isMobile: boolean
 }>()
 
-const localSearchQuery = ref(props.searchQuery)
-
-watch(localSearchQuery, (newValue) => {
-    emit('update:searchQuery', newValue)
-})
-
-watch(() => props.searchQuery, (newValue) => {
-    if (newValue !== localSearchQuery.value) {
-        localSearchQuery.value = newValue
-    }
-})
-
 const emit = defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar', 'update:settings'])
 
+const localSearchQuery = ref(props.searchQuery)
 const fetchEmails = inject('fetchEmails') as () => void
-
 const isRefreshing = ref<boolean>(false)
 const isSending = ref<boolean>(false)
-const isDeleting = ref<boolean>(false)
 const isPolling = ref<boolean>(false)
 const pollingInterval = ref<number | null>(null)
-
 const paginationTriggered = inject('paginationTriggered', null) as any
 const isPollingActive = inject('isPollingActive', true) as boolean
-
 const showSettingsDialog = ref<boolean>(false)
-const showDeleteAllDialog = ref<boolean>(false)
-const showDeleteAllDisabledDialog = ref<boolean>(false)
-const paginationOptions: number[] = [10, 25, 50, 100]
-const dateFormatOptions = [
-    { value: 'timestamp', label: 'Timestamp' },
-    { value: 'uk', label: 'UK (DD/MM/YYYY)' },
-    { value: 'us', label: 'US (MM/DD/YYYY)' },
-    { value: 'days-ago', label: 'X Days ago' }
-]
-const settings: Record<string, any> = ref({
+
+const settings = ref({
     paginationAmount: 25,
     dateFormat: 'days-ago'
 })
 
-// Use the mailweb config composable
 const { getReturnConfig, isDeleteAllEnabled: checkDeleteAllEnabled, isSendSampleButtonEnabled: checkSendSampleButtonEnabled } = useMailwebConfig()
-
-const returnConfig = ref({
-    appName: '',
-    appUrl: ''
-})
-
+const returnConfig = ref({ appName: '', appUrl: '' })
 const isSendSampleButtonEnabled = ref<boolean>(false)
 const isDeleteAllEnabled = ref<boolean>(false)
 
 onMounted(() => {
-    // Get config values from the composable
     isDeleteAllEnabled.value = checkDeleteAllEnabled()
     returnConfig.value = getReturnConfig()
     isSendSampleButtonEnabled.value = checkSendSampleButtonEnabled()
-})
-
-const POLLING_INTERVAL_MS = 5000
-
-const startPolling = (): void => {
-    if (pollingInterval.value !== null) return
-    if (paginationTriggered) {
-        paginationTriggered.value = false
-    }
-    handleRefresh()
-    pollingInterval.value = window.setInterval(() => {
-        if (document.visibilityState === 'visible') {
-            handleRefresh()
-        }
-    }, POLLING_INTERVAL_MS)
-    isPolling.value = true
-    if (isPollingActive) {
-        isPollingActive.value = true
-    }
-}
-
-const stopPolling = (): void => {
-    if (pollingInterval.value !== null) {
-        window.clearInterval(pollingInterval.value)
-        pollingInterval.value = null
-    }
-    isPolling.value = false
-    if (isPollingActive) {
-        isPollingActive.value = false
-    }
-}
-
-const togglePolling = (): void => {
-    if (isPolling.value) {
-        stopPolling()
-    } else {
-        startPolling()
-    }
-}
-
-const handleRefresh = (): void => {
-    isRefreshing.value = true
-    if (fetchEmails) {
-        fetchEmails()
-    }
-    setTimeout(() => {
-        isRefreshing.value = false
-    }, 1000)
-}
-
-const loadSettings = (): void => {
-    const savedSettings = localStorage.getItem('mailweb-settings')
-    if (savedSettings) {
-        try {
-            const parsedSettings = JSON.parse(savedSettings)
-            settings.value = { ...settings.value, ...parsedSettings }
-            emit('update:settings', settings.value)
-        } catch (e) {
-            console.error('Failed to parse settings from localStorage:', e)
-        }
-    }
-}
-
-const saveSettings = (): void => {
-    localStorage.setItem('mailweb-settings', JSON.stringify(settings.value))
-    emit('update:settings', settings.value)
-    showSettingsDialog.value = false
-}
-
-onMounted(() => {
     loadSettings()
-    if (isPollingActive) {
-        startPolling()
-    }
+    if (isPollingActive) startPolling()
     if (paginationTriggered) {
         watch(paginationTriggered, (triggered) => {
             if (triggered && isPolling.value) {
@@ -160,24 +55,60 @@ onMounted(() => {
     }
 })
 
-onUnmounted(() => {
-    stopPolling()
+watch(localSearchQuery, (newValue) => emit('update:searchQuery', newValue))
+watch(() => props.searchQuery, (newValue) => {
+    if (newValue !== localSearchQuery.value) localSearchQuery.value = newValue
 })
+
+const POLLING_INTERVAL_MS = 5000
+
+const startPolling = (): void => {
+    if (pollingInterval.value !== null) return
+    if (paginationTriggered) paginationTriggered.value = false
+    handleRefresh()
+    pollingInterval.value = window.setInterval(() => {
+        if (document.visibilityState === 'visible') handleRefresh()
+    }, POLLING_INTERVAL_MS)
+    isPolling.value = true
+    if (isPollingActive) isPollingActive.value = true
+}
+
+const stopPolling = (): void => {
+    if (pollingInterval.value !== null) {
+        window.clearInterval(pollingInterval.value)
+        pollingInterval.value = null
+    }
+    isPolling.value = false
+    if (isPollingActive) isPollingActive.value = false
+}
+
+const togglePolling = (): void => isPolling.value ? stopPolling() : startPolling()
+
+const handleRefresh = (): void => {
+    isRefreshing.value = true
+    if (fetchEmails) fetchEmails()
+    setTimeout(() => isRefreshing.value = false, 1000)
+}
+
+const loadSettings = (): void => {
+    const savedSettings = localStorage.getItem('mailweb-settings')
+    if (savedSettings) {
+        try {
+            settings.value = { ...settings.value, ...JSON.parse(savedSettings) }
+            emit('update:settings', settings.value)
+        } catch (e) {
+            console.error('Failed to parse settings from localStorage:', e)
+        }
+    }
+}
 
 const sendTestEmail = async (): Promise<void> => {
     isSending.value = true
     try {
         const response = await axios.get('/mailweb/send-test-email', {
-            headers: {
-                'Accept': 'application/json'
-            }
+            headers: { 'Accept': 'application/json' }
         })
-
-        if (response.status === 200) {
-            toast.success('Test email sent successfully')
-        } else {
-            toast.error('Failed to send test email')
-        }
+        toast.success(response.status === 200 ? 'Test email sent successfully' : 'Failed to send test email')
     } catch (error) {
         toast.error('Failed to send test email')
         console.error('Error sending test email:', error)
@@ -186,42 +117,7 @@ const sendTestEmail = async (): Promise<void> => {
     }
 }
 
-const deleteAllEmails = async (): Promise<void> => {
-    if (!isDeleteAllEnabled.value) {
-        showDeleteAllDialog.value = false
-        showDeleteAllDisabledDialog.value = true
-        return
-    }
-
-    isDeleting.value = true
-    try {
-        const response = await axios.delete('/mailweb/emails/delete-all', {
-            headers: {
-                'Accept': 'application/json'
-            }
-        })
-
-        if (response.status === 200) {
-            toast.success('All emails have been deleted successfully!')
-            if (fetchEmails) {
-                fetchEmails()
-            }
-        } else {
-            toast.error('Failed to delete all emails')
-        }
-    } catch (error: any) {
-        if (error.response && error.response.status === 403) {
-            toast.error('Delete all emails feature is disabled')
-            showDeleteAllDisabledDialog.value = true
-        } else {
-            toast.error('Error deleting all emails')
-            console.error('Error deleting all emails:', error)
-        }
-    } finally {
-        isDeleting.value = false
-        showDeleteAllDialog.value = false
-    }
-}
+onUnmounted(() => stopPolling())
 </script>
 
 <template>
@@ -276,7 +172,6 @@ const deleteAllEmails = async (): Promise<void> => {
                                 <TooltipContent>Settings</TooltipContent>
                             </Tooltip>
                         </TooltipProvider>
-
                         <TooltipProvider v-if="isSendSampleButtonEnabled">
                             <Tooltip>
                                 <TooltipTrigger as-child>
@@ -302,96 +197,7 @@ const deleteAllEmails = async (): Promise<void> => {
         </div>
     </div>
 
-    <!-- Settings Dialog -->
-    <Dialog :open="showSettingsDialog" @update:open="showSettingsDialog = $event">
-        <DialogContent class="sm:max-w-[425px]">
-            <DialogHeader>
-                <DialogTitle>Settings</DialogTitle>
-            </DialogHeader>
-            <div class="grid gap-4 py-4">
-                <div class="space-y-2">
-                    <label class="text-sm font-medium">Pagination Amount</label>
-                    <Select v-model="settings.paginationAmount">
-                        <SelectTrigger>
-                            <SelectValue :placeholder="`${settings.paginationAmount} items per page`" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="option in paginationOptions" :key="option" :value="option">
-                                {{ option }} items per page
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div class="space-y-2">
-                    <label class="text-sm font-medium">Date Format</label>
-                    <Select v-model="settings.dateFormat">
-                        <SelectTrigger>
-                            <SelectValue placeholder="Select date format" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem v-for="option in dateFormatOptions" :key="option.value" :value="option.value">
-                                {{ option.label }}
-                            </SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div class="my-4" v-if="isDeleteAllEnabled">
-                    <Button variant="destructive"
-                        @click="isDeleteAllEnabled ? showDeleteAllDialog = true : showDeleteAllDisabledDialog = true"
-                        class="w-full">
-                        <Trash2 class="h-4 w-4" /> Delete All Emails
-                    </Button>
-                </div>
-            </div>
-            <DialogFooter>
-                <Button variant="outline" @click="showSettingsDialog = false">Cancel</Button>
-                <Button @click="saveSettings">Save Changes</Button>
-            </DialogFooter>
-        </DialogContent>
-    </Dialog>
-
-    <!-- Delete All Confirmation Dialog -->
-    <Dialog :open="showDeleteAllDialog" @update:open="showDeleteAllDialog = $event">
-        <DialogContent class="sm:max-w-[425px]">
-            <DialogHeader>
-                <DialogTitle class="text-destructive">Delete All Emails</DialogTitle>
-            </DialogHeader>
-            <div class="py-4">
-                <p class="text-sm text-muted-foreground">
-                    Are you sure you want to delete all emails? This action cannot be undone.
-                </p>
-            </div>
-            <DialogFooter>
-                <Button variant="outline" @click="showDeleteAllDialog = false">Cancel</Button>
-                <Button variant="destructive" @click="deleteAllEmails()" :disabled="isDeleting">
-                    <span v-if="isDeleting">Deleting...</span>
-                    <span v-else>Delete All</span>
-                </Button>
-            </DialogFooter>
-        </DialogContent>
-    </Dialog>
-
-    <!-- Delete All Disabled Dialog -->
-    <Dialog :open="showDeleteAllDisabledDialog" @update:open="showDeleteAllDisabledDialog = $event">
-        <DialogContent class="sm:max-w-[425px]">
-            <DialogHeader>
-                <DialogTitle class="flex items-center gap-2">
-                    <AlertCircle class="h-5 w-5 text-amber-500" />
-                    Feature Disabled
-                </DialogTitle>
-            </DialogHeader>
-            <div class="py-4">
-                <p class="text-sm text-muted-foreground">
-                    The "Delete All Emails" feature is currently disabled by your administrator.
-                </p>
-                <p class="text-sm text-muted-foreground mt-2">
-                    To enable this feature, set <code>MAILWEB_DELETE_ALL_ENABLED=true</code> in your environment
-                    variables or update the config file.
-                </p>
-            </div>
-            <DialogFooter>
-                <Button variant="outline" @click="showDeleteAllDisabledDialog = false">Close</Button>
-            </DialogFooter>
-        </DialogContent>
-    </Dialog>
+    <SettingsDialog :show-settings-dialog="showSettingsDialog" :is-delete-all-enabled="isDeleteAllEnabled"
+        :initial-settings="settings" @update:show-settings-dialog="showSettingsDialog = $event"
+        @update:settings="settings = $event; emit('update:settings', $event)" />
 </template>

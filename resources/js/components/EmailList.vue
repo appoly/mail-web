@@ -123,7 +123,7 @@ watch(isPollingActive, (newValue) => {
 </script>
 
 <template>
-    <div class="flex h-full flex-col">
+    <div class="flex h-full flex-col lg:w-[350px]">
         <div v-if="error" class="text-destructive p-4 text-center">
             <AlertCircle class="h-8 w-8 mx-auto mb-2" />
             <p>Failed to load emails</p>

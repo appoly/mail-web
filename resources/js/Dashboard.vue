@@ -45,13 +45,13 @@ const fetchEmails = (resetList = true): void => {
     } else {
         isLoadingMore.value = true;
     }
-    
+
     const params = {
         page: currentPage.value,
         per_page: userSettings.value.paginationAmount,
         search: searchQuery.value || undefined
     };
-    
+
     axios.get('/mailweb/emails', { params })
         .then((response) => {
             if (resetList) {
@@ -75,7 +75,7 @@ const loadMoreEmails = (): void => {
     if (currentPage.value < lastPage.value && !isLoadingMore.value) {
         // Signal that pagination has been triggered
         paginationTriggered.value = true;
-        
+
         currentPage.value++;
         fetchEmails(false);
     }
@@ -84,7 +84,7 @@ const loadMoreEmails = (): void => {
 // Format date based on user settings
 const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
-    
+
     switch (userSettings.value.dateFormat) {
         case 'uk':
             return date.toLocaleDateString('en-GB');
@@ -114,7 +114,7 @@ watch(searchQuery, (newValue, oldValue) => {
         const debounceTimeout = setTimeout(() => {
             fetchEmails(true);
         }, 300);
-        
+
         return () => clearTimeout(debounceTimeout);
     }
 }, { immediate: false });
@@ -129,7 +129,7 @@ watch(() => userSettings.value.paginationAmount, (newValue, oldValue) => {
 // Method to fetch full email content when an email is selected
 const fetchEmailContent = (emailId: string): void => {
     isLoadingEmailContent.value = true;
-    
+
     axios.get(`/mailweb/emails/${emailId}`)
         .then((response) => {
             selectedEmailWithFullContent.value = response.data;
@@ -187,32 +187,22 @@ onMounted((): void => {
             </div>
         </div>
 
-        <Sidebar v-model:searchQuery="searchQuery" v-model:isOpen="sidebarOpen"
-            :isMobile="isMobile" @update:settings="updateSettings" />
+        <Sidebar v-model:searchQuery="searchQuery" v-model:isOpen="sidebarOpen" :isMobile="isMobile"
+            :filters="{}" @update:settings="updateSettings" />
 
         <div class="flex flex-col flex-1 h-[calc(100vh-57px)] lg:h-screen overflow-hidden">
             <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
                 <template v-if="isMobile">
                     <SlidingPanel>
-                        <EmailList 
-                            :emails="filteredEmails" 
-                            v-model:selectedEmail="selectedEmail" 
-                            :isLoading="isLoading"
-                            :isLoadingMore="isLoadingMore"
-                            :error="error" 
-                            :isMobile="isMobile" 
-                            :totalEmails="totalEmails"
-                            :hasMoreEmails="currentPage < lastPage"
-                            @loadMore="loadMoreEmails"
-                        />
+                        <EmailList :emails="filteredEmails" v-model:selectedEmail="selectedEmail" :isLoading="isLoading"
+                            :isLoadingMore="isLoadingMore" :error="error" :isMobile="isMobile"
+                            :totalEmails="totalEmails" :hasMoreEmails="currentPage < lastPage"
+                            @loadMore="loadMoreEmails" />
                         <template #preview>
                             <div v-if="selectedEmail" class="h-full overflow-y-auto">
-                                <EmailPreview 
-                                    :email="selectedEmailWithFullContent || selectedEmail" 
-                                    :isLoading="isLoadingEmailContent"
-                                    :isMobile="isMobile" 
-                                    @delete-email="handleDeleteEmail"
-                                />
+                                <EmailPreview :email="selectedEmailWithFullContent || selectedEmail"
+                                    :isLoading="isLoadingEmailContent" :isMobile="isMobile"
+                                    @delete-email="handleDeleteEmail" />
                             </div>
                             <div v-else class="flex items-center justify-center h-full p-6 text-center bg-muted/30">
                                 <div>
@@ -224,25 +214,14 @@ onMounted((): void => {
                     </SlidingPanel>
                 </template>
                 <template v-else>
-                    <EmailList 
-                        :emails="filteredEmails" 
-                        v-model:selectedEmail="selectedEmail" 
-                        :isLoading="isLoading"
-                        :isLoadingMore="isLoadingMore"
-                        :error="error" 
-                        :isMobile="isMobile" 
-                        :totalEmails="totalEmails"
-                        :hasMoreEmails="currentPage < lastPage"
-                        @loadMore="loadMoreEmails"
-                    />
+                    <EmailList :emails="filteredEmails" v-model:selectedEmail="selectedEmail" :isLoading="isLoading"
+                        :isLoadingMore="isLoadingMore" :error="error" :isMobile="isMobile" :totalEmails="totalEmails"
+                        :hasMoreEmails="currentPage < lastPage" @loadMore="loadMoreEmails" />
                     <template v-if="selectedEmail">
                         <div class="flex flex-col flex-1 overflow-hidden">
-                            <EmailPreview 
-                                :email="selectedEmailWithFullContent || selectedEmail" 
-                                :isLoading="isLoadingEmailContent"
-                                :isMobile="isMobile" 
-                                @delete-email="handleDeleteEmail" 
-                            />
+                            <EmailPreview :email="selectedEmailWithFullContent || selectedEmail"
+                                :isLoading="isLoadingEmailContent" :isMobile="isMobile"
+                                @delete-email="handleDeleteEmail" />
                         </div>
                     </template>
                     <template v-else>
@@ -256,6 +235,6 @@ onMounted((): void => {
                 </template>
             </div>
         </div>
-    <Toaster />
+        <Toaster />
     </div>
 </template>

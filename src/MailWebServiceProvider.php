@@ -120,8 +120,8 @@ class MailWebServiceProvider extends ServiceProvider
             $router->get('/mailweb/emails', '\Appoly\MailWeb\Http\Controllers\MailWebController@fetchEmails')->name('mailweb.fetch');
             $router->get('/mailweb/emails/{id}', '\Appoly\MailWeb\Http\Controllers\MailWebController@fetchEmail')->name('mailweb.fetch-email');
             $router->post('/mailweb/emails/{id}/toggle-share', '\Appoly\MailWeb\Http\Controllers\MailWebController@toggleShare')->name('mailweb.toggle-share');
-            $router->delete('/mailweb/emails/{id}', '\Appoly\MailWeb\Http\Controllers\MailWebController@delete')->name('mailweb.delete');
             $router->delete('/mailweb/emails/delete-all', '\Appoly\MailWeb\Http\Controllers\MailWebController@deleteAll')->name('mailweb.delete-all');
+            $router->delete('/mailweb/emails/{id}', '\Appoly\MailWeb\Http\Controllers\MailWebController@delete')->name('mailweb.delete');
             $router->get('/mailweb/share/{mailwebEmail}', '\Appoly\MailWeb\Http\Controllers\MailWebController@show')->name('mailweb.share');
             $router->get('/mailweb/send-test-email', '\Appoly\MailWeb\Http\Controllers\MailWebController@sendTestEmail')->name('mailweb.send-test-email');
         });
