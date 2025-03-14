@@ -1,0 +1,239 @@
+<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
+import { Share2, QrCode, Eye, Copy, Check } from 'lucide-vue-next'
+import axios from 'axios'
+import type { EmailPreview } from '@/types/email'
+import { generate } from 'lean-qr'
+import type { Bitmap2D } from 'lean-qr'
+import { toSvg, toSvgDataURL } from 'lean-qr/extras/svg'
+
+const props = defineProps<{
+    open: boolean
+    email: EmailPreview
+}>()
+
+const emit = defineEmits(['update:open'])
+
+// Reactive state
+const shareUrlCopied = ref(false)
+const isToggling = ref(false)
+const shareUrl = ref('')
+const qrCode = ref<Bitmap2D | null>(null)
+const urlInputRef = ref<HTMLInputElement | null>(null)
+const qrSvgRef = ref<SVGElement | null>(null)
+const qrSvgUrl = ref<string>('')
+const qrCodeError = ref<string>('')
+
+// Generate QR code and render as SVG
+const generateQrCode = (url: string) => {
+    if (!url) return
+    
+    // Reset error state
+    qrCodeError.value = ''
+    
+    try {
+        // Generate QR code
+        const qrCodeBitmap = generate(url)
+        qrCode.value = qrCodeBitmap
+        
+        // Generate SVG data URL
+        qrSvgUrl.value = toSvgDataURL(qrCodeBitmap, {
+            on: '#000000',
+            off: 'transparent',
+            padX: 4,
+            padY: 4,
+            scale: 4
+        })
+        
+        // Render SVG element on next tick to ensure DOM is updated
+        setTimeout(() => {
+            if (qrSvgRef.value && qrCodeBitmap) {
+                // Create new SVG with QR code
+                toSvg(qrCodeBitmap, qrSvgRef.value, {
+                    on: '#000000',
+                    off: 'transparent',
+                    padX: 4,
+                    padY: 4,
+                    width: 200,
+                    height: 200
+                })
+            }
+        }, 0)
+    } catch (error) {
+        console.error('Error generating QR code:', error)
+        qrCode.value = null
+        qrSvgUrl.value = ''
+        qrCodeError.value = 'Failed to generate QR code'
+    }
+}
+
+// Watch for dialog opening
+watch(() => props.open, (isOpen) => {
+    if (isOpen && props.email.share_enabled && props.email.share_url) {
+        shareUrl.value = props.email.share_url
+        generateQrCode(props.email.share_url)
+    }
+})
+
+// Clipboard functions
+const copyShareUrl = async (): Promise<void> => {
+    if (!shareUrl.value) return
+
+    try {
+        if (navigator.clipboard) {
+            await navigator.clipboard.writeText(shareUrl.value)
+        } else {
+            fallbackCopyTextToClipboard(shareUrl.value)
+        }
+        shareUrlCopied.value = true
+        setTimeout(() => (shareUrlCopied.value = false), 2000)
+    } catch (error) {
+        console.error('Failed to copy to clipboard:', error)
+        fallbackCopyTextToClipboard(shareUrl.value)
+    }
+}
+
+const fallbackCopyTextToClipboard = (text: string): void => {
+    const textArea = document.createElement('textarea')
+    textArea.value = text
+    textArea.style.position = 'fixed'
+    textArea.style.top = '0'
+    textArea.style.left = '0'
+    document.body.appendChild(textArea)
+    textArea.focus()
+    textArea.select()
+
+    try {
+        document.execCommand('copy')
+        shareUrlCopied.value = true
+        setTimeout(() => (shareUrlCopied.value = false), 2000)
+    } catch (error) {
+        console.error('Fallback copy failed:', error)
+    } finally {
+        document.body.removeChild(textArea)
+    }
+}
+
+const toggleShareEnabled = async (): Promise<void> => {
+    if (!props.email || isToggling.value) return
+
+    isToggling.value = true
+    try {
+        const response = await axios.post<{ share_enabled: number; share_url?: string }>(
+            `/mailweb/emails/${props.email.id}/toggle-share`
+        )
+        if (response.data.share_enabled) {
+            shareUrl.value = response.data.share_url || ''
+            generateQrCode(shareUrl.value)
+        } else {
+            shareUrl.value = ''
+            qrCode.value = null
+        }
+        props.email.share_enabled = response.data.share_enabled
+    } catch (error) {
+        console.error('Error toggling share status:', error)
+    } finally {
+        isToggling.value = false
+    }
+}
+
+const closeDialog = () => {
+    emit('update:open', false)
+}
+
+const selectAllText = () => {
+    if (urlInputRef.value) {
+        urlInputRef.value.select()
+    }
+}
+</script>
+
+<template>
+    <Dialog :open="open" @update:open="emit('update:open', $event)">
+        <DialogContent class="max-w-[1000px] sm:max-w-[700px] max-h-[90vh] p-4 sm:p-6 flex flex-col justify-between">
+            <div class="flex flex-col space-y-4 min-h-0 flex-1">
+                <DialogHeader>
+                    <DialogTitle>Share Email</DialogTitle>
+                </DialogHeader>
+
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <Share2 class="h-5 w-5 text-primary" />
+                        <span class="font-medium text-sm">Email Sharing</span>
+                    </div>
+                    <Switch :model-value="email.share_enabled" @update:model-value="toggleShareEnabled"
+                        :disabled="isToggling" />
+                </div>
+
+                <div v-if="email.share_enabled" class="flex flex-col space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-4 items-center">
+                        <div class="flex-shrink-0 bg-white p-2 border rounded-lg shadow-sm">
+                            <svg v-if="qrCode" ref="qrSvgRef" class="w-48 h-48"></svg>
+                            <img v-else-if="qrSvgUrl" :src="qrSvgUrl" alt="QR Code" class="w-48 h-48" />
+                            <div v-else-if="qrCodeError" 
+                                class="w-48 h-48 flex flex-col items-center justify-center bg-gray-100 dark:bg-gray-800 rounded p-4">
+                                <QrCode class="h-8 w-8 text-red-400 mb-2" />
+                                <p class="text-xs text-center text-red-500 font-medium">QR Code Error</p>
+                                <p class="text-xs text-center text-gray-500 mt-1">{{ qrCodeError }}</p>
+                            </div>
+                            <div v-else
+                                class="w-48 h-48 flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded">
+                                <div class="animate-pulse">
+                                    <QrCode class="h-8 w-8 text-gray-300" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-1 space-y-1 max-w-full text-sm">
+                            <h3 class="font-medium">QR Code</h3>
+                            <p class="text-gray-500 dark:text-gray-400">Scan this code with a mobile device to view
+                                the email.</p>
+                            <p class="text-gray-400 dark:text-gray-500 text-xs sm:block hidden">
+                                Anyone with this code can access the content.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h3 class="font-medium text-sm">Share Link</h3>
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="flex-1 flex items-center border rounded-md overflow-hidden bg-gray-50 dark:bg-gray-800 min-w-0">
+                                <input ref="urlInputRef" type="text" readonly :value="shareUrl"
+                                    @dblclick="selectAllText" @focus="selectAllText"
+                                    class="flex-1 px-2 py-1 text-xs bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-primary w-full" />
+                                <Button variant="ghost" size="sm" @click="copyShareUrl"
+                                    class="h-full px-2 border-l hover:bg-gray-100 dark:hover:bg-gray-700 flex-shrink-0">
+                                    <Check v-if="shareUrlCopied" class="h-3 w-3 text-green-500" />
+                                    <Copy v-else class="h-3 w-3" />
+                                    <span class="ml-1 text-xs">{{ shareUrlCopied ? 'Copied!' : 'Copy' }}</span>
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div v-else class="flex flex-col items-center justify-center py-4 px-2 text-center">
+                    <div class="bg-gray-100 dark:bg-gray-800 p-3 rounded-full mb-2">
+                        <QrCode class="h-6 w-6 text-gray-400" />
+                    </div>
+                    <h3 class="text-sm font-medium mb-1">Enable sharing to continue</h3>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 max-w-xs">
+                        Toggle the switch above to generate a shareable link and QR code.
+                    </p>
+                </div>
+            </div>
+
+            <DialogFooter class="mt-auto">
+                <Button variant="outline" @click="closeDialog" class="text-xs">Close</Button>
+                <Button as="a" v-if="email.share_enabled && shareUrl" variant="default" :href="shareUrl" target="_blank"
+                    class="ml-2 text-xs">
+                    <Eye class="h-3 w-3 mr-1" />
+                    Preview
+                </Button>
+            </DialogFooter>
+        </DialogContent>
+    </Dialog>
+</template>
