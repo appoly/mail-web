@@ -1,38 +1,39 @@
 <script setup lang="ts">
 // Is it pointless, yes. Is it cool, also yes!
-import { ref } from 'vue'
-import { Send } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
+import { Send } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 const props = defineProps<{
-    disabled: boolean
-}>()
+    disabled: boolean;
+}>();
 
-const emit = defineEmits(['click'])
+const emit = defineEmits(['click']);
 
-const isAnimating = ref(false)
+const isAnimating = ref(false);
 
 const handleClick = () => {
     if (!props.disabled) {
-        isAnimating.value = true
-        emit('click')
+        isAnimating.value = true;
+        emit('click');
         setTimeout(() => {
-            isAnimating.value = false
-        }, 1000) // Total duration: 0.5s fly off + 0.5s fly back
+            isAnimating.value = false;
+        }, 1000); // Total duration: 0.5s fly off + 0.5s fly back
     }
-}
+};
 </script>
 
 <template>
     <Button variant="ghost" size="icon" :disabled="disabled" @click="handleClick">
-        <Send
-            :class="['h-4 w-4', { 'animate-fly-sequence': isAnimating, 'animate-pulse': disabled && !isAnimating }]" />
+        <Send :class="['h-4 w-4', { 'animate-fly-sequence': isAnimating, 'animate-pulse': disabled && !isAnimating }]" />
     </Button>
 </template>
 
 <style scoped>
 .animate-fly-sequence {
-    animation: flyOff 0.5s ease-out, flyBack 0.5s ease-in 0.5s;
+    animation:
+        flyOff 0.5s ease-out,
+        flyBack 0.5s ease-in 0.5s;
 }
 
 @keyframes flyOff {

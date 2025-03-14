@@ -1,16 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, provide, watch } from 'vue';
-import { Menu } from 'lucide-vue-next';
-import { Button } from '@/components/ui/button';
-import Sidebar from '@/components/Sidebar.vue';
 import EmailList from '@/components/EmailList.vue';
 import EmailPreview from '@/components/EmailPreview.vue';
+import Sidebar from '@/components/Sidebar.vue';
 import SlidingPanel from '@/components/SlidingPanel.vue';
+import { Button } from '@/components/ui/button';
 import { Email } from '@/types/email';
 import axios from 'axios';
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import toast, { Toaster } from 'vue3-hot-toast'
-
+import { Menu } from 'lucide-vue-next';
+import { computed, onMounted, provide, ref, watch } from 'vue';
+import toast, { Toaster } from 'vue3-hot-toast';
 
 const emails = ref<Email[]>([]);
 const selectedEmail = ref<Email | null>(null);
@@ -27,7 +26,7 @@ const totalEmails = ref<number>(0);
 const lastPage = ref<number>(1);
 const userSettings = ref({
     paginationAmount: 25,
-    dateFormat: 'timestamp'
+    dateFormat: 'timestamp',
 });
 
 // Create a ref to track pagination events
@@ -49,10 +48,11 @@ const fetchEmails = (resetList = true): void => {
     const params = {
         page: currentPage.value,
         per_page: userSettings.value.paginationAmount,
-        search: searchQuery.value || undefined
+        search: searchQuery.value || undefined,
     };
 
-    axios.get('/mailweb/emails', { params })
+    axios
+        .get('/mailweb/emails', { params })
         .then((response) => {
             if (resetList) {
                 emails.value = response.data.data;
@@ -108,29 +108,38 @@ provide('isPollingActive', isPollingActive);
 const filteredEmails = computed<Email[]>(() => emails.value);
 
 // Watch for search query changes to trigger new search
-watch(searchQuery, (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-        // Debounce search to avoid too many requests
-        const debounceTimeout = setTimeout(() => {
-            fetchEmails(true);
-        }, 300);
+watch(
+    searchQuery,
+    (newValue, oldValue) => {
+        if (newValue !== oldValue) {
+            // Debounce search to avoid too many requests
+            const debounceTimeout = setTimeout(() => {
+                fetchEmails(true);
+            }, 300);
 
-        return () => clearTimeout(debounceTimeout);
-    }
-}, { immediate: false });
+            return () => clearTimeout(debounceTimeout);
+        }
+    },
+    { immediate: false },
+);
 
 // Watch for settings changes
-watch(() => userSettings.value.paginationAmount, (newValue, oldValue) => {
-    if (newValue !== oldValue) {
-        fetchEmails(true);
-    }
-}, { immediate: false });
+watch(
+    () => userSettings.value.paginationAmount,
+    (newValue, oldValue) => {
+        if (newValue !== oldValue) {
+            fetchEmails(true);
+        }
+    },
+    { immediate: false },
+);
 
 // Method to fetch full email content when an email is selected
 const fetchEmailContent = (emailId: string): void => {
     isLoadingEmailContent.value = true;
 
-    axios.get(`/mailweb/emails/${emailId}`)
+    axios
+        .get(`/mailweb/emails/${emailId}`)
         .then((response) => {
             selectedEmailWithFullContent.value = response.data;
             isLoadingEmailContent.value = false;
@@ -160,12 +169,12 @@ const checkMobile = (): void => {
 };
 
 const handleDeleteEmail = (emailId: string): void => {
-    emails.value = emails.value.filter(email => email.id !== emailId);
+    emails.value = emails.value.filter((email) => email.id !== emailId);
     selectedEmail.value = null;
     selectedEmailWithFullContent.value = null;
 
     toast.success('Email deleted successfully');
-}
+};
 
 // Lifecycle hooks
 onMounted((): void => {
@@ -176,8 +185,8 @@ onMounted((): void => {
 </script>
 
 <template>
-    <div class="flex flex-col h-screen overflow-hidden lg:flex-row">
-        <div v-if="isMobile" class="flex items-center p-4 border-b">
+    <div class="flex h-screen flex-col overflow-hidden lg:flex-row">
+        <div v-if="isMobile" class="flex items-center border-b p-4">
             <Button variant="ghost" size="icon" @click="sidebarOpen = true" class="mr-2">
                 <Menu class="h-5 w-5" />
                 <span class="sr-only">Toggle menu</span>
@@ -187,24 +196,39 @@ onMounted((): void => {
             </div>
         </div>
 
-        <Sidebar v-model:searchQuery="searchQuery" v-model:isOpen="sidebarOpen" :isMobile="isMobile"
-            :filters="{}" @update:settings="updateSettings" />
+        <Sidebar
+            v-model:searchQuery="searchQuery"
+            v-model:isOpen="sidebarOpen"
+            :isMobile="isMobile"
+            :filters="{}"
+            @update:settings="updateSettings"
+        />
 
-        <div class="flex flex-col flex-1 h-[calc(100vh-57px)] lg:h-screen overflow-hidden">
-            <div class="flex flex-col lg:flex-row flex-1 overflow-hidden">
+        <div class="flex h-[calc(100vh-57px)] flex-1 flex-col overflow-hidden lg:h-screen">
+            <div class="flex flex-1 flex-col overflow-hidden lg:flex-row">
                 <template v-if="isMobile">
                     <SlidingPanel>
-                        <EmailList :emails="filteredEmails" v-model:selectedEmail="selectedEmail" :isLoading="isLoading"
-                            :isLoadingMore="isLoadingMore" :error="error" :isMobile="isMobile"
-                            :totalEmails="totalEmails" :hasMoreEmails="currentPage < lastPage"
-                            @loadMore="loadMoreEmails" />
+                        <EmailList
+                            :emails="filteredEmails"
+                            v-model:selectedEmail="selectedEmail"
+                            :isLoading="isLoading"
+                            :isLoadingMore="isLoadingMore"
+                            :error="error"
+                            :isMobile="isMobile"
+                            :totalEmails="totalEmails"
+                            :hasMoreEmails="currentPage < lastPage"
+                            @loadMore="loadMoreEmails"
+                        />
                         <template #preview>
                             <div v-if="selectedEmail" class="h-full overflow-y-auto">
-                                <EmailPreview :email="selectedEmailWithFullContent || selectedEmail"
-                                    :isLoading="isLoadingEmailContent" :isMobile="isMobile"
-                                    @delete-email="handleDeleteEmail" />
+                                <EmailPreview
+                                    :email="selectedEmailWithFullContent || selectedEmail"
+                                    :isLoading="isLoadingEmailContent"
+                                    :isMobile="isMobile"
+                                    @delete-email="handleDeleteEmail"
+                                />
                             </div>
-                            <div v-else class="flex items-center justify-center h-full p-6 text-center bg-muted/30">
+                            <div v-else class="flex h-full items-center justify-center bg-muted/30 p-6 text-center">
                                 <div>
                                     <h3 class="text-xl font-medium">No email selected</h3>
                                     <p class="text-muted-foreground">Select an email from the list to preview it</p>
@@ -214,18 +238,29 @@ onMounted((): void => {
                     </SlidingPanel>
                 </template>
                 <template v-else>
-                    <EmailList :emails="filteredEmails" v-model:selectedEmail="selectedEmail" :isLoading="isLoading"
-                        :isLoadingMore="isLoadingMore" :error="error" :isMobile="isMobile" :totalEmails="totalEmails"
-                        :hasMoreEmails="currentPage < lastPage" @loadMore="loadMoreEmails" />
+                    <EmailList
+                        :emails="filteredEmails"
+                        v-model:selectedEmail="selectedEmail"
+                        :isLoading="isLoading"
+                        :isLoadingMore="isLoadingMore"
+                        :error="error"
+                        :isMobile="isMobile"
+                        :totalEmails="totalEmails"
+                        :hasMoreEmails="currentPage < lastPage"
+                        @loadMore="loadMoreEmails"
+                    />
                     <template v-if="selectedEmail">
-                        <div class="flex flex-col flex-1 overflow-hidden">
-                            <EmailPreview :email="selectedEmailWithFullContent || selectedEmail"
-                                :isLoading="isLoadingEmailContent" :isMobile="isMobile"
-                                @delete-email="handleDeleteEmail" />
+                        <div class="flex flex-1 flex-col overflow-hidden">
+                            <EmailPreview
+                                :email="selectedEmailWithFullContent || selectedEmail"
+                                :isLoading="isLoadingEmailContent"
+                                :isMobile="isMobile"
+                                @delete-email="handleDeleteEmail"
+                            />
                         </div>
                     </template>
                     <template v-else>
-                        <div class="flex items-center justify-center flex-1 p-6 text-center bg-muted/30">
+                        <div class="flex flex-1 items-center justify-center bg-muted/30 p-6 text-center">
                             <div>
                                 <h3 class="text-xl font-medium">No email selected</h3>
                                 <p class="text-muted-foreground">Select an email from the list to preview it</p>

@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 defineProps<{
-    open: boolean
-}>()
+    open: boolean;
+}>();
 
-const emit = defineEmits(['update:open', 'confirm'])
+const emit = defineEmits(['update:open', 'confirm']);
 
 const closeDialog = () => {
-    emit('update:open', false)
-}
+    emit('update:open', false);
+};
 
 const confirmDelete = () => {
-    emit('confirm')
-}
+    emit('confirm');
+};
 </script>
 
 <template>
