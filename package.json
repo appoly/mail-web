@@ -4,21 +4,42 @@
     "scripts": {
         "dev": "vite",
         "build": "vite build",
-        "prod": "vite build"
+        "prod": "vite build",
+        "format": "prettier --write resources/",
+        "format:check": "prettier --check resources/",
+        "lint": "eslint . --fix"
     },
     "dependencies": {
-        "autoprefixer": "^10.4.17",
+        "@tailwindcss/vite": "^4.0.9",
+        "@vueuse/core": "^12.8.2",
         "axios": "^1.6.7",
-        "moment": "^2.30.1"
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "date-fns": "^4.1.0",
+        "dompurify": "^3.2.4",
+        "lean-qr": "^2.4.1",
+        "lucide-vue-next": "^0.476.0",
+        "reka-ui": "^2.0.2",
+        "tailwind-merge": "^3.0.2",
+        "tailwindcss-animate": "^1.0.7",
+        "vue3-hot-toast": "^0.0.5"
     },
     "devDependencies": {
-        "@vitejs/plugin-vue": "^5.0.3",
-        "laravel-vite-plugin": "^1.0.1",
-        "postcss": "^8.4.35",
-        "resolve-url-loader": "^5.0.0",
-        "sass": "~1.70.0",
+        "@vitejs/plugin-vue": "^5.2.1",
+        "autoprefixer": "^10.4.20",
+        "laravel-vite-plugin": "^1.0",
         "tailwindcss": "^3.4.1",
-        "vite": "^5.1.1",
-        "vue": "^3.4.18"
+        "vite": "^6.0.3",
+        "vue": "^3.5.13",
+        "vue-tsc": "^2.2.0",
+        "@eslint/js": "^9.19.0",
+        "@vue/eslint-config-typescript": "^14.3.0",
+        "eslint": "^9.17.0",
+        "eslint-config-prettier": "^10.0.1",
+        "eslint-plugin-vue": "^9.32.0",
+        "prettier": "^3.4.2",
+        "prettier-plugin-organize-imports": "^4.1.0",
+        "prettier-plugin-tailwindcss": "^0.6.9",
+        "typescript-eslint": "^8.23.0"
     }
 }

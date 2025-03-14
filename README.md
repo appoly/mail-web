@@ -17,17 +17,17 @@ MailWeb is a robust Laravel package that revolutionizes email development and de
 ## ✨ Features
 
 - 📧 **Real-time Email Interception**: Catch and inspect outgoing emails instantly
-- 🎨 **Modern Tailwind UI**: Beautiful, responsive interface for easy navigation
+- 🎨 **Modern UI**: Beautiful, responsive interface for easy navigation
 - 🔍 **Powerful Search**: Quickly find emails with advanced search capabilities
 - 🔄 **Email Sharing**: Share email previews with your team effortlessly
 - 📎 **Attachment Support**: Handle email attachments with flexible storage options
 - 🛡️ **Secure Access Control**: Granular control over who can access the dashboard
+- 📱 **Mobile Responsive**: Optimized interface for both desktop and mobile devices
 
 ## 📋 Requirements
 
 - PHP 8.1 or higher
 - Laravel 9.21|10.0|11.0|12.0
-- Livewire 3.2 or higher
 
 ## 🔧 Installation
 
@@ -41,9 +41,8 @@ composer require appoly/mail-web
 php artisan migrate
 ```
 
-3. Publish assets and config:
+3. Publish config (if needed):
 ```bash
-php artisan vendor:publish --tag=mailweb-public --force
 php artisan vendor:publish --tag=mailweb-config --force
 ```
 
@@ -108,11 +107,7 @@ MAILWEB_ATTACHMENTS_DISK=s3  # Or any configured disk
 MAILWEB_ATTACHMENTS_PATH=/custom/path  # Optional, defaults to /mailweb/attachments
 ```
 
-## 🔄 Version Migration
 
-### Upgrading to v5
-
-Version 5 introduces a new data structure with an archived table for better email data management. A migration tool for existing emails is in development.
 
 ## 🤝 Contributing
 
@@ -157,5 +152,5 @@ This project is licensed under the [MIT License](https://choosealicense.com/lice
 ---
 
 <div align="center">
-Made with ❤️ by <a href="https://appoly.co.uk">Appoly</a>
+Made by <a href="https://appoly.co.uk">Appoly</a>
 </div>
