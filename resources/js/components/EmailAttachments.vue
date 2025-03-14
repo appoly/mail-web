@@ -33,11 +33,8 @@ const getFileType = (filename: string) => {
                         <div class="overflow-hidden">
                             <div class="truncate text-sm font-medium" :title="attachment.name">{{ attachment.name }}</div>
                             <div class="flex items-center gap-1 text-xs text-gray-500">
-                                <span class="uppercase">{{ getFileType(attachment.name) }}</span>
+                                <span class="uppercase">{{ getFileType(attachment.name) }}</span> • {{ attachment.human_readable_size }}
                             </div>
-                            <!-- <div class="text-xs text-gray-500 flex items-center gap-1">
-                                <span class="capitalize">txt</span> • 100kb
-                            </div> -->
                         </div>
                     </div>
                 </div>

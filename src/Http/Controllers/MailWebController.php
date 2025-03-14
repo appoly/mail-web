@@ -194,13 +194,10 @@ class MailWebController
         $originalMailDriver = Config::get('mail.default');
         Config::set('mail.default', 'log');
 
-        // Get template ID from request or use random template
-        $templateId = $request->input('template_id');
-
         try {
             // Send notification to example@appoly.co.uk
             Notification::route('mail', 'example@appoly.co.uk')
-                ->notify(new MailwebSampleNotification($templateId));
+                ->notify(new MailwebSampleNotification);
 
             // Reset mail driver
             Config::set('mail.default', $originalMailDriver);
