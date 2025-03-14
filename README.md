@@ -107,18 +107,7 @@ MAILWEB_ATTACHMENTS_DISK=s3  # Or any configured disk
 MAILWEB_ATTACHMENTS_PATH=/custom/path  # Optional, defaults to /mailweb/attachments
 ```
 
-## 🔄 Version Migration
 
-### Upgrading to Latest Version
-
-The latest version introduces several important changes:
-
-- No longer uses Livewire
-- No need to manually publish assets
-- Improved mobile responsiveness with adaptive layout
-- Enhanced email preview and management interface
-
-If you're upgrading from a previous version, simply update via Composer and run migrations:
 
 ## 🤝 Contributing
 
@@ -163,5 +152,5 @@ This project is licensed under the [MIT License](https://choosealicense.com/lice
 ---
 
 <div align="center">
-Made with ❤️ by <a href="https://appoly.co.uk">Appoly</a>
+Made by <a href="https://appoly.co.uk">Appoly</a>
 </div>
