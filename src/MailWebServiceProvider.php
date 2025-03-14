@@ -39,57 +39,73 @@ class MailWebServiceProvider extends ServiceProvider
     }
 
     /**
-     * Get the CSS for the MailWeb dashboard.
+     * Get the CSS or JS asset for the MailWeb dashboard.
      *
-     * @return \Illuminate\Contracts\Support\Htmlable
+     * @param  string  $assetType  Either 'css' or 'js'
      */
-    public static function css()
+    private static function getAsset(string $assetType): \Illuminate\Contracts\Support\Htmlable
     {
         $manifestPath = __DIR__ . '/../public/vendor/mailweb/.vite/manifest.json';
-        if (file_exists($manifestPath)) {
 
-            $cssPath = __DIR__ . '/../public/vendor/mailweb/' . json_decode(file_get_contents($manifestPath), true)['style.css']['file'];
-            if (file_exists($cssPath)) {
-                $css = @file_get_contents($cssPath);
-
-                return new HtmlString("<style>{$css}</style>");
-            }
+        if (! file_exists($manifestPath)) {
+            return new HtmlString('');
         }
 
-        return new HtmlString('');
+        $manifest = json_decode(file_get_contents($manifestPath), true);
+
+        if (! $manifest) {
+            return new HtmlString('');
+        }
+
+        $assetKey = $assetType === 'css' ? 'style.css' : 'resources/js/app.js';
+
+        if (! isset($manifest[$assetKey]['file'])) {
+            return new HtmlString('');
+        }
+
+        $assetPath = __DIR__ . '/../public/vendor/mailweb/' . $manifest[$assetKey]['file'];
+
+        if (! file_exists($assetPath)) {
+            return new HtmlString('');
+        }
+
+        $content = file_get_contents($assetPath);
+
+        if ($assetType === 'css') {
+            return new HtmlString("<style>{$content}</style>");
+        } else {
+            $config = Js::from([
+                'deleteAllEnabled' => config('MailWeb.MAILWEB_DELETE_ALL_ENABLED', false),
+                'sendSampleButton' => config('MailWeb.MAILWEB_SEND_SAMPLE_BUTTON', true),
+                'return' => [
+                    'appName' => config('MailWeb.MAILWEB_RETURN.APP_NAME') ?? config('app.name') ?? 'App',
+                    'appUrl' => config('MailWeb.MAILWEB_RETURN.APP_URL') ?? '/',
+                ],
+            ]);
+
+            return new HtmlString(<<<HTML
+            <script type="module">
+                window.mailwebConfig = {$config};
+                {$content}
+            </script>
+            HTML);
+        }
+    }
+
+    /**
+     * Get the CSS for the MailWeb dashboard.
+     */
+    public static function css(): \Illuminate\Contracts\Support\Htmlable
+    {
+        return self::getAsset('css');
     }
 
     /**
      * Get the JS for the MailWeb dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Htmlable
      */
-    public static function js(): HtmlString
+    public static function js(): \Illuminate\Contracts\Support\Htmlable
     {
-        $manifestPath = __DIR__ . '/../public/vendor/mailweb/.vite/manifest.json';
-        if (file_exists($manifestPath)) {
-            $jsPath = __DIR__ . '/../public/vendor/mailweb/' . json_decode(file_get_contents($manifestPath), true)['resources/js/app.js']['file'];
-            if (file_exists($jsPath)) {
-                $js = @file_get_contents($jsPath);
-                $config = Js::from([
-                    'deleteAllEnabled' => config('MailWeb.MAILWEB_DELETE_ALL_ENABLED', false),
-                    'sendSampleButton' => config('MailWeb.MAILWEB_SEND_SAMPLE_BUTTON', true),
-                    'return' => [
-                        'appName' => config('MailWeb.MAILWEB_RETURN.APP_NAME') ?? config('app.name') ?? 'App',
-                        'appUrl' => config('MailWeb.MAILWEB_RETURN.APP_URL') ?? '/',
-                    ],
-                ]);
-
-                return new HtmlString(<<<HTML
-                    <script type="module">
-                        window.mailwebConfig = {$config};
-                        {$js}
-                    </script>
-                    HTML);
-            }
-        }
-
-        return new HtmlString('');
+        return self::getAsset('js');
     }
 
     /**
