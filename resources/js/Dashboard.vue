@@ -256,6 +256,6 @@ onMounted((): void => {
                 </template>
             </div>
         </div>
-    </div>
     <Toaster />
+    </div>
 </template>
