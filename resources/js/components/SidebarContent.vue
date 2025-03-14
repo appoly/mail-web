@@ -198,7 +198,7 @@ onMounted(() => {
         watch(paginationTriggered, (triggered) => {
             if (triggered && isPolling.value) {
                 stopPolling()
-                toast.success('Auto-refresh has been disabled while you\'re browsing. You can re-enable it in the bottom right corner')
+                toast.success('Auto-refresh has been disabled while you\'re browsing. You can re-enable it in the bottom left corner')
             }
         })
     }
