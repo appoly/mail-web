@@ -205,7 +205,7 @@ onMounted(updateIframe)
                     :class="viewMode === 'html' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'"
                     @click="viewMode = 'html'">
                     <Eye class="h-3 w-3 sm:h-4 sm:w-4" />
-                    Preview
+                    Preview 
                 </button>
                 <button class="px-4 py-2 flex items-center gap-2 text-sm font-medium transition-colors"
                     :class="viewMode === 'text' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'"

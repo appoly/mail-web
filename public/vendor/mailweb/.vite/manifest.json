@@ -1,0 +1,12 @@
+{
+  "resources/js/app.js": {
+    "file": "mailweb.CWELc2n-.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "style.css": {
+    "file": "mailweb.CDh5l519.css",
+    "src": "style.css"
+  }
+}
