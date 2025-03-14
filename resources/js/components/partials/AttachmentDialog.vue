@@ -2,9 +2,9 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EmailAttachment } from '@/types/email';
-import AttachmentIcon from '../ui/AttachmentIcon.vue';
 import { Download, FileX } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
+import AttachmentIcon from '../ui/AttachmentIcon.vue';
 
 const props = defineProps<{
     open: boolean;
@@ -40,7 +40,7 @@ watch(
             isImage.value = checkIfImage(attachment.name);
         }
     },
-    { immediate: true }
+    { immediate: true },
 );
 
 // Handle image load complete
@@ -54,11 +54,10 @@ const handleImageError = () => {
     imageError.value = true;
 };
 
-
 // Download the attachment
 const downloadAttachment = () => {
     if (!props.attachment?.file_url) return;
-    
+
     // Create a temporary anchor element
     const link = document.createElement('a');
     link.href = props.attachment.file_url;
@@ -81,15 +80,15 @@ const downloadAttachment = () => {
 
             <div class="py-4">
                 <!-- No attachment case -->
-                <div v-if="!attachment" class="flex flex-col items-center justify-center p-8 text-center bg-gray-50 rounded-md">
-                    <FileX class="h-16 w-16 text-gray-400 mb-4" />
-                    <p class="text-gray-600 mb-2">Attachment not found</p>
+                <div v-if="!attachment" class="flex flex-col items-center justify-center rounded-md bg-gray-50 p-8 text-center">
+                    <FileX class="mb-4 h-16 w-16 text-gray-400" />
+                    <p class="mb-2 text-gray-600">Attachment not found</p>
                 </div>
 
                 <!-- Missing file URL case -->
-                <div v-else-if="!attachment.file_url" class="flex flex-col items-center justify-center p-8 text-center bg-gray-50 rounded-md">
-                    <FileX class="h-16 w-16 text-gray-400 mb-4" />
-                    <p class="text-gray-600 mb-2">Attachment was not stored</p>
+                <div v-else-if="!attachment.file_url" class="flex flex-col items-center justify-center rounded-md bg-gray-50 p-8 text-center">
+                    <FileX class="mb-4 h-16 w-16 text-gray-400" />
+                    <p class="mb-2 text-gray-600">Attachment was not stored</p>
                 </div>
 
                 <!-- Image attachment -->
@@ -101,7 +100,7 @@ const downloadAttachment = () => {
                         v-if="attachment.file_url"
                         :src="attachment.file_url"
                         :alt="attachment.name"
-                        class="max-h-[400px] object-contain rounded border"
+                        class="max-h-[400px] rounded border object-contain"
                         @load="handleImageLoaded"
                         @error="handleImageError"
                     />
@@ -111,14 +110,14 @@ const downloadAttachment = () => {
                 </div>
 
                 <!-- Non-image attachment -->
-                <div v-else-if="attachment" class="text-center p-8 bg-gray-50 rounded-md">
-                    <div class="flex justify-center mb-4">
+                <div v-else-if="attachment" class="rounded-md bg-gray-50 p-8 text-center">
+                    <div class="mb-4 flex justify-center">
                         <AttachmentIcon :filename="attachment.name" class="h-16 w-16" />
                     </div>
-                    <p class="text-gray-600 mb-2">Preview not available for this file type</p>
-                    <p class="text-sm text-gray-500 mb-4">{{ attachment.human_readable_size }}</p>
+                    <p class="mb-2 text-gray-600">Preview not available for this file type</p>
+                    <p class="mb-4 text-sm text-gray-500">{{ attachment.human_readable_size }}</p>
                     <Button v-if="attachment.file_url" @click="downloadAttachment">
-                        <Download class="h-4 w-4 mr-2" />
+                        <Download class="mr-2 h-4 w-4" />
                         Download
                     </Button>
                 </div>

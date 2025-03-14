@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { EmailAttachment } from '@/types/email';
+import { ref } from 'vue';
 import AttachmentDialog from './partials/AttachmentDialog.vue';
 import AttachmentIcon from './ui/AttachmentIcon.vue';
-import { ref } from 'vue';
 
 defineProps<{
     attachments: EmailAttachment[];
@@ -47,11 +47,8 @@ const getFileType = (filename: string) => {
                 </div>
             </div>
         </div>
-        
+
         <!-- Attachment Dialog -->
-        <AttachmentDialog 
-            v-model:open="isDialogOpen" 
-            :attachment="selectedAttachment" 
-        />
+        <AttachmentDialog v-model:open="isDialogOpen" :attachment="selectedAttachment" />
     </div>
 </template>
