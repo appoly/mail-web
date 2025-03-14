@@ -1,46 +1,38 @@
-<script setup>
-import { cn } from '@/lib/utils';
-import { X } from 'lucide-vue-next';
+<script setup lang="ts">
+import { cn } from '@/lib/utils'
+import { X } from 'lucide-vue-next'
 import {
   DialogClose,
   DialogContent,
+  type DialogContentEmits,
+  type DialogContentProps,
   DialogOverlay,
   DialogPortal,
   useForwardPropsEmits,
-} from 'reka-ui';
-import { computed } from 'vue';
-import { sheetVariants } from '.';
+} from 'reka-ui'
+import { computed, type HTMLAttributes } from 'vue'
+import { type SheetVariants, sheetVariants } from '.'
+
+interface SheetContentProps extends DialogContentProps {
+  class?: HTMLAttributes['class']
+  side?: SheetVariants['side']
+}
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 
-const props = defineProps({
-  class: { type: null, required: false },
-  side: { type: null, required: false },
-  forceMount: { type: Boolean, required: false },
-  trapFocus: { type: Boolean, required: false },
-  disableOutsidePointerEvents: { type: Boolean, required: false },
-  asChild: { type: Boolean, required: false },
-  as: { type: null, required: false },
-});
+const props = defineProps<SheetContentProps>()
 
-const emits = defineEmits([
-  'escapeKeyDown',
-  'pointerDownOutside',
-  'focusOutside',
-  'interactOutside',
-  'openAutoFocus',
-  'closeAutoFocus',
-]);
+const emits = defineEmits<DialogContentEmits>()
 
 const delegatedProps = computed(() => {
-  const { class: _, side, ...delegated } = props;
+  const { class: _, side, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 
-const forwarded = useForwardPropsEmits(delegatedProps, emits);
+const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>
 
 <template>

@@ -1,11 +1,7 @@
-<script setup>
-import { AvatarFallback } from 'reka-ui';
+<script setup lang="ts">
+import { AvatarFallback, type AvatarFallbackProps } from 'reka-ui'
 
-const props = defineProps({
-  delayMs: { type: Number, required: false },
-  asChild: { type: Boolean, required: false },
-  as: { type: null, required: false },
-});
+const props = defineProps<AvatarFallbackProps>()
 </script>
 
 <template>

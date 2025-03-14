@@ -1,39 +1,27 @@
-<script setup>
-import { cn } from '@/lib/utils';
-import { X } from 'lucide-vue-next';
+<script setup lang="ts">
+import { cn } from '@/lib/utils'
+import { X } from 'lucide-vue-next'
 import {
   DialogClose,
   DialogContent,
+  type DialogContentEmits,
+  type DialogContentProps,
   DialogOverlay,
   DialogPortal,
   useForwardPropsEmits,
-} from 'reka-ui';
-import { computed } from 'vue';
+} from 'reka-ui'
+import { computed, type HTMLAttributes } from 'vue'
 
-const props = defineProps({
-  forceMount: { type: Boolean, required: false },
-  trapFocus: { type: Boolean, required: false },
-  disableOutsidePointerEvents: { type: Boolean, required: false },
-  asChild: { type: Boolean, required: false },
-  as: { type: null, required: false },
-  class: { type: null, required: false },
-});
-const emits = defineEmits([
-  'escapeKeyDown',
-  'pointerDownOutside',
-  'focusOutside',
-  'interactOutside',
-  'openAutoFocus',
-  'closeAutoFocus',
-]);
+const props = defineProps<DialogContentProps & { class?: HTMLAttributes['class'] }>()
+const emits = defineEmits<DialogContentEmits>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 
-const forwarded = useForwardPropsEmits(delegatedProps, emits);
+const forwarded = useForwardPropsEmits(delegatedProps, emits)
 </script>
 
 <template>
@@ -49,18 +37,13 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
           )
         "
         v-bind="forwarded"
-        @pointer-down-outside="
-          (event) => {
-            const originalEvent = event.detail.originalEvent;
-            const target = originalEvent.target;
-            if (
-              originalEvent.offsetX > target.clientWidth ||
-              originalEvent.offsetY > target.clientHeight
-            ) {
-              event.preventDefault();
-            }
+        @pointer-down-outside="(event) => {
+          const originalEvent = event.detail.originalEvent;
+          const target = originalEvent.target as HTMLElement;
+          if (originalEvent.offsetX > target.clientWidth || originalEvent.offsetY > target.clientHeight) {
+            event.preventDefault();
           }
-        "
+        }"
       >
         <slot />
 

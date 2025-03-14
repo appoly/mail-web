@@ -1,30 +1,24 @@
-<script setup>
-import { cn } from '@/lib/utils';
-import { Check } from 'lucide-vue-next';
+<script setup lang="ts">
+import { cn } from '@/lib/utils'
+import { Check } from 'lucide-vue-next'
 import {
   SelectItem,
   SelectItemIndicator,
+  type SelectItemProps,
   SelectItemText,
   useForwardProps,
-} from 'reka-ui';
-import { computed } from 'vue';
+} from 'reka-ui'
+import { computed, type HTMLAttributes } from 'vue'
 
-const props = defineProps({
-  value: { type: null, required: true },
-  disabled: { type: Boolean, required: false },
-  textValue: { type: String, required: false },
-  asChild: { type: Boolean, required: false },
-  as: { type: null, required: false },
-  class: { type: null, required: false },
-});
+const props = defineProps<SelectItemProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 
-const forwardedProps = useForwardProps(delegatedProps);
+const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>

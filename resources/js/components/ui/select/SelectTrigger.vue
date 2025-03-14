@@ -1,35 +1,27 @@
-<script setup>
-import { cn } from '@/lib/utils';
-import { ChevronDown } from 'lucide-vue-next';
-import { SelectIcon, SelectTrigger, useForwardProps } from 'reka-ui';
-import { computed } from 'vue';
+<script setup lang="ts">
+import { cn } from '@/lib/utils'
+import { ChevronDown } from 'lucide-vue-next'
+import { SelectIcon, SelectTrigger, type SelectTriggerProps, useForwardProps } from 'reka-ui'
+import { computed, type HTMLAttributes } from 'vue'
 
-const props = defineProps({
-  disabled: { type: Boolean, required: false },
-  reference: { type: null, required: false },
-  asChild: { type: Boolean, required: false },
-  as: { type: null, required: false },
-  class: { type: null, required: false },
-});
+const props = defineProps<SelectTriggerProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 
-const forwardedProps = useForwardProps(delegatedProps);
+const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>
   <SelectTrigger
     v-bind="forwardedProps"
-    :class="
-      cn(
-        'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
-        props.class,
-      )
-    "
+    :class="cn(
+      'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
+      props.class,
+    )"
   >
     <slot />
     <SelectIcon as-child>

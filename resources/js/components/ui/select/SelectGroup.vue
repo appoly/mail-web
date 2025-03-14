@@ -1,19 +1,15 @@
-<script setup>
-import { cn } from '@/lib/utils';
-import { SelectGroup } from 'reka-ui';
-import { computed } from 'vue';
+<script setup lang="ts">
+import { cn } from '@/lib/utils'
+import { SelectGroup, type SelectGroupProps } from 'reka-ui'
+import { computed, type HTMLAttributes } from 'vue'
 
-const props = defineProps({
-  asChild: { type: Boolean, required: false },
-  as: { type: null, required: false },
-  class: { type: null, required: false },
-});
+const props = defineProps<SelectGroupProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 </script>
 
 <template>

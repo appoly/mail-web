@@ -1,28 +1,24 @@
-<script setup>
-import { cn } from '@/lib/utils';
-import { AccordionItem, useForwardProps } from 'reka-ui';
-import { computed } from 'vue';
+<script setup lang="ts">
+import { cn } from '@/lib/utils'
+import { AccordionItem, type AccordionItemProps, useForwardProps } from 'reka-ui'
+import { computed, type HTMLAttributes } from 'vue'
 
-const props = defineProps({
-  disabled: { type: Boolean, required: false },
-  value: { type: String, required: true },
-  unmountOnHide: { type: Boolean, required: false },
-  asChild: { type: Boolean, required: false },
-  as: { type: null, required: false },
-  class: { type: null, required: false },
-});
+const props = defineProps<AccordionItemProps & { class?: HTMLAttributes['class'] }>()
 
 const delegatedProps = computed(() => {
-  const { class: _, ...delegated } = props;
+  const { class: _, ...delegated } = props
 
-  return delegated;
-});
+  return delegated
+})
 
-const forwardedProps = useForwardProps(delegatedProps);
+const forwardedProps = useForwardProps(delegatedProps)
 </script>
 
 <template>
-  <AccordionItem v-bind="forwardedProps" :class="cn('border-b', props.class)">
+  <AccordionItem
+    v-bind="forwardedProps"
+    :class="cn('border-b', props.class)"
+  >
     <slot />
   </AccordionItem>
 </template>
