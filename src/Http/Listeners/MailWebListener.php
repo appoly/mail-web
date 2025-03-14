@@ -44,6 +44,7 @@ class MailWebListener
                 if ($attachment instanceof \Symfony\Component\Mime\Part\DataPart) {
                     // Extract attachment details
                     $fileName = $attachment->getFilename();
+                    $extension = pathinfo($fileName, PATHINFO_EXTENSION);
                     $fileContent = $attachment->getBody();
                     $mimeType = $attachment->getMediaType() . '/' . $attachment->getMediaSubtype();
                     $fileSizeBytes = strlen($fileContent);
@@ -59,7 +60,7 @@ class MailWebListener
                         $storageDisk = config('MailWeb.MAILWEB_ATTACHMENTS.DISK');
                         // If the config is enabled, we store the file
                         if ($storageDisk) {
-                            $path = config('MailWeb.MAILWEB_ATTACHMENTS.PATH') . '/' . $attachment->mailweb_email_id . '/' . $attachment->id;
+                            $path = config('MailWeb.MAILWEB_ATTACHMENTS.PATH') . '/' . $attachment->mailweb_email_id . '/' . $attachment->id . '.' . $extension;
                             Storage::disk($storageDisk)->put(
                                 path: $path,
                                 contents: $fileContent,
@@ -73,10 +74,7 @@ class MailWebListener
                     } catch (\Throwable $e) {
                         // We don't want to fail the entire process, so just log the error and move on
                         report($e);
-
-                        return;
                     }
-
                 }
             }
         });

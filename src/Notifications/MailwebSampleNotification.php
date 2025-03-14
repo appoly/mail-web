@@ -69,8 +69,8 @@ class MailwebSampleNotification extends Notification
                     ['type' => 'line', 'content' => 'Order Number: #12345'],
                     ['type' => 'line', 'content' => 'Date: March 7, 2025'],
                     ['type' => 'line', 'content' => 'Items:'],
-                    ['type' => 'line', 'content' => '• Product A - $49.99'],
-                    ['type' => 'line', 'content' => '• Product B - $29.99'],
+                    ['type' => 'line', 'content' => '• Plain Black T-Shirt - $49.99'],
+                    ['type' => 'line', 'content' => '• Red T-Shirt - $29.99'],
                     ['type' => 'line', 'content' => 'Subtotal: $79.98'],
                     ['type' => 'line', 'content' => 'Shipping: $5.99'],
                     ['type' => 'line', 'content' => 'Tax: $8.60'],
@@ -138,9 +138,8 @@ class MailwebSampleNotification extends Notification
                 break;
 
             case 'welcome':
-                // Two attachments
-                $mail->attachData('Platform onboarding guide for new users.', 'onboarding-guide.pdf', ['mime' => 'application/pdf']);
-                $mail->attachData(base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=='), 'welcome-screenshot.png', ['mime' => 'image/png']);
+                $document = file_get_contents(__DIR__ . '/../../public/test-documents/onboarding-guide.pdf');
+                $mail->attachData($document, 'onboarding-guide.pdf', ['mime' => 'application/pdf']);
                 break;
 
             case 'password_reset':
@@ -148,18 +147,15 @@ class MailwebSampleNotification extends Notification
                 break;
 
             case 'order_confirmation':
-                // Multiple attachments (4)
-                $mail->attachData('Order #12345 receipt.', 'order-receipt.pdf', ['mime' => 'application/pdf']);
-                $mail->attachData("order_id,product,price\n12345,Product A,$49.99\n12345,Product B,$29.99", 'order-12345.csv', ['mime' => 'text/csv']);
-                $mail->attachData(base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAEBgI/Py8WJAAAAABJRU5ErkJggg=='), 'product-image.jpg', ['mime' => 'image/jpeg']);
+                $productImage = file_get_contents(__DIR__ . '/../../public/test-documents/product.jpg');
+                $mail->attachData($productImage, 'product.jpg', ['mime' => 'image/jpeg']);
+                $mail->attachData("order_id,product,price\n12345,Plain Black T-Shirt,$49.99\n12345,Red T-Shirt,$29.99", 'order-12345.csv', ['mime' => 'text/csv']);
                 $mail->attachData('Order confirmation details for #12345.', 'confirmation.txt', ['mime' => 'text/plain']);
                 break;
 
             case 'event_invitation':
-                // Three attachments
-                $mail->attachData('Virtual Conference 2025 agenda.', 'conference-agenda.pdf', ['mime' => 'application/pdf']);
-                $mail->attachData('Speaker biographies for Virtual Conference 2025.', 'speaker-bios.docx', ['mime' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']);
-                $mail->attachData(base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChgB/PQ9WnAAAAABJRU5ErkJggg=='), 'conference-logo.png', ['mime' => 'image/png']);
+                $document = file_get_contents(__DIR__ . '/../../public/test-documents/speaker-bios.docx');
+                $mail->attachData($document, 'speaker-bios.docx', ['mime' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']);
                 break;
         }
 

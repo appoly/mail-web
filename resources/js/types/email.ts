@@ -9,6 +9,7 @@ export interface EmailAttachment {
     name: string;
     path: string;
     human_readable_size: string;
+    file_url: string;
 }
 
 // Email interface for EmailPreview component
