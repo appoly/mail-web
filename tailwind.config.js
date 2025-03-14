@@ -71,5 +71,5 @@
     		}
     	}
     },
-    plugins: [],
+    plugins: [require("tailwindcss-animate")],
   }
