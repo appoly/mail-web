@@ -14,7 +14,7 @@ declare global {
 }
 
 import { ref, onMounted, onUnmounted, watch, inject, nextTick } from 'vue'
-import { Search, Mail, Filter, RefreshCw, Settings, X, Send, Play, Pause, ArrowLeft, Trash2, AlertCircle } from 'lucide-vue-next'
+import { Search, Mail, Filter, RefreshCw, Settings, X, Play, Pause, ArrowLeft, Trash2, AlertCircle } from 'lucide-vue-next'
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -23,7 +23,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, } from '@/components/ui/dialog'
 import toast from 'vue3-hot-toast'
 import Github from '@/components/icons/Github.vue'
-
+import AnimatedSendButton from './partials/AnimatedSendButton.vue'
 import axios from 'axios'
 
 const props = defineProps<{
@@ -32,15 +32,12 @@ const props = defineProps<{
     isMobile: boolean
 }>()
 
-// Local state for search query to improve responsiveness
 const localSearchQuery = ref(props.searchQuery)
 
-// Watch for changes to localSearchQuery and emit updates to parent
 watch(localSearchQuery, (newValue) => {
     emit('update:searchQuery', newValue)
 })
 
-// Watch for changes to props.searchQuery to keep local state in sync
 watch(() => props.searchQuery, (newValue) => {
     if (newValue !== localSearchQuery.value) {
         localSearchQuery.value = newValue
@@ -49,7 +46,6 @@ watch(() => props.searchQuery, (newValue) => {
 
 const emit = defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar', 'update:settings'])
 
-// Inject the fetchEmails function from Dashboard
 const fetchEmails = inject('fetchEmails') as () => void
 
 const isRefreshing = ref<boolean>(false)
@@ -58,11 +54,9 @@ const isDeleting = ref<boolean>(false)
 const isPolling = ref<boolean>(false)
 const pollingInterval = ref<number | null>(null)
 
-// Shared state for pagination events and polling
 const paginationTriggered = inject('paginationTriggered', null) as any
 const isPollingActive = inject('isPollingActive', true) as boolean
 
-// Settings
 const showSettingsDialog = ref<boolean>(false)
 const showDeleteAllDialog = ref<boolean>(false)
 const showDeleteAllDisabledDialog = ref<boolean>(false)
@@ -78,52 +72,39 @@ const settings: Record<string, any> = ref({
     dateFormat: 'days-ago'
 })
 
-// Return config from window.mailwebConfig
 const returnConfig = ref({
     appName: '',
     appUrl: ''
 })
 
-// Send sample button config from window.mailwebConfig
 const isSendSampleButtonEnabled = ref<boolean>(false)
-
-// Check if delete all feature is enabled from window.mailwebConfig
 const isDeleteAllEnabled = ref<boolean>(false)
 
-// Initialize isDeleteAllEnabled from window config
 onMounted(() => {
     if (window.mailwebConfig && typeof window.mailwebConfig.deleteAllEnabled === 'boolean') {
         isDeleteAllEnabled.value = window.mailwebConfig.deleteAllEnabled
     }
     if (window.mailwebConfig && window.mailwebConfig.return) {
         returnConfig.value = window.mailwebConfig.return
-    } 
+    }
     if (window.mailwebConfig && typeof window.mailwebConfig.sendSampleButton === 'boolean') {
         isSendSampleButtonEnabled.value = window.mailwebConfig.sendSampleButton
     }
 })
 
-// Poll for new emails every 5 seconds
 const POLLING_INTERVAL_MS = 5000
 
 const startPolling = (): void => {
     if (pollingInterval.value !== null) return
-
-    // Reset pagination trigger if it exists
     if (paginationTriggered) {
         paginationTriggered.value = false
     }
-
-    // Immediately fetch emails
     handleRefresh()
-
-    // Start polling
     pollingInterval.value = window.setInterval(() => {
         if (document.visibilityState === 'visible') {
             handleRefresh()
         }
     }, POLLING_INTERVAL_MS)
-
     isPolling.value = true
     if (isPollingActive) {
         isPollingActive.value = true
@@ -159,18 +140,12 @@ const handleRefresh = (): void => {
     }, 1000)
 }
 
-
-// Load settings from local storage
 const loadSettings = (): void => {
     const savedSettings = localStorage.getItem('mailweb-settings')
     if (savedSettings) {
         try {
             const parsedSettings = JSON.parse(savedSettings)
-            settings.value = {
-                ...settings.value,
-                ...parsedSettings
-            }
-            // Emit the loaded settings to parent components
+            settings.value = { ...settings.value, ...parsedSettings }
             emit('update:settings', settings.value)
         } catch (e) {
             console.error('Failed to parse settings from localStorage:', e)
@@ -178,22 +153,17 @@ const loadSettings = (): void => {
     }
 }
 
-// Save settings to local storage
 const saveSettings = (): void => {
     localStorage.setItem('mailweb-settings', JSON.stringify(settings.value))
     emit('update:settings', settings.value)
     showSettingsDialog.value = false
 }
 
-// Clean up interval when component is unmounted
 onMounted(() => {
     loadSettings()
-
     if (isPollingActive) {
         startPolling()
     }
-
-    // Watch for changes to paginationTriggered to stop polling when pagination is triggered
     if (paginationTriggered) {
         watch(paginationTriggered, (triggered) => {
             if (triggered && isPolling.value) {
@@ -231,7 +201,6 @@ const sendTestEmail = async (): Promise<void> => {
 }
 
 const deleteAllEmails = async (): Promise<void> => {
-    // Check if delete all is enabled
     if (!isDeleteAllEnabled.value) {
         showDeleteAllDialog.value = false
         showDeleteAllDisabledDialog.value = true
@@ -248,13 +217,11 @@ const deleteAllEmails = async (): Promise<void> => {
 
         if (response.status === 200) {
             toast.success('All emails have been deleted successfully!')
-            // Refresh the email list
             if (fetchEmails) {
                 fetchEmails()
             }
         } else {
             toast.error('Failed to delete all emails')
-            console.error('Failed to delete all emails:', response.data)
         }
     } catch (error: any) {
         if (error.response && error.response.status === 403) {
@@ -279,7 +246,6 @@ const deleteAllEmails = async (): Promise<void> => {
                     <Mail class="h-5 w-5 text-primary" />
                     <h1 class="text-xl font-bold">Mailweb</h1>
                 </div>
-
                 <Button v-if="isMobile" variant="ghost" size="icon" @click="$emit('close-sidebar')">
                     <X class="h-5 w-5" />
                     <span class="sr-only">Close</span>
@@ -328,9 +294,7 @@ const deleteAllEmails = async (): Promise<void> => {
                         <TooltipProvider v-if="isSendSampleButtonEnabled">
                             <Tooltip>
                                 <TooltipTrigger as-child>
-                                    <Button variant="ghost" size="icon" @click="sendTestEmail" :disabled="isSending">
-                                        <Send :class="['h-4 w-4', { 'animate-pulse': isSending }]" />
-                                    </Button>
+                                    <AnimatedSendButton :disabled="isSending" @click="sendTestEmail" />
                                 </TooltipTrigger>
                                 <TooltipContent>Send Test Email</TooltipContent>
                             </Tooltip>
@@ -436,8 +400,7 @@ const deleteAllEmails = async (): Promise<void> => {
                 </p>
                 <p class="text-sm text-muted-foreground mt-2">
                     To enable this feature, set <code>MAILWEB_DELETE_ALL_ENABLED=true</code> in your environment
-                    variables
-                    or update the config file.
+                    variables or update the config file.
                 </p>
             </div>
             <DialogFooter>
