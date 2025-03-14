@@ -264,7 +264,7 @@ onMounted(updateIframe)
                             <p class="text-sm text-muted-foreground">Loading email content...</p>
                         </div>
                     </div>
-                    <pre v-else class="whitespace-pre-wrap font-mono text-sm">{{ JSON.stringify(email, null, 2) }}</pre>
+                    <pre v-else class="whitespace-pre-wrap font-mono text-sm">{{ email.body_html }}</pre>
                 </div>
             </div>
         </div>
