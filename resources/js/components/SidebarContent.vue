@@ -306,7 +306,7 @@ const deleteAllEmails = async (): Promise<void> => {
                                 <Button :variant="isPolling ? 'default' : 'ghost'" size="icon" @click="togglePolling"
                                     class="relative">
                                     <Play v-if="!isPolling" class="h-4 w-4" />
-                                    <Pause v-else class="h-4 w-4" />
+                                    <Pause v-else-if="!isRefreshing" class="h-4 w-4" />
                                     <RefreshCw v-if="isRefreshing" class="h-4 w-4 animate-spin absolute" />
                                 </Button>
                             </TooltipTrigger>
