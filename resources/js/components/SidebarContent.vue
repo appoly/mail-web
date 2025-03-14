@@ -1,17 +1,5 @@
 <script setup lang="ts">
-// Declare mailwebConfig on window object
-declare global {
-    interface Window {
-        mailwebConfig?: {
-            deleteAllEnabled: boolean,
-            sendSampleButton: boolean,
-            return: {
-                appName: string,
-                appUrl: string
-            }
-        }
-    }
-}
+import { useMailwebConfig } from '@/composables/useMailwebConfig'
 
 import { ref, onMounted, onUnmounted, watch, inject, nextTick } from 'vue'
 import { Search, Mail, Filter, RefreshCw, Settings, X, Play, Pause, ArrowLeft, Trash2, AlertCircle } from 'lucide-vue-next'
@@ -72,6 +60,9 @@ const settings: Record<string, any> = ref({
     dateFormat: 'days-ago'
 })
 
+// Use the mailweb config composable
+const { getReturnConfig, isDeleteAllEnabled: checkDeleteAllEnabled, isSendSampleButtonEnabled: checkSendSampleButtonEnabled } = useMailwebConfig()
+
 const returnConfig = ref({
     appName: '',
     appUrl: ''
@@ -81,15 +72,10 @@ const isSendSampleButtonEnabled = ref<boolean>(false)
 const isDeleteAllEnabled = ref<boolean>(false)
 
 onMounted(() => {
-    if (window.mailwebConfig && typeof window.mailwebConfig.deleteAllEnabled === 'boolean') {
-        isDeleteAllEnabled.value = window.mailwebConfig.deleteAllEnabled
-    }
-    if (window.mailwebConfig && window.mailwebConfig.return) {
-        returnConfig.value = window.mailwebConfig.return
-    }
-    if (window.mailwebConfig && typeof window.mailwebConfig.sendSampleButton === 'boolean') {
-        isSendSampleButtonEnabled.value = window.mailwebConfig.sendSampleButton
-    }
+    // Get config values from the composable
+    isDeleteAllEnabled.value = checkDeleteAllEnabled()
+    returnConfig.value = getReturnConfig()
+    isSendSampleButtonEnabled.value = checkSendSampleButtonEnabled()
 })
 
 const POLLING_INTERVAL_MS = 5000
