@@ -2,7 +2,7 @@
     import { EmailAttachment } from '@/types/email';
     import AttachmentIcon from './ui/AttachmentIcon.vue';
 
-    const props = defineProps<{
+    defineProps<{
         attachments: EmailAttachment[]
     }>()
 

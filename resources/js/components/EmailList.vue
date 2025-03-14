@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, inject } from 'vue'
 import { AlertCircle, Loader2 } from 'lucide-vue-next'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Separator } from '@/components/ui/separator'
 import { Email, EmailAddress } from '@/types/email'
-import { formatDistanceToNow, parseISO } from 'date-fns'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 const props = defineProps<{
@@ -114,7 +112,7 @@ watch(
     }
 );
 
-watch(isPollingActive, (newValue) => {
+watch(isPollingActive, () => {
     if (observer) {
         observer.disconnect();
     }
