@@ -11,7 +11,7 @@ return [
     |
     */
     'MAILWEB_ENABLED' => env('MAILWEB_ENABLED', true),
-    'MAILWEB_LIMIT' => env('MAILWEB_LIMIT', 20),
+    'MAILWEB_LIMIT' => env('MAILWEB_LIMIT', 30),
     'MAILWEB_SEND_SAMPLE_BUTTON' => env('MAILWEB_SEND_SAMPLE_BUTTON', true),
     'MAILWEB_DELETE_ALL_ENABLED' => env('MAILWEB_DELETE_ALL_ENABLED', false),
     'MAILWEB_RETURN' => [

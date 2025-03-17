@@ -170,21 +170,24 @@ watch(isPollingActive, () => {
                     >
                         <div class="flex items-center justify-between">
                             <div class="flex items-center font-medium">
-                                {{ formatEmailAddress(email.to[0]) }}
-                                <TooltipProvider v-if="email.to.length > 1">
-                                    <Tooltip>
-                                        <TooltipTrigger>
-                                            <span class="ml-1 cursor-pointer text-xs text-muted-foreground hover:text-primary">
-                                                + {{ email.to.length - 1 }} more
-                                            </span>
-                                        </TooltipTrigger>
-                                        <TooltipContent>
-                                            <div class="max-w-[250px] break-words text-xs">
-                                                {{ getFullEmailAddresses(email.to) }}
-                                            </div>
-                                        </TooltipContent>
-                                    </Tooltip>
-                                </TooltipProvider>
+                                <template v-if="email.to && email.to.length > 0">
+                                    {{ formatEmailAddress(email.to[0]) }}
+                                    <TooltipProvider v-if="email.to.length > 1">
+                                        <Tooltip>
+                                            <TooltipTrigger>
+                                                <span class="ml-1 cursor-pointer text-xs text-muted-foreground hover:text-primary">
+                                                    + {{ email.to.length - 1 }} more
+                                                </span>
+                                            </TooltipTrigger>
+                                            <TooltipContent>
+                                                <div class="max-w-[250px] break-words text-xs">
+                                                    {{ getFullEmailAddresses(email.to) }}
+                                                </div>
+                                            </TooltipContent>
+                                        </Tooltip>
+                                    </TooltipProvider>
+                                </template>
+                                <span v-else class="italic text-destructive font-normal">No recipients</span>
                             </div>
                             <div class="text-xs text-muted-foreground">
                                 {{ formatDate(email.created_at) }}

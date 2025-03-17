@@ -18,6 +18,8 @@ export interface EmailPreview {
     subject: string;
     from: EmailAddress[];
     to: EmailAddress[];
+    cc?: EmailAddress[];
+    bcc?: EmailAddress[];
     body_html: string;
     body_text: string;
     read: number;
