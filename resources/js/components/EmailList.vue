@@ -4,7 +4,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Email, EmailAddress } from '@/types/email';
-import { AlertCircle, Loader2 } from 'lucide-vue-next';
+import { AlertCircle, Loader2, Paperclip } from 'lucide-vue-next';
 import { inject, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
