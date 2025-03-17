@@ -25,7 +25,7 @@ class MailWebController
      */
     private function authorizeMailWebAccess(string $message = 'Unauthorized access to Mail Web'): void
     {
-        if (Gate::denies('view-mailweb', auth()->user())) {
+        if (Gate::denies('view-mailweb', request()->user())) {
             abort(Response::HTTP_FORBIDDEN, $message);
         }
     }
@@ -50,9 +50,26 @@ class MailWebController
         $perPage = $request->input('per_page', 25);
         $page = $request->input('page', 1);
         $search = $request->input('search');
+        $hasAttachments = $request->input('has_attachments');
+        $dateFrom = $request->input('date_from');
+        $dateTo = $request->input('date_to');
+        $recipientEmail = $request->input('recipient_email');
 
         $emails = MailwebEmail::query()
             ->when($search, fn ($q) => $q->search($search))
+            ->when($hasAttachments, fn ($q) => $q->has('attachments'))
+            ->when($dateFrom, fn ($q) => $q->where('created_at', '>=', $dateFrom))
+            ->when($dateTo, fn ($q) => $q->where('created_at', '<=', $dateTo))
+            ->when($recipientEmail, function ($query) use ($recipientEmail) {
+                return $query->whereAny([
+                    'to',
+                    'cc',
+                    'bcc',
+                ],
+                    '%LIKE%',
+                    $recipientEmail
+                );
+            })
             ->orderBy('created_at', 'desc')
             ->select([
                 'id', 'from', 'to', 'cc', 'bcc', 'subject', 'body_text',

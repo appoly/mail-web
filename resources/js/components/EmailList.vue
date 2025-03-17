@@ -4,7 +4,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Email, EmailAddress } from '@/types/email';
-import { AlertCircle, Loader2 } from 'lucide-vue-next';
+import { AlertCircle, Loader2, Paperclip } from 'lucide-vue-next';
 import { inject, onMounted, onUnmounted, ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -190,7 +190,12 @@ watch(isPollingActive, () => {
                                 {{ formatDate(email.created_at) }}
                             </div>
                         </div>
-                        <div class="text-sm font-medium">{{ email.subject }}</div>
+                        <div class="flex items-center justify-between">
+                            <div class="text-sm font-medium">{{ email.subject }}</div>
+                            <div class="text-xs text-muted-foreground flex items-center" v-if="email.attachments_count && email.attachments_count > 0">
+                                <Paperclip  class="mr-1 h-3 w-3" /> {{ email.attachments_count }}
+                            </div>
+                        </div>
                         <div class="text-xs text-muted-foreground">{{ truncateText(email.body_text) }}</div>
                     </div>
 

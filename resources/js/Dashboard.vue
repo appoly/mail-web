@@ -16,6 +16,11 @@ const selectedEmail = ref<Email | null>(null);
 const selectedEmailWithFullContent = ref<Email | null>(null);
 const isLoadingEmailContent = ref<boolean>(false);
 const searchQuery = ref<string>('');
+const filters = ref<Record<string, any>>({
+    hasAttachments: false,
+    dateRange: 'all',
+    recipientEmail: ''
+});
 const sidebarOpen = ref<boolean>(false);
 const isMobile = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
@@ -45,10 +50,33 @@ const fetchEmails = (resetList = true): void => {
         isLoadingMore.value = true;
     }
 
+    // Build date range filter
+    let dateFrom: string | undefined;
+    let dateTo: string | undefined;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (filters.value.dateRange === 'today') {
+        dateFrom = today.toISOString();
+    } else if (filters.value.dateRange === 'last7days') {
+        const last7Days = new Date(today);
+        last7Days.setDate(today.getDate() - 7);
+        dateFrom = last7Days.toISOString();
+    } else if (filters.value.dateRange === 'last30days') {
+        const last30Days = new Date(today);
+        last30Days.setDate(today.getDate() - 30);
+        dateFrom = last30Days.toISOString();
+    }
+
     const params = {
         page: currentPage.value,
         per_page: userSettings.value.paginationAmount,
         search: searchQuery.value || undefined,
+        has_attachments: filters.value.hasAttachments ? 1 : undefined,
+        date_from: dateFrom,
+        date_to: dateTo,
+        recipient_email: filters.value.recipientEmail || undefined,
     };
 
     axios
@@ -121,6 +149,18 @@ watch(
         }
     },
     { immediate: false },
+);
+
+// Watch for filter changes to trigger new search
+watch(
+    filters,
+    (newValue, oldValue) => {
+        // Only trigger if the filters actually changed
+        if (JSON.stringify(newValue) !== JSON.stringify(oldValue)) {
+            fetchEmails(true);
+        }
+    },
+    { deep: true, immediate: false },
 );
 
 // Watch for settings changes
@@ -198,9 +238,9 @@ onMounted((): void => {
 
         <Sidebar
             v-model:searchQuery="searchQuery"
+            v-model:filters="filters"
             v-model:isOpen="sidebarOpen"
             :isMobile="isMobile"
-            :filters="{}"
             @update:settings="updateSettings"
         />
 

@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useMailwebConfig } from '@/composables/useMailwebConfig';
 import axios from 'axios';
 import { ArrowLeft, Mail, Pause, Play, RefreshCw, Search, Settings, X } from 'lucide-vue-next';
-import { inject, onMounted, onUnmounted, ref, watch } from 'vue';
+import { inject, onMounted, onUnmounted, ref, Ref, watch } from 'vue';
 import toast from 'vue3-hot-toast';
 import AnimatedSendButton from './partials/AnimatedSendButton.vue';
 import SettingsDialog from './partials/SettingsDialog.vue';
@@ -19,6 +19,13 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar', 'update:settings']);
 
+// Filter options
+const filterOptions = ref({
+    hasAttachments: false,
+    dateRange: 'all', // all, today, last7days, last30days
+    recipientEmail: ''
+});
+
 const localSearchQuery = ref(props.searchQuery);
 const fetchEmails = inject('fetchEmails') as () => void;
 const isRefreshing = ref<boolean>(false);
@@ -26,7 +33,7 @@ const isSending = ref<boolean>(false);
 const isPolling = ref<boolean>(false);
 const pollingInterval = ref<number | null>(null);
 const paginationTriggered = inject('paginationTriggered', null) as any;
-const isPollingActive = inject('isPollingActive', true) as boolean;
+const isPollingActive = inject('isPollingActive', ref(true)) as Ref<boolean>;
 const showSettingsDialog = ref<boolean>(false);
 
 const settings = ref({
@@ -44,7 +51,7 @@ onMounted(() => {
     returnConfig.value = getReturnConfig();
     isSendSampleButtonEnabled.value = checkSendSampleButtonEnabled();
     loadSettings();
-    if (isPollingActive) startPolling();
+    if (isPollingActive.value) startPolling();
     if (paginationTriggered) {
         watch(paginationTriggered, (triggered) => {
             if (triggered && isPolling.value) {
@@ -62,6 +69,15 @@ watch(
         if (newValue !== localSearchQuery.value) localSearchQuery.value = newValue;
     },
 );
+
+// Watch for filter changes and emit them
+watch(filterOptions, (newValue) => {
+    emit('update:filters', {
+        hasAttachments: newValue.hasAttachments,
+        dateRange: newValue.dateRange,
+        recipientEmail: newValue.recipientEmail
+    });
+}, { deep: true });
 
 const POLLING_INTERVAL_MS = 5000;
 
@@ -139,6 +155,92 @@ onUnmounted(() => stopPolling());
             <div class="relative">
                 <Search class="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                 <Input placeholder="Search emails..." class="pl-8" v-model="localSearchQuery" />
+            </div>
+            
+            <!-- Email Filters -->
+            <div class="mt-4">
+                <h3 class="mb-2 text-sm font-medium">Filters</h3>
+                
+                <!-- Attachments Filter -->
+                <div class="mb-3">
+                    <div class="flex items-center">
+                        <input 
+                            type="checkbox" 
+                            id="attachments-filter" 
+                            v-model="filterOptions.hasAttachments"
+                            class="mr-2 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                        />
+                        <label for="attachments-filter" class="text-xs font-medium">Has Attachments</label>
+                    </div>
+                </div>
+                
+                <!-- Date Range Filter -->
+                <div class="mb-3">
+                    <label class="text-xs font-medium text-muted-foreground">Date Range</label>
+                    <div class="mt-1 grid grid-cols-2 gap-2">
+                        <Button 
+                            size="sm" 
+                            :variant="filterOptions.dateRange === 'all' ? 'default' : 'outline'"
+                            @click="filterOptions.dateRange = 'all'"
+                            class="text-xs"
+                        >
+                            All Time
+                        </Button>
+                        <Button 
+                            size="sm" 
+                            :variant="filterOptions.dateRange === 'today' ? 'default' : 'outline'"
+                            @click="filterOptions.dateRange = 'today'"
+                            class="text-xs"
+                        >
+                            Today
+                        </Button>
+                        <Button 
+                            size="sm" 
+                            :variant="filterOptions.dateRange === 'last7days' ? 'default' : 'outline'"
+                            @click="filterOptions.dateRange = 'last7days'"
+                            class="text-xs"
+                        >
+                            Last 7 Days
+                        </Button>
+                        <Button 
+                            size="sm" 
+                            :variant="filterOptions.dateRange === 'last30days' ? 'default' : 'outline'"
+                            @click="filterOptions.dateRange = 'last30days'"
+                            class="text-xs"
+                        >
+                            Last 30 Days
+                        </Button>
+                    </div>
+                </div>
+                
+                <!-- Recipient Filter -->
+                <div class="mb-3">
+                    <label class="text-xs font-medium text-muted-foreground">Recipient Email</label>
+                    <div class="mt-1">
+                        <Input 
+                            placeholder="Filter by recipient..." 
+                            v-model="filterOptions.recipientEmail" 
+                            class="text-xs"
+                        />
+                        <div class="mt-1 text-xs text-muted-foreground">
+                            Searches To, CC, and BCC fields
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Clear Filters Button -->
+                <Button 
+                    variant="outline" 
+                    size="sm" 
+                    class="w-full text-xs"
+                    @click="() => {
+                        filterOptions.hasAttachments = false;
+                        filterOptions.dateRange = 'all';
+                        filterOptions.recipientEmail = '';
+                    }"
+                >
+                    Clear Filters
+                </Button>
             </div>
         </div>
 
