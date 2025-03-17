@@ -39,8 +39,12 @@ const previewStyle = computed(() => ({
 }));
 
 // Utility functions
-const formatEmailAddresses = (addresses: EmailAddress[]): string => {
-    return addresses.map((addr) => (addr.name ? `${addr.name} <${addr.address}>` : addr.address)).join(', ');
+const formatEmailAddresses = (addresses?: EmailAddress[]): string => {
+    if (!addresses || addresses.length === 0) return 'None';
+    return addresses.map((addr) => {
+        if (!addr) return 'Unknown';
+        return addr.name ? `${addr.name} <${addr.address}>` : addr.address;
+    }).join(', ');
 };
 
 const getPreviewWidth = (): string => {
@@ -112,7 +116,12 @@ onMounted(updateIframe);
             <div class="overflow-hidden">
                 <h2 class="truncate text-lg font-semibold">{{ email.subject }}</h2>
                 <p class="text-sm text-muted-foreground">From: {{ formatEmailAddresses(email.from) }}</p>
-                <p class="text-sm text-muted-foreground">To: {{ formatEmailAddresses(email.to) }}</p>
+                <div>
+                    <p v-if="email.to && email.to.length > 0" class="text-sm text-muted-foreground">To: {{ formatEmailAddresses(email.to) }}</p>
+                    <p v-else class="text-sm italic text-destructive font-medium">To: No recipients</p>
+                </div>
+                <p v-if="email.cc && email.cc.length > 0" class="text-sm text-muted-foreground">CC: {{ formatEmailAddresses(email.cc) }}</p>
+                <p v-if="email.bcc && email.bcc.length > 0" class="text-sm text-muted-foreground">BCC: {{ formatEmailAddresses(email.bcc) }}</p>
                 <div class="mt-1 flex items-center text-xs text-muted-foreground">
                     <Clock class="mr-1 h-3 w-3" />
                     <span>{{ formatDate(email.created_at) }}</span>
