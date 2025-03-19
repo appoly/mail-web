@@ -88,7 +88,7 @@ const updateIframe = (): void => {
                         links.forEach(link => {
                             link.setAttribute("target", "_blank");
                         });
-                    }, 1000);
+                    }, 500);
                 `;
                 
                 iframeDoc.open();
