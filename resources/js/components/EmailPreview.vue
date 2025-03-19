@@ -260,7 +260,7 @@ onMounted(updateIframe);
                         :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1rem' }"
                     >
                         <div class="h-full bg-white shadow-sm transition-all duration-300 dark:bg-gray-800" :style="previewStyle">
-                            <iframe ref="iframeRef" title="Email Preview" class="h-full w-full border-0" sandbox="allow-same-origin allow-popups allow-scripts allow-popups-to-escape-sandbox" />
+                            <iframe ref="iframeRef" title="Email Preview" class="h-full w-full border-0" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" />
                         </div>
                     </div>
                 </div>
