@@ -82,17 +82,22 @@ const updateIframe = (): void => {
         if (iframeRef.value && props.email.body_html) {
             const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow?.document;
             if (iframeDoc) {
-                const parser = new DOMParser();
-                const emailDoc = parser.parseFromString(props.email.body_html, 'text/html');
-
-                emailDoc.querySelectorAll('a').forEach(link => {
-                    link.setAttribute('target', '_blank');
-                    link.setAttribute('rel', 'noopener noreferrer');
-                });
-
+                const scriptContent = `
+                    setTimeout(function() {
+                        const links = document.querySelectorAll("a:not([target])");
+                        links.forEach(link => {
+                            link.setAttribute("target", "_blank");
+                        });
+                    }, 500);
+                `;
+                
                 iframeDoc.open();
-                iframeDoc.write(emailDoc.documentElement.outerHTML);
+                iframeDoc.write(props.email.body_html);
                 iframeDoc.close();
+                
+                const script = iframeDoc.createElement('script');
+                script.textContent = scriptContent;
+                iframeDoc.body.appendChild(script);
             }
         }
     });
@@ -260,7 +265,7 @@ onMounted(updateIframe);
                         :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1rem' }"
                     >
                         <div class="h-full bg-white shadow-sm transition-all duration-300 dark:bg-gray-800" :style="previewStyle">
-                            <iframe ref="iframeRef" title="Email Preview" class="h-full w-full border-0" sandbox="allow-same-origin allow-popups allow-scripts allow-popups-to-escape-sandbox" />
+                            <iframe ref="iframeRef" title="Email Preview" class="h-full w-full border-0" sandbox="allow-same-origin allow-popups allow-scripts" />
                         </div>
                     </div>
                 </div>
