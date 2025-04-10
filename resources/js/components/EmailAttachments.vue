@@ -33,7 +33,7 @@ const getFileType = (filename: string) => {
                     v-for="attachment in attachments"
                     :key="attachment.id"
                     @click="handleAttachmentClick(attachment)"
-                    class="w-60 flex-shrink-0 cursor-pointer rounded-md border p-3 transition-colors hover:bg-gray-50"
+                    class="w-60 shrink-0 cursor-pointer rounded-md border p-3 transition-colors hover:bg-gray-50"
                 >
                     <div class="flex items-center gap-3">
                         <AttachmentIcon :filename="attachment.name" />

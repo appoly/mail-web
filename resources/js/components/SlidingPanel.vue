@@ -11,7 +11,7 @@ const isPreviewOpen = ref<boolean>(false);
         <div class="flex-1 overflow-hidden">
             <slot></slot>
         </div>
-        <div class="fixed inset-x-0 bottom-0 z-10 border-t bg-background">
+        <div class="bg-background fixed inset-x-0 bottom-0 z-10 border-t">
             <div class="flex items-center justify-center p-2">
                 <Button variant="ghost" size="sm" @click="isPreviewOpen = !isPreviewOpen">
                     <template v-if="isPreviewOpen">
@@ -27,7 +27,7 @@ const isPreviewOpen = ref<boolean>(false);
         </div>
         <div
             :class="[
-                'fixed inset-x-0 bottom-0 z-20 transform border-t bg-background transition-transform duration-300 ease-in-out',
+                'bg-background fixed inset-x-0 bottom-0 z-20 transform border-t transition-transform duration-300 ease-in-out',
                 isPreviewOpen ? 'translate-y-0' : 'translate-y-full',
             ]"
             style="height: 80vh"

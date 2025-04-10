@@ -120,16 +120,16 @@ watch(isPollingActive, () => {
 
 <template>
     <div class="flex h-full flex-col lg:w-[350px]">
-        <div v-if="error" class="p-4 text-center text-destructive">
+        <div v-if="error" class="text-destructive p-4 text-center">
             <AlertCircle class="mx-auto mb-2 h-8 w-8" />
             <p>Failed to load emails</p>
-            <p class="text-sm text-muted-foreground">{{ error.message }}</p>
+            <p class="text-muted-foreground text-sm">{{ error.message }}</p>
         </div>
 
         <template v-else>
             <div class="flex items-center justify-between p-4">
                 <h2 class="text-lg font-semibold">Emails</h2>
-                <div class="text-sm text-muted-foreground">
+                <div class="text-muted-foreground text-sm">
                     {{ props.totalEmails ? `${emails.length} of ${props.totalEmails}` : emails.length }} emails
                 </div>
             </div>
@@ -153,7 +153,7 @@ watch(isPollingActive, () => {
                 </div>
             </div>
 
-            <div v-else-if="!isLoading && emails.length === 0" class="p-8 text-center text-muted-foreground">
+            <div v-else-if="!isLoading && emails.length === 0" class="text-muted-foreground p-8 text-center">
                 <p>No emails found</p>
             </div>
 
@@ -163,7 +163,7 @@ watch(isPollingActive, () => {
                         v-for="email in emails"
                         :key="email.id"
                         :class="[
-                            'flex cursor-pointer flex-col gap-1 border-b p-4 hover:bg-muted/50',
+                            'hover:bg-muted/50 flex cursor-pointer flex-col gap-1 border-b p-4',
                             selectedEmail?.id === email.id ? 'bg-muted' : '',
                         ]"
                         @click="emit('update:selectedEmail', email)"
@@ -175,43 +175,46 @@ watch(isPollingActive, () => {
                                     <TooltipProvider v-if="email.to.length > 1">
                                         <Tooltip>
                                             <TooltipTrigger>
-                                                <span class="ml-1 cursor-pointer text-xs text-muted-foreground hover:text-primary">
+                                                <span class="text-muted-foreground hover:text-primary ml-1 cursor-pointer text-xs">
                                                     + {{ email.to.length - 1 }} more
                                                 </span>
                                             </TooltipTrigger>
                                             <TooltipContent>
-                                                <div class="max-w-[250px] break-words text-xs">
+                                                <div class="max-w-[250px] text-xs break-words">
                                                     {{ getFullEmailAddresses(email.to) }}
                                                 </div>
                                             </TooltipContent>
                                         </Tooltip>
                                     </TooltipProvider>
                                 </template>
-                                <span v-else class="italic text-destructive font-normal">No recipients</span>
-                            </div>
-                            <div class="text-xs text-muted-foreground">
-                                {{ formatDate(email.created_at) }}
+                                <span v-else class="text-destructive font-normal italic">No recipients</span>
                             </div>
                         </div>
                         <div class="flex items-center justify-between">
                             <div class="text-sm font-medium">{{ email.subject }}</div>
-                            <div class="text-xs text-muted-foreground flex items-center" v-if="email.attachments_count && email.attachments_count > 0">
-                                <Paperclip  class="mr-1 h-3 w-3" /> {{ email.attachments_count }}
+                            <div
+                                class="text-muted-foreground flex items-center text-xs"
+                                v-if="email.attachments_count && email.attachments_count > 0"
+                            >
+                                <Paperclip class="mr-1 h-3 w-3" /> {{ email.attachments_count }}
                             </div>
                         </div>
-                        <div class="text-xs text-muted-foreground">{{ truncateText(email.body_text) }}</div>
+                        <div class="flex flex-col gap-1">
+                        <div class="text-muted-foreground text-xs">{{ truncateText(email.body_text) }}</div>
+                            <div class="text-muted-foreground text-xs">{{ formatDate(email.created_at) }}</div>
+                        </div>
                     </div>
 
                     <!-- Infinite scroll loading indicator -->
                     <div v-if="props.isLoadingMore" class="flex justify-center p-4">
-                        <Loader2 class="h-6 w-6 animate-spin text-primary" />
+                        <Loader2 class="text-primary h-6 w-6 animate-spin" />
                     </div>
 
                     <!-- Intersection observer target -->
                     <div v-if="props.hasMoreEmails" class="h-1" id="scroll-target"></div>
 
                     <!-- End of list indicator -->
-                    <div v-if="emails.length > 0 && !props.hasMoreEmails" class="p-4 text-center text-sm text-muted-foreground">End of emails</div>
+                    <div v-if="emails.length > 0 && !props.hasMoreEmails" class="text-muted-foreground p-4 text-center text-sm">End of emails</div>
                 </div>
             </ScrollArea>
         </template>

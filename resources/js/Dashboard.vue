@@ -228,7 +228,7 @@ onMounted((): void => {
                                     @delete-email="handleDeleteEmail"
                                 />
                             </div>
-                            <div v-else class="flex h-full items-center justify-center bg-muted/30 p-6 text-center">
+                            <div v-else class="bg-muted/30 flex h-full items-center justify-center p-6 text-center">
                                 <div>
                                     <h3 class="text-xl font-medium">No email selected</h3>
                                     <p class="text-muted-foreground">Select an email from the list to preview it</p>
@@ -260,7 +260,7 @@ onMounted((): void => {
                         </div>
                     </template>
                     <template v-else>
-                        <div class="flex flex-1 items-center justify-center bg-muted/30 p-6 text-center">
+                        <div class="bg-muted/30 flex flex-1 items-center justify-center p-6 text-center">
                             <div>
                                 <h3 class="text-xl font-medium">No email selected</h3>
                                 <p class="text-muted-foreground">Select an email from the list to preview it</p>

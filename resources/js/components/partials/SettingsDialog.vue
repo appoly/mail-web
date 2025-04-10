@@ -127,7 +127,7 @@ const deleteAllEmails = async (): Promise<void> => {
                 <DialogTitle class="text-destructive">Delete All Emails</DialogTitle>
             </DialogHeader>
             <div class="py-4">
-                <p class="text-sm text-muted-foreground">Are you sure you want to delete all emails? This action cannot be undone.</p>
+                <p class="text-muted-foreground text-sm">Are you sure you want to delete all emails? This action cannot be undone.</p>
             </div>
             <DialogFooter>
                 <Button variant="outline" @click="showDeleteAllDialog = false">Cancel</Button>
@@ -149,8 +149,8 @@ const deleteAllEmails = async (): Promise<void> => {
                 </DialogTitle>
             </DialogHeader>
             <div class="py-4">
-                <p class="text-sm text-muted-foreground">The "Delete All Emails" feature is currently disabled by your administrator.</p>
-                <p class="mt-2 text-sm text-muted-foreground">
+                <p class="text-muted-foreground text-sm">The "Delete All Emails" feature is currently disabled by your administrator.</p>
+                <p class="text-muted-foreground mt-2 text-sm">
                     To enable this feature, set <code>MAILWEB_DELETE_ALL_ENABLED=true</code> in your environment variables or update the config file.
                 </p>
             </div>

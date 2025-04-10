@@ -30,7 +30,7 @@ defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen', 'update:se
             </SheetContent>
         </Sheet>
 
-        <div v-else class="h-full w-64 flex-col border-r bg-card">
+        <div v-else class="bg-card h-full w-64 flex-col border-r">
             <SidebarContent
                 :search-query="searchQuery"
                 :filters="filters"

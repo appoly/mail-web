@@ -128,7 +128,7 @@ onUnmounted(() => stopPolling());
         <div class="border-b p-4">
             <div class="mb-4 flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
-                    <Mail class="h-5 w-5 text-primary" />
+                    <Mail class="text-primary h-5 w-5" />
                     <h1 class="text-xl font-bold">Mailweb</h1>
                 </div>
                 <Button v-if="isMobile" variant="ghost" size="icon" @click="$emit('close-sidebar')">
@@ -137,14 +137,14 @@ onUnmounted(() => stopPolling());
                 </Button>
             </div>
             <div class="relative">
-                <Search class="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Search class="text-muted-foreground absolute top-2.5 left-2 h-4 w-4" />
                 <Input placeholder="Search emails..." class="pl-8" v-model="localSearchQuery" />
             </div>
         </div>
 
         <div class="mt-auto">
             <div class="border-t p-4">
-                <a :href="returnConfig.appUrl || '/'" class="text-xs text-primary hover:underline">
+                <a :href="returnConfig.appUrl || '/'" class="text-primary text-xs hover:underline">
                     <ArrowLeft class="inline-block h-4 w-4" /> Return to {{ returnConfig.appName || 'App' }}
                 </a>
             </div>

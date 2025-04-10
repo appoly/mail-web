@@ -3,8 +3,8 @@
   "style": "new-york",
   "typescript": true,
   "tailwind": {
-    "config": "tailwind.config.js",
-    "css": "vendor/orchestra/workbench/resources/css/app.css",
+    "config": "",
+    "css": "resources/css/app.css",
     "baseColor": "neutral",
     "cssVariables": true,
     "prefix": ""

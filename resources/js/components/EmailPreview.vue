@@ -41,10 +41,12 @@ const previewStyle = computed(() => ({
 // Utility functions
 const formatEmailAddresses = (addresses?: EmailAddress[]): string => {
     if (!addresses || addresses.length === 0) return 'None';
-    return addresses.map((addr) => {
-        if (!addr) return 'Unknown';
-        return addr.name ? `${addr.name} <${addr.address}>` : addr.address;
-    }).join(', ');
+    return addresses
+        .map((addr) => {
+            if (!addr) return 'Unknown';
+            return addr.name ? `${addr.name} <${addr.address}>` : addr.address;
+        })
+        .join(', ');
 };
 
 const getPreviewWidth = (): string => {
@@ -85,7 +87,7 @@ const updateIframe = (): void => {
                 const parser = new DOMParser();
                 const emailDoc = parser.parseFromString(props.email.body_html, 'text/html');
 
-                emailDoc.querySelectorAll('a').forEach(link => {
+                emailDoc.querySelectorAll('a').forEach((link) => {
                     link.setAttribute('target', '_blank');
                     link.setAttribute('rel', 'noopener noreferrer');
                 });
@@ -123,14 +125,14 @@ onMounted(updateIframe);
         <div class="flex flex-col justify-between gap-2 border-b p-2 sm:flex-row sm:items-center sm:p-4">
             <div class="overflow-hidden">
                 <h2 class="truncate text-lg font-semibold">{{ email.subject }}</h2>
-                <p class="text-sm text-muted-foreground">From: {{ formatEmailAddresses(email.from) }}</p>
+                <p class="text-muted-foreground text-sm">From: {{ formatEmailAddresses(email.from) }}</p>
                 <div>
-                    <p v-if="email.to && email.to.length > 0" class="text-sm text-muted-foreground">To: {{ formatEmailAddresses(email.to) }}</p>
-                    <p v-else class="text-sm italic text-destructive font-medium">To: No recipients</p>
+                    <p v-if="email.to && email.to.length > 0" class="text-muted-foreground text-sm">To: {{ formatEmailAddresses(email.to) }}</p>
+                    <p v-else class="text-destructive text-sm font-medium italic">To: No recipients</p>
                 </div>
-                <p v-if="email.cc && email.cc.length > 0" class="text-sm text-muted-foreground">CC: {{ formatEmailAddresses(email.cc) }}</p>
-                <p v-if="email.bcc && email.bcc.length > 0" class="text-sm text-muted-foreground">BCC: {{ formatEmailAddresses(email.bcc) }}</p>
-                <div class="mt-1 flex items-center text-xs text-muted-foreground">
+                <p v-if="email.cc && email.cc.length > 0" class="text-muted-foreground text-sm">CC: {{ formatEmailAddresses(email.cc) }}</p>
+                <p v-if="email.bcc && email.bcc.length > 0" class="text-muted-foreground text-sm">BCC: {{ formatEmailAddresses(email.bcc) }}</p>
+                <div class="text-muted-foreground mt-1 flex items-center text-xs">
                     <Clock class="mr-1 h-3 w-3" />
                     <span>{{ formatDate(email.created_at) }}</span>
                 </div>
@@ -216,7 +218,7 @@ onMounted(updateIframe);
             <div class="flex border-b">
                 <button
                     class="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="viewMode === 'html' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'"
+                    :class="viewMode === 'html' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'"
                     @click="viewMode = 'html'"
                 >
                     <Eye class="h-3 w-3 sm:h-4 sm:w-4" />
@@ -224,7 +226,7 @@ onMounted(updateIframe);
                 </button>
                 <button
                     class="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="viewMode === 'text' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'"
+                    :class="viewMode === 'text' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'"
                     @click="viewMode = 'text'"
                 >
                     <Code class="h-3 w-3 sm:h-4 sm:w-4" />
@@ -233,7 +235,7 @@ onMounted(updateIframe);
                 <button
                     v-if="!isMobile"
                     class="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="viewMode === 'raw' ? 'border-b-2 border-primary text-primary' : 'text-muted-foreground hover:text-foreground'"
+                    :class="viewMode === 'raw' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'"
                     @click="viewMode = 'raw'"
                 >
                     <Code class="h-3 w-3 sm:h-4 sm:w-4" />
@@ -247,8 +249,8 @@ onMounted(updateIframe);
                 <div v-show="viewMode === 'html'" class="h-full">
                     <div v-if="props.isLoading" class="flex h-full items-center justify-center">
                         <div class="flex flex-col items-center">
-                            <div class="mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
-                            <p class="text-sm text-muted-foreground">Loading email content...</p>
+                            <div class="border-primary mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
+                            <p class="text-muted-foreground text-sm">Loading email content...</p>
                         </div>
                     </div>
                     <div v-else-if="!props.email.body_html" class="flex h-full items-center justify-center">
@@ -259,8 +261,13 @@ onMounted(updateIframe);
                         class="flex h-full justify-center overflow-auto bg-gray-100 transition-all duration-300 dark:bg-gray-900"
                         :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1rem' }"
                     >
-                        <div class="h-full bg-white shadow-sm transition-all duration-300 dark:bg-gray-800" :style="previewStyle">
-                            <iframe ref="iframeRef" title="Email Preview" class="h-full w-full border-0" sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox" />
+                        <div class="h-full bg-white shadow-xs transition-all duration-300 dark:bg-gray-800" :style="previewStyle">
+                            <iframe
+                                ref="iframeRef"
+                                title="Email Preview"
+                                class="h-full w-full border-0"
+                                sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+                            />
                         </div>
                     </div>
                 </div>
@@ -269,22 +276,22 @@ onMounted(updateIframe);
                 <div v-show="viewMode === 'text'" class="h-full overflow-auto p-4">
                     <div v-if="props.isLoading" class="flex h-full items-center justify-center">
                         <div class="flex flex-col items-center">
-                            <div class="mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
-                            <p class="text-sm text-muted-foreground">Loading email content...</p>
+                            <div class="border-primary mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
+                            <p class="text-muted-foreground text-sm">Loading email content...</p>
                         </div>
                     </div>
-                    <pre v-else class="whitespace-pre-wrap font-mono text-sm">{{ email.body_text }}</pre>
+                    <pre v-else class="font-mono text-sm whitespace-pre-wrap">{{ email.body_text }}</pre>
                 </div>
 
                 <!-- Raw View -->
                 <div v-show="viewMode === 'raw' && !isMobile" class="h-full overflow-auto p-4">
                     <div v-if="props.isLoading" class="flex h-full items-center justify-center">
                         <div class="flex flex-col items-center">
-                            <div class="mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
-                            <p class="text-sm text-muted-foreground">Loading email content...</p>
+                            <div class="border-primary mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
+                            <p class="text-muted-foreground text-sm">Loading email content...</p>
                         </div>
                     </div>
-                    <pre v-else class="whitespace-pre-wrap font-mono text-sm">{{ email.body_html }}</pre>
+                    <pre v-else class="font-mono text-sm whitespace-pre-wrap">{{ email.body_html }}</pre>
                 </div>
             </div>
         </div>

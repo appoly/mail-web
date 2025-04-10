@@ -94,7 +94,7 @@ const downloadAttachment = () => {
                 <!-- Image attachment -->
                 <div v-else-if="isImage" class="flex justify-center">
                     <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center">
-                        <div class="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-primary"></div>
+                        <div class="border-t-primary h-8 w-8 animate-spin rounded-full border-4 border-gray-300"></div>
                     </div>
                     <img
                         v-if="attachment.file_url"

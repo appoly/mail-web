@@ -162,7 +162,7 @@ const selectAllText = () => {
 
                 <div class="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
                     <div class="flex items-center gap-2">
-                        <Share2 class="h-5 w-5 text-primary" />
+                        <Share2 class="text-primary h-5 w-5" />
                         <span class="text-sm font-medium">Email Sharing</span>
                     </div>
                     <Switch :model-value="email.share_enabled" @update:model-value="toggleShareEnabled" :disabled="isToggling" />
@@ -170,7 +170,7 @@ const selectAllText = () => {
 
                 <div v-if="email.share_enabled" class="flex flex-col space-y-4">
                     <div class="flex flex-col items-center gap-4 sm:flex-row">
-                        <div class="flex-shrink-0 rounded-lg border bg-white p-2 shadow-sm">
+                        <div class="shrink-0 rounded-lg border bg-white p-2 shadow-xs">
                             <svg v-if="qrCode" ref="qrSvgRef" class="h-48 w-48"></svg>
                             <img v-else-if="qrSvgUrl" :src="qrSvgUrl" alt="QR Code" class="h-48 w-48" />
                             <div
@@ -190,7 +190,7 @@ const selectAllText = () => {
                         <div class="max-w-full flex-1 space-y-1 text-sm">
                             <h3 class="font-medium">QR Code</h3>
                             <p class="text-gray-500 dark:text-gray-400">Scan this code with a mobile device to view the email.</p>
-                            <p class="hidden text-xs text-gray-400 dark:text-gray-500 sm:block">Anyone with this code can access the content.</p>
+                            <p class="hidden text-xs text-gray-400 sm:block dark:text-gray-500">Anyone with this code can access the content.</p>
                         </div>
                     </div>
 
@@ -205,13 +205,13 @@ const selectAllText = () => {
                                     :value="shareUrl"
                                     @dblclick="selectAllText"
                                     @focus="selectAllText"
-                                    class="w-full flex-1 border-none bg-transparent px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+                                    class="focus:ring-primary w-full flex-1 border-none bg-transparent px-2 py-1 text-xs focus:ring-1 focus:outline-hidden"
                                 />
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     @click="copyShareUrl"
-                                    class="h-full flex-shrink-0 border-l px-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    class="h-full shrink-0 border-l px-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                                 >
                                     <Check v-if="shareUrlCopied" class="h-3 w-3 text-green-500" />
                                     <Copy v-else class="h-3 w-3" />
