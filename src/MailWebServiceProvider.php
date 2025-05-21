@@ -118,6 +118,7 @@ class MailWebServiceProvider extends ServiceProvider
         $router->macro('mailweb', function () use ($router) {
             $router->get('/mailweb', '\Appoly\MailWeb\Http\Controllers\MailWebController@index')->name('mailweb.index');
             $router->get('/mailweb/emails', '\Appoly\MailWeb\Http\Controllers\MailWebController@fetchEmails')->name('mailweb.fetch');
+            $router->get('/mailweb/emails/attachment/{mailwebEmailAttachment}', '\Appoly\MailWeb\Http\Controllers\MailWebController@downloadAttachment')->name('mailweb.download-attachment');
             $router->get('/mailweb/emails/{id}', '\Appoly\MailWeb\Http\Controllers\MailWebController@fetchEmail')->name('mailweb.fetch-email');
             $router->post('/mailweb/emails/{id}/toggle-share', '\Appoly\MailWeb\Http\Controllers\MailWebController@toggleShare')->name('mailweb.toggle-share');
             $router->delete('/mailweb/emails/delete-all', '\Appoly\MailWeb\Http\Controllers\MailWebController@deleteAll')->name('mailweb.delete-all');

@@ -6,11 +6,14 @@ use Illuminate\View\View;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Storage;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
 use Illuminate\Support\Facades\Notification;
 use Symfony\Component\HttpFoundation\Response;
+use Appoly\MailWeb\Http\Models\MailwebEmailAttachment;
 use Appoly\MailWeb\Notifications\MailwebSampleNotification;
 
 /**
@@ -166,6 +169,13 @@ class MailWebController
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function downloadAttachment(MailwebEmailAttachment $mailwebEmailAttachment)
+    {
+        $this->authorizeMailWebAccess();
+
+        return Storage::disk(config('MailWeb.MAILWEB_ATTACHMENTS.DISK'))->download($mailwebEmailAttachment->path);
     }
 
     public function delete($id): JsonResponse

@@ -13,7 +13,7 @@ class MailwebEmailAttachment extends Model
 
     protected $fillable = ['mailweb_email_id', 'name', 'path', 'size_bytes'];
 
-    protected $appends = ['human_readable_size', 'file_url'];
+    protected $appends = ['human_readable_size', 'download_url'];
 
     public function mailwebEmail()
     {
@@ -35,6 +35,19 @@ class MailwebEmailAttachment extends Model
             return null;
         }
 
-        return Storage::disk(config('MailWeb.MAILWEB_ATTACHMENTS.DISK'))->url($this->path);
+        // get signed URL:
+        return Storage::disk(config('MailWeb.MAILWEB_ATTACHMENTS.DISK'))->temporaryUrl(
+            $this->path,
+            now()->addMinutes(5)
+        );
+    }
+
+    public function getDownloadUrlAttribute()
+    {
+        if ($this->path === null) {
+            return null;
+        }
+
+        return route('mailweb.download-attachment', [$this]);
     }
 }
