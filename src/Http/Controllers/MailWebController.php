@@ -171,7 +171,7 @@ class MailWebController
         }
     }
 
-    public function downloadAttachment(MailwebEmailAttachment $mailwebEmailAttachment)
+    public function downloadAttachment(MailwebEmail $mailwebEmail, MailwebEmailAttachment $mailwebEmailAttachment)
     {
         $this->authorizeMailWebAccess();
 

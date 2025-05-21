@@ -36,10 +36,7 @@ class MailwebEmailAttachment extends Model
         }
 
         // get signed URL:
-        return Storage::disk(config('MailWeb.MAILWEB_ATTACHMENTS.DISK'))->temporaryUrl(
-            $this->path,
-            now()->addMinutes(5)
-        );
+        return Storage::disk(config('MailWeb.MAILWEB_ATTACHMENTS.DISK'))->url($this->path);
     }
 
     public function getDownloadUrlAttribute()
@@ -48,6 +45,6 @@ class MailwebEmailAttachment extends Model
             return null;
         }
 
-        return route('mailweb.download-attachment', [$this]);
+        return route('mailweb.download-attachment', [$this->mailwebEmail, $this]);
     }
 }
