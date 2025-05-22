@@ -56,11 +56,11 @@ const handleImageError = () => {
 
 // Download the attachment
 const downloadAttachment = () => {
-    if (!props.attachment?.file_url) return;
+    if (!props.attachment?.download_url) return;
 
     // Create a temporary anchor element
     const link = document.createElement('a');
-    link.href = props.attachment.file_url;
+    link.href = props.attachment.download_url;
     link.download = props.attachment.name;
     document.body.appendChild(link);
     link.click();
@@ -80,13 +80,15 @@ const downloadAttachment = () => {
 
             <div class="py-4">
                 <!-- No attachment case -->
-                <div v-if="!attachment" class="flex flex-col items-center justify-center rounded-md bg-gray-50 p-8 text-center">
+                <div v-if="!attachment"
+                    class="flex flex-col items-center justify-center rounded-md bg-gray-50 p-8 text-center">
                     <FileX class="mb-4 h-16 w-16 text-gray-400" />
                     <p class="mb-2 text-gray-600">Attachment not found</p>
                 </div>
 
                 <!-- Missing file URL case -->
-                <div v-else-if="!attachment.file_url" class="flex flex-col items-center justify-center rounded-md bg-gray-50 p-8 text-center">
+                <div v-else-if="!attachment.download_url"
+                    class="flex flex-col items-center justify-center rounded-md bg-gray-50 p-8 text-center">
                     <FileX class="mb-4 h-16 w-16 text-gray-400" />
                     <p class="mb-2 text-gray-600">Attachment was not stored</p>
                 </div>
@@ -96,14 +98,9 @@ const downloadAttachment = () => {
                     <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center">
                         <div class="border-t-primary h-8 w-8 animate-spin rounded-full border-4 border-gray-300"></div>
                     </div>
-                    <img
-                        v-if="attachment.file_url"
-                        :src="attachment.file_url"
-                        :alt="attachment.name"
-                        class="max-h-[400px] rounded border object-contain"
-                        @load="handleImageLoaded"
-                        @error="handleImageError"
-                    />
+                    <img v-if="attachment.download_url" :src="attachment.download_url" :alt="attachment.name"
+                        class="max-h-[400px] rounded border object-contain" @load="handleImageLoaded"
+                        @error="handleImageError" />
                     <div v-if="imageError" class="mt-4 text-center text-sm text-gray-500">
                         <p>Unable to display image</p>
                     </div>
@@ -116,7 +113,7 @@ const downloadAttachment = () => {
                     </div>
                     <p class="mb-2 text-gray-600">Preview not available for this file type</p>
                     <p class="mb-4 text-sm text-gray-500">{{ attachment.human_readable_size }}</p>
-                    <Button v-if="attachment.file_url" @click="downloadAttachment">
+                    <Button v-if="attachment.download_url" @click="downloadAttachment">
                         <Download class="mr-2 h-4 w-4" />
                         Download
                     </Button>

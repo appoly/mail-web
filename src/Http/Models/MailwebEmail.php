@@ -27,6 +27,12 @@ class MailwebEmail extends Model
         'bcc' => 'json',
     ];
 
+    // Create this for route model bindings - it's identical to the attachments() relation below
+    public function mailwebEmailAttachments()
+    {
+        return $this->hasMany(MailwebEmailAttachment::class);
+    }
+
     public function attachments()
     {
         return $this->hasMany(MailwebEmailAttachment::class);

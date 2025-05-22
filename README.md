@@ -144,6 +144,7 @@ composer install
     }
 }
 ```
+4. Run `composer update appoly/mail-web`
 
 ## 📄 License
 
