@@ -3,7 +3,6 @@
 namespace Appoly\MailWeb\Http\Controllers;
 
 use Illuminate\View\View;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
@@ -43,12 +42,12 @@ class MailWebController
     /**
      * Fetch emails for the dashboard with pagination.
      */
-    public function fetchEmails(\Illuminate\Http\Request $request): JsonResponse
+    public function fetchEmails(Request $request): JsonResponse
     {
         $this->authorizeMailWebAccess();
 
-        $perPage = $request->input('per_page', 25);
-        $page = $request->input('page', 1);
+        $perPage = min((int) $request->input('per_page', 25), 100);
+        $page = (int) $request->input('page', 1);
         $search = $request->input('search');
 
         $emails = MailwebEmail::query()
@@ -68,7 +67,7 @@ class MailWebController
                     'cc' => $email->cc,
                     'bcc' => $email->bcc,
                     'subject' => $email->subject,
-                    'body_text' => Str::of($email->body_text)->limit(60),
+                    'body_text' => str($email->body_text)->limit(60),
                     'read' => $email->read,
                     'share_enabled' => $email->share_enabled,
                     'created_at' => $email->created_at,
@@ -110,7 +109,7 @@ class MailWebController
 
         // Mark the email as read
         if (! $email->read) {
-            $email->read = 1;
+            $email->read = true;
             $email->save();
         }
 
@@ -160,57 +159,50 @@ class MailWebController
                 'count' => $count,
             ]);
         } catch (\Exception $e) {
+            report($e);
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete all emails',
-                'error' => $e->getMessage(),
             ], 500);
         }
     }
 
-    public function delete($id): JsonResponse
+    /**
+     * Delete a specific email.
+     */
+    public function delete(string $id): JsonResponse
     {
         $this->authorizeMailWebAccess();
-        try {
-            $email = MailwebEmail::findOrFail($id);
-            $email->delete();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Email deleted successfully',
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to delete email',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        $email = MailwebEmail::findOrFail($id);
+        $email->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Email deleted successfully',
+        ]);
     }
 
-    public function sendTestEmail(Request $request)
+    /**
+     * Send a test email via the log driver.
+     */
+    public function sendTestEmail(Request $request): JsonResponse
     {
-        // Temporarily set mail driver to log
         $originalMailDriver = Config::get('mail.default');
         Config::set('mail.default', 'log');
 
         try {
-            // Send notification to example@appoly.co.uk
             Notification::route('mail', 'example@appoly.co.uk')
                 ->notify(new MailwebSampleNotification);
 
-            // Reset mail driver
-            Config::set('mail.default', $originalMailDriver);
-
-            return new JsonResponse(['success' => true, 'message' => 'Test email sent to logs']);
+            return response()->json(['success' => true, 'message' => 'Test email sent to logs']);
         } catch (\Exception $e) {
-            // Reset mail driver in case of error
-            Config::set('mail.default', $originalMailDriver);
+            report($e);
 
-            return new JsonResponse(
-                ['success' => false, 'message' => 'Failed to send test email', 'error' => $e->getMessage()],
-                500
-            );
+            return response()->json(['success' => false, 'message' => 'Failed to send test email'], 500);
+        } finally {
+            Config::set('mail.default', $originalMailDriver);
         }
     }
 }

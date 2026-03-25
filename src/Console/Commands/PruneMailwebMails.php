@@ -37,29 +37,28 @@ class PruneMailwebMails extends Command
         $remaining = (int) $remaining;
 
         $emailIdsToDeleteKeyedById = MailwebEmail::latest()
-            ->withCount(['attachments as hasFileAttachments' => fn($q) => $q->whereNotNull('path')])
-            ->limit(5_000) // We need a limit to use offset, and to avoid memory issues. 5k is... probably enough, as this can just run more often if not
-            ->offset($remaining) // We keep only the amount specified, so offset by that number
-            ->pluck('hasFileAttachments', 'id') // Key of email ID, val of count of attachments
+            ->withCount(['attachments as hasFileAttachments' => fn ($q) => $q->whereNotNull('path')])
+            ->limit(5_000)
+            ->offset($remaining)
+            ->pluck('hasFileAttachments', 'id')
             ->toArray();
 
-        $emailIdsWithAttachments = array_keys(array_filter($emailIdsToDeleteKeyedById, fn($count) => $count > 0));
+        if (count($emailIdsToDeleteKeyedById) === 0) {
+            return;
+        }
+
+        $emailIdsWithAttachments = array_keys(array_filter($emailIdsToDeleteKeyedById, fn ($count) => $count > 0));
 
         Log::info('Pruning ' . count($emailIdsToDeleteKeyedById) . ' emails, of which ' . count($emailIdsWithAttachments) . ' have attachments');
 
-        // Attachment cleanup needs to be done slowly
-        if (count($emailIdsToDeleteKeyedById) > 0) {
-            dispatch(function () use ($emailIdsWithAttachments) {
-                // Chunk into batches of 100 for deletion
-                $storageDisk = config('MailWeb.MAILWEB_ATTACHMENTS.DISK');
-                if ($storageDisk) {
-                    $basePath = config('MailWeb.MAILWEB_ATTACHMENTS.PATH');
+        // Delete attachment files before removing database records
+        $storageDisk = config('MailWeb.MAILWEB_ATTACHMENTS.DISK');
+        if ($storageDisk && count($emailIdsWithAttachments) > 0) {
+            $basePath = config('MailWeb.MAILWEB_ATTACHMENTS.PATH');
 
-                    foreach ($emailIdsWithAttachments as $emailId) {
-                        Storage::disk($storageDisk)->deleteDirectory($basePath . '/' . $emailId);
-                    }
-                }
-            });
+            foreach ($emailIdsWithAttachments as $emailId) {
+                Storage::disk($storageDisk)->deleteDirectory($basePath . '/' . $emailId);
+            }
         }
 
         MailwebEmail::whereIn('id', array_keys($emailIdsToDeleteKeyedById))->delete();

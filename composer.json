@@ -34,7 +34,7 @@
                 "Appoly\\MailWeb\\MailWebServiceProvider"
             ],
             "aliases": {
-                "MailWeb": "Appoly\\MailWeb\\MailWebFacade"
+                "MailWeb": "Appoly\\MailWeb\\Facades\\MailWeb"
             }
         }
     },

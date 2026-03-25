@@ -4,21 +4,12 @@ namespace Appoly\MailWeb\Http\Listeners;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Mime\Part\DataPart;
 use Illuminate\Mail\Events\MessageSending;
 use Appoly\MailWeb\Http\Models\MailwebEmail;
 
 class MailWebListener
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
     /**
      * Handle and store the mailweb email.
      */
@@ -40,17 +31,15 @@ class MailWebListener
                 'read' => false,
             ]);
 
-            foreach ($event->message->getAttachments() as $attachment) {
-                if ($attachment instanceof \Symfony\Component\Mime\Part\DataPart) {
-                    // Extract attachment details
-                    $fileName = $attachment->getFilename();
+            foreach ($event->message->getAttachments() as $dataPart) {
+                if ($dataPart instanceof DataPart) {
+                    $fileName = $dataPart->getFilename();
                     $extension = pathinfo($fileName, PATHINFO_EXTENSION);
-                    $fileContent = $attachment->getBody();
-                    $mimeType = $attachment->getMediaType() . '/' . $attachment->getMediaSubtype();
+                    $fileContent = $dataPart->getBody();
+                    $mimeType = $dataPart->getMediaType() . '/' . $dataPart->getMediaSubtype();
                     $fileSizeBytes = strlen($fileContent);
 
-                    // Store the original name regardless of whether we end up backing up the file
-                    $attachment = $mailwebEmail->attachments()->create([
+                    $attachmentRecord = $mailwebEmail->attachments()->create([
                         'name' => $fileName,
                         'size_bytes' => $fileSizeBytes,
                         'path' => null,
@@ -58,21 +47,18 @@ class MailWebListener
 
                     try {
                         $storageDisk = config('MailWeb.MAILWEB_ATTACHMENTS.DISK');
-                        // If the config is enabled, we store the file
+
                         if ($storageDisk) {
-                            $path = config('MailWeb.MAILWEB_ATTACHMENTS.PATH') . '/' . $attachment->mailweb_email_id . '/' . $attachment->id . '.' . $extension;
+                            $path = config('MailWeb.MAILWEB_ATTACHMENTS.PATH') . '/' . $attachmentRecord->mailweb_email_id . '/' . $attachmentRecord->id . '.' . $extension;
                             Storage::disk($storageDisk)->put(
                                 path: $path,
                                 contents: $fileContent,
                                 options: ['ContentType' => $mimeType]
                             );
 
-                            $attachment->update([
-                                'path' => $path,
-                            ]);
+                            $attachmentRecord->update(['path' => $path]);
                         }
                     } catch (\Throwable $e) {
-                        // We don't want to fail the entire process, so just log the error and move on
                         report($e);
                     }
                 }
@@ -82,11 +68,9 @@ class MailWebListener
 
     private function getAddresses(array $addresses): array
     {
-        return collect($addresses)->map(function ($address) {
-            return [
-                'address' => $address->getAddress(),
-                'name' => $address->getName(),
-            ];
-        })->toArray();
+        return collect($addresses)->map(fn ($address) => [
+            'address' => $address->getAddress(),
+            'name' => $address->getName(),
+        ])->toArray();
     }
 }

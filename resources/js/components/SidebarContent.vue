@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useMailwebConfig } from '@/composables/useMailwebConfig';
 import axios from 'axios';
 import { ArrowLeft, Loader2, Mail, Paperclip, Pause, Play, RefreshCw, Search, Settings, X } from 'lucide-vue-next';
-import { type Ref, inject, onMounted, onUnmounted, ref, watch } from 'vue';
+import { type Ref, computed, inject, onMounted, onUnmounted, ref, watch } from 'vue';
 import toast from 'vue3-hot-toast';
 import AnimatedSendButton from './partials/AnimatedSendButton.vue';
 import SettingsDialog from './partials/SettingsDialog.vue';
@@ -20,7 +20,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:searchQuery', 'update:filters', 'close-sidebar', 'update:settings']);
 
 const localSearchQuery = ref(props.searchQuery);
-const fetchEmails = inject('fetchEmails') as () => void;
+const fetchEmails = inject('fetchEmails') as (resetList?: boolean) => Promise<void>;
 const isRefreshing = ref<boolean>(false);
 const isSending = ref<boolean>(false);
 const isPolling = ref<boolean>(false);
@@ -44,12 +44,12 @@ const returnConfig = ref({ appName: '', appUrl: '' });
 const isSendSampleButtonEnabled = ref<boolean>(false);
 const isDeleteAllEnabled = ref<boolean>(false);
 
-const activeFilterCount = () => {
+const activeFilterCount = computed(() => {
     let count = 0;
     if (filterHasAttachments.value) count++;
     if (filterUnread.value) count++;
     return count;
-};
+});
 
 const emitFilters = () => {
     emit('update:filters', {
@@ -123,10 +123,10 @@ const stopPolling = (): void => {
 
 const togglePolling = (): void => (isPolling.value ? stopPolling() : startPolling());
 
-const handleRefresh = (): void => {
+const handleRefresh = async (): Promise<void> => {
     isRefreshing.value = true;
-    if (fetchEmails) fetchEmails();
-    setTimeout(() => (isRefreshing.value = false), 1000);
+    if (fetchEmails) await fetchEmails();
+    isRefreshing.value = false;
 };
 
 const loadSettings = (): void => {
@@ -224,7 +224,7 @@ onUnmounted(() => stopPolling());
                     Has files
                 </button>
                 <button
-                    v-if="activeFilterCount() > 0"
+                    v-if="activeFilterCount > 0"
                     @click="clearFilters"
                     class="text-muted-foreground hover:text-foreground flex items-center gap-0.5 rounded-md px-1.5 py-1 text-xs transition-colors"
                 >

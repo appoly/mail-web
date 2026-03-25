@@ -82,6 +82,7 @@ const handleDownload = (): void => {
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
+    URL.revokeObjectURL(element.href);
 };
 
 const handleShare = (): void => {
@@ -321,7 +322,7 @@ watch(() => props.email, updateIframe, { immediate: true });
                                 ref="iframeRef"
                                 title="Email Preview"
                                 class="h-full w-full border-0"
-                                sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+                                sandbox="allow-same-origin allow-popups"
                             />
                         </div>
                     </div>

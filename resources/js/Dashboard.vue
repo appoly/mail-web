@@ -44,7 +44,7 @@ const paginationTriggered = ref(false);
 // Create a ref to track polling state for components to access
 const isPollingActive = ref(false);
 
-const fetchEmails = (resetList = true): void => {
+const fetchEmails = (resetList = true): Promise<void> => {
     if (resetList) {
         isLoading.value = true;
         currentPage.value = 1;
@@ -63,7 +63,7 @@ const fetchEmails = (resetList = true): void => {
         search: searchQuery.value || undefined,
     };
 
-    axios
+    return axios
         .get('/mailweb/emails', { params })
         .then((response) => {
             if (resetList) {

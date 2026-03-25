@@ -6,6 +6,7 @@ use Illuminate\Support\Js;
 use Illuminate\Support\HtmlString;
 use Appoly\MailWeb\Facades\MailWeb;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Support\Htmlable;
 use Appoly\MailWeb\Providers\MessageServiceProvider;
 use Appoly\MailWeb\Console\Commands\PruneMailwebMails;
 
@@ -43,7 +44,7 @@ class MailWebServiceProvider extends ServiceProvider
      *
      * @param  string  $assetType  Either 'css' or 'js'
      */
-    private static function getAsset(string $assetType): \Illuminate\Contracts\Support\Htmlable
+    private static function getAsset(string $assetType): Htmlable
     {
         $manifestPath = __DIR__ . '/../public/vendor/mailweb/.vite/manifest.json';
 
@@ -95,7 +96,7 @@ class MailWebServiceProvider extends ServiceProvider
     /**
      * Get the CSS for the MailWeb dashboard.
      */
-    public static function css(): \Illuminate\Contracts\Support\Htmlable
+    public static function css(): Htmlable
     {
         return self::getAsset('css');
     }
@@ -103,7 +104,7 @@ class MailWebServiceProvider extends ServiceProvider
     /**
      * Get the JS for the MailWeb dashboard.
      */
-    public static function js(): \Illuminate\Contracts\Support\Htmlable
+    public static function js(): Htmlable
     {
         return self::getAsset('js');
     }
