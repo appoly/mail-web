@@ -35,6 +35,16 @@ class MailwebEmailAttachment extends Model
             return null;
         }
 
-        return Storage::disk(config('MailWeb.MAILWEB_ATTACHMENTS.DISK'))->url($this->path);
+        $disk = Storage::disk(config('MailWeb.MAILWEB_ATTACHMENTS.DISK'));
+
+        if (method_exists($disk, 'temporaryUrl')) {
+            try {
+                return $disk->temporaryUrl($this->path, now()->addMinutes(30));
+            } catch (\RuntimeException) {
+                // Driver doesn't support temporary URLs (e.g. local disk)
+            }
+        }
+
+        return $disk->url($this->path);
     }
 }
