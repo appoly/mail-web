@@ -1,18 +1,30 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { EmailAddress, EmailPreview } from '@/types/email';
 import axios from 'axios';
-import { Clock, Code, Download, Eye, Monitor, Share2, Smartphone, Tablet, Trash2 } from 'lucide-vue-next';
-import { computed, defineEmits, inject, nextTick, onMounted, ref, watch } from 'vue';
+import {
+    Clock,
+    Code,
+    Download,
+    Eye,
+    FileText,
+    Loader2,
+    Monitor,
+    Share2,
+    Smartphone,
+    Tablet,
+    Trash2,
+} from 'lucide-vue-next';
+import { computed, inject, nextTick, ref, watch } from 'vue';
 import EmailAttachments from './EmailAttachments.vue';
 import DeleteEmailDialog from './partials/DeleteEmailDialog.vue';
 import ShareEmailDialog from './partials/ShareEmailDialog.vue';
 
 const emit = defineEmits(['delete-email']);
 
-// Props with TypeScript interface
 interface Props {
     email: EmailPreview;
     isMobile: boolean;
@@ -21,7 +33,6 @@ interface Props {
 
 const props = defineProps<Props>();
 
-// Injected dependencies
 const formatDate = inject<(dateString: string) => string>('formatDate')!;
 
 // Reactive state
@@ -31,7 +42,7 @@ const iframeRef = ref<HTMLIFrameElement | null>(null);
 const showShareDialog = ref(false);
 const showDeleteDialog = ref(false);
 
-// Computed properties
+// Computed
 const previewStyle = computed(() => ({
     width: props.isMobile ? '100%' : getPreviewWidth(),
     maxWidth: '100%',
@@ -78,6 +89,10 @@ const handleShare = (): void => {
     showShareDialog.value = true;
 };
 
+const deleteEmail = (): void => {
+    showDeleteDialog.value = true;
+};
+
 // Iframe management
 const updateIframe = (): void => {
     nextTick(() => {
@@ -100,10 +115,6 @@ const updateIframe = (): void => {
     });
 };
 
-const deleteEmail = (): void => {
-    showDeleteDialog.value = true;
-};
-
 const handleDeleteConfirm = async (): Promise<void> => {
     try {
         await axios.delete(`/mailweb/emails/${props.email.id}`);
@@ -114,154 +125,198 @@ const handleDeleteConfirm = async (): Promise<void> => {
     }
 };
 
-// Lifecycle hooks
 watch(() => props.email, updateIframe, { immediate: true });
-onMounted(updateIframe);
 </script>
 
 <template>
-    <div class="flex h-[calc(100vh-57px)] flex-col overflow-hidden lg:h-screen">
+    <div class="flex h-[calc(100vh-53px)] flex-col overflow-hidden lg:h-screen">
         <!-- Header -->
-        <div class="flex flex-col justify-between gap-2 border-b p-2 sm:flex-row sm:items-center sm:p-4">
-            <div class="overflow-hidden">
-                <h2 class="truncate text-lg font-semibold">{{ email.subject }}</h2>
-                <p class="text-muted-foreground text-sm">From: {{ formatEmailAddresses(email.from) }}</p>
-                <div>
-                    <p v-if="email.to && email.to.length > 0" class="text-muted-foreground text-sm">To: {{ formatEmailAddresses(email.to) }}</p>
-                    <p v-else class="text-destructive text-sm font-medium italic">To: No recipients</p>
+        <div class="border-b px-5 py-3 sm:px-6">
+            <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0 flex-1">
+                    <!-- Subject -->
+                    <h2 class="truncate text-lg font-semibold leading-tight tracking-tight">{{ email.subject }}</h2>
+
+                    <!-- Address lines — always visible -->
+                    <div class="mt-2 space-y-0.5 text-sm">
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-muted-foreground shrink-0 text-xs">From:</span>
+                            <span class="truncate">{{ formatEmailAddresses(email.from) }}</span>
+                        </div>
+                        <div class="flex items-baseline gap-1.5">
+                            <span class="text-muted-foreground shrink-0 text-xs">To:</span>
+                            <span v-if="email.to && email.to.length > 0" class="truncate">{{ formatEmailAddresses(email.to) }}</span>
+                            <span v-else class="text-destructive italic">No recipients</span>
+                        </div>
+                        <div v-if="email.cc && email.cc.length > 0" class="flex items-baseline gap-1.5">
+                            <span class="text-muted-foreground shrink-0 text-xs">Cc:</span>
+                            <span class="truncate">{{ formatEmailAddresses(email.cc) }}</span>
+                        </div>
+                        <div v-if="email.bcc && email.bcc.length > 0" class="flex items-baseline gap-1.5">
+                            <span class="text-muted-foreground shrink-0 text-xs">Bcc:</span>
+                            <span class="truncate">{{ formatEmailAddresses(email.bcc) }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Date -->
+                    <div class="text-muted-foreground mt-1.5 flex items-center gap-1.5 text-xs">
+                        <Clock class="h-3 w-3" />
+                        <span>{{ formatDate(email.created_at) }}</span>
+                    </div>
                 </div>
-                <p v-if="email.cc && email.cc.length > 0" class="text-muted-foreground text-sm">CC: {{ formatEmailAddresses(email.cc) }}</p>
-                <p v-if="email.bcc && email.bcc.length > 0" class="text-muted-foreground text-sm">BCC: {{ formatEmailAddresses(email.bcc) }}</p>
-                <div class="text-muted-foreground mt-1 flex items-center text-xs">
-                    <Clock class="mr-1 h-3 w-3" />
-                    <span>{{ formatDate(email.created_at) }}</span>
+
+                <!-- Desktop Toolbar -->
+                <div v-if="!isMobile" class="flex items-center gap-1 rounded-md border p-1">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button
+                                    variant="ghost" size="icon"
+                                    @click="previewWidth = 'mobile'"
+                                    class="h-7 w-7"
+                                    :class="previewWidth === 'mobile' ? 'bg-accent text-primary' : 'text-muted-foreground'"
+                                >
+                                    <Smartphone class="h-3.5 w-3.5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Mobile view</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button
+                                    variant="ghost" size="icon"
+                                    @click="previewWidth = 'tablet'"
+                                    class="h-7 w-7"
+                                    :class="previewWidth === 'tablet' ? 'bg-accent text-primary' : 'text-muted-foreground'"
+                                >
+                                    <Tablet class="h-3.5 w-3.5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Tablet view</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button
+                                    variant="ghost" size="icon"
+                                    @click="previewWidth = 'desktop'"
+                                    class="h-7 w-7"
+                                    :class="previewWidth === 'desktop' ? 'bg-accent text-primary' : 'text-muted-foreground'"
+                                >
+                                    <Monitor class="h-3.5 w-3.5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Desktop view</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <Separator orientation="vertical" class="mx-0.5 h-5" />
+
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button variant="ghost" size="icon" @click="handleDownload" class="h-7 w-7 text-muted-foreground hover:text-foreground">
+                                    <Download class="h-3.5 w-3.5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Download</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button variant="ghost" size="icon" @click="handleShare" class="h-7 w-7 text-muted-foreground hover:text-foreground">
+                                    <Share2 class="h-3.5 w-3.5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Share</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <Separator orientation="vertical" class="mx-0.5 h-5" />
+
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger as-child>
+                                <Button variant="ghost" size="icon" @click="deleteEmail" class="h-7 w-7 text-muted-foreground hover:text-destructive">
+                                    <Trash2 class="h-3.5 w-3.5" />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>Delete</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
                 </div>
-            </div>
 
-            <div v-if="!isMobile" class="flex items-center gap-1 sm:gap-2">
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger as-child>
-                            <Button variant="outline" size="icon" @click="previewWidth = 'mobile'">
-                                <Smartphone :class="['h-4 w-4', previewWidth === 'mobile' ? 'text-primary' : '']" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Mobile View</TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger as-child>
-                            <Button variant="outline" size="icon" @click="previewWidth = 'tablet'">
-                                <Tablet :class="['h-4 w-4', previewWidth === 'tablet' ? 'text-primary' : '']" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Tablet View</TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger as-child>
-                            <Button variant="outline" size="icon" @click="previewWidth = 'desktop'">
-                                <Monitor :class="['h-4 w-4', previewWidth === 'desktop' ? 'text-primary' : '']" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Desktop View</TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-
-                <Separator orientation="vertical" class="mx-1 hidden h-6 sm:block" />
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger as-child>
-                            <Button variant="outline" size="icon" @click="handleDownload">
-                                <Download class="h-4 w-4" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Download</TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger as-child>
-                            <Button variant="outline" size="icon" @click="handleShare">
-                                <Share2 class="h-4 w-4" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Share Email</TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger as-child>
-                            <Button variant="destructive" size="icon" @click="deleteEmail">
-                                <Trash2 class="h-4 w-4" />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Delete Email</TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
+                <!-- Mobile Actions -->
+                <div v-else class="flex shrink-0 items-center gap-1">
+                    <Button variant="ghost" size="icon" @click="handleShare" class="h-8 w-8 text-muted-foreground">
+                        <Share2 class="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" @click="handleDownload" class="h-8 w-8 text-muted-foreground">
+                        <Download class="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" @click="deleteEmail" class="h-8 w-8 text-muted-foreground hover:text-destructive">
+                        <Trash2 class="h-4 w-4" />
+                    </Button>
+                </div>
             </div>
         </div>
-        <div class="border-b p-2 sm:p-4" v-if="email.attachments && email.attachments.length > 0">
+
+        <!-- Attachments -->
+        <div class="border-b px-5 py-3 sm:px-6" v-if="email.attachments && email.attachments.length > 0">
             <EmailAttachments :attachments="email.attachments" />
         </div>
 
-        <!-- Custom Tabs -->
-        <div class="flex h-full flex-col">
-            <!-- Tab Navigation -->
-            <div class="flex border-b">
-                <button
-                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="viewMode === 'html' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'"
-                    @click="viewMode = 'html'"
+        <!-- Tabs + Content -->
+        <Tabs v-model="viewMode" class="flex h-full flex-col">
+            <TabsList class="h-auto w-full justify-start gap-0 rounded-none border-b bg-transparent p-0 px-2">
+                <TabsTrigger
+                    value="html"
+                    class="inline-flex items-center gap-1.5 rounded-none border-b-2 border-transparent bg-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none"
                 >
-                    <Eye class="h-3 w-3 sm:h-4 sm:w-4" />
+                    <Eye class="h-3.5 w-3.5" />
                     Preview
-                </button>
-                <button
-                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="viewMode === 'text' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'"
-                    @click="viewMode = 'text'"
+                </TabsTrigger>
+                <TabsTrigger
+                    value="text"
+                    class="inline-flex items-center gap-1.5 rounded-none border-b-2 border-transparent bg-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none"
                 >
-                    <Code class="h-3 w-3 sm:h-4 sm:w-4" />
+                    <FileText class="h-3.5 w-3.5" />
                     Text
-                </button>
-                <button
+                </TabsTrigger>
+                <TabsTrigger
                     v-if="!isMobile"
-                    class="flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors"
-                    :class="viewMode === 'raw' ? 'border-primary text-primary border-b-2' : 'text-muted-foreground hover:text-foreground'"
-                    @click="viewMode = 'raw'"
+                    value="raw"
+                    class="inline-flex items-center gap-1.5 rounded-none border-b-2 border-transparent bg-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none data-[state=active]:border-b-primary data-[state=active]:bg-transparent data-[state=active]:text-primary data-[state=active]:shadow-none"
                 >
-                    <Code class="h-3 w-3 sm:h-4 sm:w-4" />
-                    Raw
-                </button>
-            </div>
+                    <Code class="h-3.5 w-3.5" />
+                    Source
+                </TabsTrigger>
+            </TabsList>
 
-            <!-- Tab Content -->
-            <div class="flex-1 overflow-hidden">
-                <!-- HTML Preview -->
-                <div v-show="viewMode === 'html'" class="h-full">
+            <TabsContent value="html" class="mt-0 flex-1 overflow-hidden data-[state=inactive]:hidden">
+                <div class="h-full">
                     <div v-if="props.isLoading" class="flex h-full items-center justify-center">
-                        <div class="flex flex-col items-center">
-                            <div class="border-primary mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
-                            <p class="text-muted-foreground text-sm">Loading email content...</p>
+                        <div class="flex flex-col items-center gap-3">
+                            <Loader2 class="text-primary h-6 w-6 animate-spin" />
+                            <p class="text-muted-foreground text-sm">Loading content...</p>
                         </div>
                     </div>
                     <div v-else-if="!props.email.body_html" class="flex h-full items-center justify-center">
-                        <p class="text-muted-foreground">No HTML content available</p>
+                        <p class="text-muted-foreground text-sm">No HTML content available</p>
                     </div>
                     <div
                         v-else
-                        class="flex h-full justify-center overflow-auto bg-gray-100 transition-all duration-300 dark:bg-gray-900"
-                        :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1rem' }"
+                        class="flex h-full justify-center overflow-auto bg-muted/30 transition-all duration-300"
+                        :style="{ padding: isMobile || previewWidth === 'desktop' ? '0' : '1.5rem' }"
                     >
-                        <div class="h-full bg-white shadow-xs transition-all duration-300 dark:bg-gray-800" :style="previewStyle">
+                        <div class="h-full bg-white shadow-sm transition-all duration-300 dark:bg-gray-800" :style="previewStyle">
                             <iframe
                                 ref="iframeRef"
                                 title="Email Preview"
@@ -271,34 +326,35 @@ onMounted(updateIframe);
                         </div>
                     </div>
                 </div>
+            </TabsContent>
 
-                <!-- Text View -->
-                <div v-show="viewMode === 'text'" class="h-full overflow-auto p-4">
+            <TabsContent value="text" class="mt-0 flex-1 overflow-hidden data-[state=inactive]:hidden">
+                <div class="h-full overflow-auto p-5">
                     <div v-if="props.isLoading" class="flex h-full items-center justify-center">
-                        <div class="flex flex-col items-center">
-                            <div class="border-primary mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
-                            <p class="text-muted-foreground text-sm">Loading email content...</p>
+                        <div class="flex flex-col items-center gap-3">
+                            <Loader2 class="text-primary h-6 w-6 animate-spin" />
+                            <p class="text-muted-foreground text-sm">Loading content...</p>
                         </div>
                     </div>
-                    <pre v-else class="font-mono text-sm whitespace-pre-wrap">{{ email.body_text }}</pre>
+                    <pre v-else class="font-mono text-sm leading-relaxed whitespace-pre-wrap">{{ email.body_text }}</pre>
                 </div>
+            </TabsContent>
 
-                <!-- Raw View -->
-                <div v-show="viewMode === 'raw' && !isMobile" class="h-full overflow-auto p-4">
+            <TabsContent v-if="!isMobile" value="raw" class="mt-0 flex-1 overflow-hidden data-[state=inactive]:hidden">
+                <div class="h-full overflow-auto p-5">
                     <div v-if="props.isLoading" class="flex h-full items-center justify-center">
-                        <div class="flex flex-col items-center">
-                            <div class="border-primary mb-2 h-8 w-8 animate-spin rounded-full border-b-2"></div>
-                            <p class="text-muted-foreground text-sm">Loading email content...</p>
+                        <div class="flex flex-col items-center gap-3">
+                            <Loader2 class="text-primary h-6 w-6 animate-spin" />
+                            <p class="text-muted-foreground text-sm">Loading content...</p>
                         </div>
                     </div>
-                    <pre v-else class="font-mono text-sm whitespace-pre-wrap">{{ email.body_html }}</pre>
+                    <pre v-else class="bg-muted/50 rounded-lg p-4 font-mono text-sm leading-relaxed whitespace-pre-wrap">{{ email.body_html }}</pre>
                 </div>
-            </div>
-        </div>
+            </TabsContent>
+        </Tabs>
 
         <!-- Dialog Components -->
         <DeleteEmailDialog :open="showDeleteDialog" @update:open="showDeleteDialog = $event" @confirm="handleDeleteConfirm" />
-
         <ShareEmailDialog :open="showShareDialog" :email="email" @update:open="showShareDialog = $event" />
     </div>
 </template>

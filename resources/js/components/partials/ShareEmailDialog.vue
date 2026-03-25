@@ -7,7 +7,7 @@ import axios from 'axios';
 import type { Bitmap2D } from 'lean-qr';
 import { generate } from 'lean-qr';
 import { toSvg, toSvgDataURL } from 'lean-qr/extras/svg';
-import { Check, Copy, Eye, QrCode, Share2 } from 'lucide-vue-next';
+import { Check, Copy, ExternalLink, Link2, QrCode, Share2 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 
 const props = defineProps<{
@@ -31,15 +31,12 @@ const qrCodeError = ref<string>('');
 const generateQrCode = (url: string) => {
     if (!url) return;
 
-    // Reset error state
     qrCodeError.value = '';
 
     try {
-        // Generate QR code
         const qrCodeBitmap = generate(url);
         qrCode.value = qrCodeBitmap;
 
-        // Generate SVG data URL
         qrSvgUrl.value = toSvgDataURL(qrCodeBitmap, {
             on: '#000000',
             off: 'transparent',
@@ -48,10 +45,8 @@ const generateQrCode = (url: string) => {
             scale: 4,
         });
 
-        // Render SVG element on next tick to ensure DOM is updated
         setTimeout(() => {
             if (qrSvgRef.value && qrCodeBitmap) {
-                // Create new SVG with QR code
                 toSvg(qrCodeBitmap, qrSvgRef.value, {
                     on: '#000000',
                     off: 'transparent',
@@ -154,50 +149,59 @@ const selectAllText = () => {
 
 <template>
     <Dialog :open="open" @update:open="emit('update:open', $event)">
-        <DialogContent class="flex max-h-[90vh] max-w-[1000px] flex-col justify-between p-4 sm:max-w-[700px] sm:p-6">
-            <div class="flex min-h-0 flex-1 flex-col space-y-4">
+        <DialogContent class="flex max-h-[90vh] max-w-[1000px] flex-col justify-between p-5 sm:max-w-[640px] sm:p-6">
+            <div class="flex min-h-0 flex-1 flex-col space-y-5">
                 <DialogHeader>
-                    <DialogTitle>Share Email</DialogTitle>
+                    <DialogTitle class="flex items-center gap-2">
+                        <div class="bg-primary/10 flex h-8 w-8 items-center justify-center rounded-lg">
+                            <Share2 class="text-primary h-4 w-4" />
+                        </div>
+                        Share Email
+                    </DialogTitle>
                 </DialogHeader>
 
-                <div class="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800">
-                    <div class="flex items-center gap-2">
-                        <Share2 class="text-primary h-5 w-5" />
-                        <span class="text-sm font-medium">Email Sharing</span>
+                <!-- Toggle -->
+                <div class="flex items-center justify-between rounded-xl border bg-muted/30 p-3.5">
+                    <div class="flex items-center gap-2.5">
+                        <Link2 class="text-muted-foreground h-4 w-4" />
+                        <div>
+                            <span class="text-sm font-medium">Public sharing</span>
+                            <p class="text-muted-foreground text-xs">Anyone with the link can view</p>
+                        </div>
                     </div>
                     <Switch :model-value="email.share_enabled" @update:model-value="toggleShareEnabled" :disabled="isToggling" />
                 </div>
 
-                <div v-if="email.share_enabled" class="flex flex-col space-y-4">
-                    <div class="flex flex-col items-center gap-4 sm:flex-row">
-                        <div class="shrink-0 rounded-lg border bg-white p-2 shadow-xs">
-                            <svg v-if="qrCode" ref="qrSvgRef" class="h-48 w-48"></svg>
-                            <img v-else-if="qrSvgUrl" :src="qrSvgUrl" alt="QR Code" class="h-48 w-48" />
+                <!-- Enabled state -->
+                <div v-if="email.share_enabled" class="flex flex-col space-y-5">
+                    <div class="flex flex-col items-center gap-5 sm:flex-row">
+                        <div class="shrink-0 overflow-hidden rounded-xl border bg-white p-2 shadow-sm">
+                            <svg v-if="qrCode" ref="qrSvgRef" class="h-44 w-44"></svg>
+                            <img v-else-if="qrSvgUrl" :src="qrSvgUrl" alt="QR Code" class="h-44 w-44" />
                             <div
                                 v-else-if="qrCodeError"
-                                class="flex h-48 w-48 flex-col items-center justify-center rounded bg-gray-100 p-4 dark:bg-gray-800"
+                                class="flex h-44 w-44 flex-col items-center justify-center rounded-lg bg-destructive/5 p-4"
                             >
-                                <QrCode class="mb-2 h-8 w-8 text-red-400" />
-                                <p class="text-center text-xs font-medium text-red-500">QR Code Error</p>
-                                <p class="mt-1 text-center text-xs text-gray-500">{{ qrCodeError }}</p>
+                                <QrCode class="text-destructive/50 mb-2 h-8 w-8" />
+                                <p class="text-destructive text-center text-xs font-medium">QR Code Error</p>
+                                <p class="text-muted-foreground mt-1 text-center text-xs">{{ qrCodeError }}</p>
                             </div>
-                            <div v-else class="flex h-48 w-48 items-center justify-center rounded bg-gray-100 dark:bg-gray-800">
-                                <div class="animate-pulse">
-                                    <QrCode class="h-8 w-8 text-gray-300" />
-                                </div>
+                            <div v-else class="flex h-44 w-44 items-center justify-center rounded-lg bg-muted">
+                                <QrCode class="text-muted-foreground/30 h-8 w-8 animate-pulse" />
                             </div>
                         </div>
-                        <div class="max-w-full flex-1 space-y-1 text-sm">
+                        <div class="max-w-full flex-1 space-y-1.5 text-sm">
                             <h3 class="font-medium">QR Code</h3>
-                            <p class="text-gray-500 dark:text-gray-400">Scan this code with a mobile device to view the email.</p>
-                            <p class="hidden text-xs text-gray-400 sm:block dark:text-gray-500">Anyone with this code can access the content.</p>
+                            <p class="text-muted-foreground text-sm leading-relaxed">Scan with a mobile device to view this email.</p>
+                            <p class="text-muted-foreground/70 hidden text-xs sm:block">Anyone with this code can access the content.</p>
                         </div>
                     </div>
 
+                    <!-- Share Link -->
                     <div class="space-y-2">
-                        <h3 class="text-sm font-medium">Share Link</h3>
+                        <h3 class="text-sm font-medium">Share link</h3>
                         <div class="flex items-center gap-2">
-                            <div class="flex min-w-0 flex-1 items-center overflow-hidden rounded-md border bg-gray-50 dark:bg-gray-800">
+                            <div class="flex min-w-0 flex-1 items-center overflow-hidden rounded-lg border bg-muted/30">
                                 <input
                                     ref="urlInputRef"
                                     type="text"
@@ -205,36 +209,37 @@ const selectAllText = () => {
                                     :value="shareUrl"
                                     @dblclick="selectAllText"
                                     @focus="selectAllText"
-                                    class="focus:ring-primary w-full flex-1 border-none bg-transparent px-2 py-1 text-xs focus:ring-1 focus:outline-hidden"
+                                    class="focus:ring-primary w-full flex-1 border-none bg-transparent px-3 py-2 text-xs focus:ring-1 focus:outline-hidden"
                                 />
                                 <Button
                                     variant="ghost"
                                     size="sm"
                                     @click="copyShareUrl"
-                                    class="h-full shrink-0 border-l px-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                    class="h-full shrink-0 border-l px-3 hover:bg-muted"
                                 >
-                                    <Check v-if="shareUrlCopied" class="h-3 w-3 text-green-500" />
-                                    <Copy v-else class="h-3 w-3" />
-                                    <span class="ml-1 text-xs">{{ shareUrlCopied ? 'Copied!' : 'Copy' }}</span>
+                                    <Check v-if="shareUrlCopied" class="h-3.5 w-3.5 text-green-500" />
+                                    <Copy v-else class="h-3.5 w-3.5" />
+                                    <span class="ml-1.5 text-xs">{{ shareUrlCopied ? 'Copied!' : 'Copy' }}</span>
                                 </Button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div v-else class="flex flex-col items-center justify-center px-2 py-4 text-center">
-                    <div class="mb-2 rounded-full bg-gray-100 p-3 dark:bg-gray-800">
-                        <QrCode class="h-6 w-6 text-gray-400" />
+                <!-- Disabled state -->
+                <div v-else class="flex flex-col items-center justify-center px-4 py-8 text-center">
+                    <div class="bg-muted mb-3 flex h-14 w-14 items-center justify-center rounded-xl">
+                        <QrCode class="text-muted-foreground h-7 w-7" />
                     </div>
-                    <h3 class="mb-1 text-sm font-medium">Enable sharing to continue</h3>
-                    <p class="max-w-xs text-xs text-gray-500 dark:text-gray-400">Toggle the switch above to generate a shareable link and QR code.</p>
+                    <h3 class="text-sm font-medium">Enable sharing</h3>
+                    <p class="text-muted-foreground mt-1 max-w-xs text-xs leading-relaxed">Toggle the switch above to generate a shareable link and QR code.</p>
                 </div>
             </div>
 
-            <DialogFooter class="mt-auto">
-                <Button variant="outline" @click="closeDialog" class="text-xs">Close</Button>
-                <Button as="a" v-if="email.share_enabled && shareUrl" variant="default" :href="shareUrl" target="_blank" class="ml-2 text-xs">
-                    <Eye class="mr-1 h-3 w-3" />
+            <DialogFooter class="mt-auto gap-2 sm:gap-0">
+                <Button variant="outline" @click="closeDialog" class="text-sm">Close</Button>
+                <Button as="a" v-if="email.share_enabled && shareUrl" variant="default" :href="shareUrl" target="_blank" class="text-sm">
+                    <ExternalLink class="mr-1.5 h-3.5 w-3.5" />
                     Preview
                 </Button>
             </DialogFooter>

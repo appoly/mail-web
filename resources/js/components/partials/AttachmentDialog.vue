@@ -2,7 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EmailAttachment } from '@/types/email';
-import { Download, FileX } from 'lucide-vue-next';
+import { Download, FileX, Loader2 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import AttachmentIcon from '../ui/AttachmentIcon.vue';
 
@@ -58,7 +58,6 @@ const handleImageError = () => {
 const downloadAttachment = () => {
     if (!props.attachment?.file_url) return;
 
-    // Create a temporary anchor element
     const link = document.createElement('a');
     link.href = props.attachment.file_url;
     link.download = props.attachment.name;
@@ -73,51 +72,55 @@ const downloadAttachment = () => {
         <DialogContent class="sm:max-w-lg">
             <DialogHeader>
                 <DialogTitle class="flex items-center gap-2">
-                    <AttachmentIcon v-if="attachment" :filename="attachment.name" />
-                    <span>{{ attachment?.name || 'Attachment' }}</span>
+                    <div class="bg-muted flex h-8 w-8 items-center justify-center rounded-lg">
+                        <AttachmentIcon v-if="attachment" :filename="attachment.name" />
+                    </div>
+                    <span class="truncate">{{ attachment?.name || 'Attachment' }}</span>
                 </DialogTitle>
             </DialogHeader>
 
-            <div class="py-4">
+            <div class="py-3">
                 <!-- No attachment case -->
-                <div v-if="!attachment" class="flex flex-col items-center justify-center rounded-md bg-gray-50 p-8 text-center">
-                    <FileX class="mb-4 h-16 w-16 text-gray-400" />
-                    <p class="mb-2 text-gray-600">Attachment not found</p>
+                <div v-if="!attachment" class="flex flex-col items-center justify-center rounded-xl bg-muted/50 p-10 text-center">
+                    <FileX class="text-muted-foreground/50 mb-3 h-12 w-12" />
+                    <p class="text-muted-foreground text-sm font-medium">Attachment not found</p>
                 </div>
 
                 <!-- Missing file URL case -->
-                <div v-else-if="!attachment.file_url" class="flex flex-col items-center justify-center rounded-md bg-gray-50 p-8 text-center">
-                    <FileX class="mb-4 h-16 w-16 text-gray-400" />
-                    <p class="mb-2 text-gray-600">Attachment was not stored</p>
+                <div v-else-if="!attachment.file_url" class="flex flex-col items-center justify-center rounded-xl bg-muted/50 p-10 text-center">
+                    <FileX class="text-muted-foreground/50 mb-3 h-12 w-12" />
+                    <p class="text-muted-foreground text-sm font-medium">Attachment was not stored</p>
                 </div>
 
                 <!-- Image attachment -->
                 <div v-else-if="isImage" class="flex justify-center">
                     <div v-if="isLoading" class="absolute inset-0 flex items-center justify-center">
-                        <div class="border-t-primary h-8 w-8 animate-spin rounded-full border-4 border-gray-300"></div>
+                        <Loader2 class="text-primary h-6 w-6 animate-spin" />
                     </div>
                     <img
                         v-if="attachment.file_url"
                         :src="attachment.file_url"
                         :alt="attachment.name"
-                        class="max-h-[400px] rounded border object-contain"
+                        class="max-h-[400px] rounded-lg border object-contain"
                         @load="handleImageLoaded"
                         @error="handleImageError"
                     />
-                    <div v-if="imageError" class="mt-4 text-center text-sm text-gray-500">
+                    <div v-if="imageError" class="text-muted-foreground mt-4 text-center text-sm">
                         <p>Unable to display image</p>
                     </div>
                 </div>
 
                 <!-- Non-image attachment -->
-                <div v-else-if="attachment" class="rounded-md bg-gray-50 p-8 text-center">
+                <div v-else-if="attachment" class="rounded-xl bg-muted/50 p-10 text-center">
                     <div class="mb-4 flex justify-center">
-                        <AttachmentIcon :filename="attachment.name" class="h-16 w-16" />
+                        <div class="bg-background flex h-16 w-16 items-center justify-center rounded-xl shadow-sm">
+                            <AttachmentIcon :filename="attachment.name" class="h-8 w-8" />
+                        </div>
                     </div>
-                    <p class="mb-2 text-gray-600">Preview not available for this file type</p>
-                    <p class="mb-4 text-sm text-gray-500">{{ attachment.human_readable_size }}</p>
-                    <Button v-if="attachment.file_url" @click="downloadAttachment">
-                        <Download class="mr-2 h-4 w-4" />
+                    <p class="text-muted-foreground text-sm font-medium">Preview not available</p>
+                    <p class="text-muted-foreground/70 mt-1 text-xs">{{ attachment.human_readable_size }}</p>
+                    <Button v-if="attachment.file_url" @click="downloadAttachment" class="mt-4 text-sm">
+                        <Download class="mr-1.5 h-3.5 w-3.5" />
                         Download
                     </Button>
                 </div>

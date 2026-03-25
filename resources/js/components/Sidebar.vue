@@ -7,6 +7,7 @@ defineProps<{
     filters: Record<string, any>;
     isOpen: boolean;
     isMobile: boolean;
+    isLoading?: boolean;
 }>();
 
 defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen', 'update:settings']);
@@ -21,6 +22,7 @@ defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen', 'update:se
                         :search-query="searchQuery"
                         :filters="filters"
                         :is-mobile="isMobile"
+                        :is-loading="isLoading"
                         @update:search-query="$emit('update:searchQuery', $event)"
                         @update:filters="$emit('update:filters', $event)"
                         @update:settings="$emit('update:settings', $event)"
@@ -30,11 +32,12 @@ defineEmits(['update:searchQuery', 'update:filters', 'update:isOpen', 'update:se
             </SheetContent>
         </Sheet>
 
-        <div v-else class="bg-card h-full w-64 flex-col border-r">
+        <div v-else class="flex h-full w-[272px] flex-col border-r">
             <SidebarContent
                 :search-query="searchQuery"
                 :filters="filters"
                 :is-mobile="isMobile"
+                :is-loading="isLoading"
                 @update:search-query="$emit('update:searchQuery', $event)"
                 @update:filters="$emit('update:filters', $event)"
                 @update:settings="$emit('update:settings', $event)"
