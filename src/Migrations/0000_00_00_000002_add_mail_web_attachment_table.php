@@ -16,7 +16,7 @@ return new class extends Migration
     {
         Schema::create('mailweb_email_attachments', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            if (config('MailWeb.SINGLESTORE')) {
+            if (config('MailWeb.MAILWEB_SINGLESTORE')) {
                 $table->foreignUuid('mailweb_email_id');
                 $table->index('mailweb_email_id');
             } else {
