@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -15,7 +16,12 @@ return new class extends Migration
     {
         Schema::create('mailweb_email_attachments', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('mailweb_email_id')->constrained('mailweb_emails')->onDelete('cascade');
+            if (config('MailWeb.MAILWEB_SINGLESTORE')) {
+                $table->foreignUuid('mailweb_email_id');
+                $table->index('mailweb_email_id');
+            } else {
+                $table->foreignUuid('mailweb_email_id')->constrained('mailweb_emails')->onDelete('cascade');
+            }
             $table->string('name')->nullable();
             $table->string('path')->nullable();
             $table->timestamps();

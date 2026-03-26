@@ -68,16 +68,17 @@ php artisan vendor:publish --tag=mailweb-config --force
 
 This creates `config/MailWeb.php`. Everything can also be set via environment variables:
 
-| Environment Variable | Default | Description |
-|---|---|---|
-| `MAILWEB_ENABLED` | `true` | Enable or disable email capturing entirely |
-| `MAILWEB_LIMIT` | `30` | Maximum number of emails kept in the database |
-| `MAILWEB_SEND_SAMPLE_BUTTON` | `true` | Show the "Send Test Email" button in the dashboard |
-| `MAILWEB_DELETE_ALL_ENABLED` | `false` | Allow bulk deletion of all emails from the dashboard |
-| `MAILWEB_RETURN_APP_NAME` | Your `app.name` | App name shown in the dashboard's return link |
-| `MAILWEB_RETURN_APP_URL` | `/` | URL the return link points to |
-| `MAILWEB_ATTACHMENTS_DISK` | `null` | Storage disk for attachments (e.g. `s3`, `local`) |
-| `MAILWEB_ATTACHMENTS_PATH` | `mailweb/attachments` | Path within the disk where attachments are stored |
+| Environment Variable         | Default              | Description                                          |
+|------------------------------|----------------------|------------------------------------------------------|
+| `MAILWEB_ENABLED`            | `true`               | Enable or disable email capturing entirely           |
+| `MAILWEB_SINGLESTORE`        | `false`              | Enable or disable SingleStore support                |
+| `MAILWEB_LIMIT`              | `30`                 | Maximum number of emails kept in the database        |
+| `MAILWEB_SEND_SAMPLE_BUTTON` | `true`               | Show the "Send Test Email" button in the dashboard   |
+| `MAILWEB_DELETE_ALL_ENABLED` | `false`              | Allow bulk deletion of all emails from the dashboard |
+| `MAILWEB_RETURN_APP_NAME`    | Your `app.name`      | App name shown in the dashboard's return link        |
+| `MAILWEB_RETURN_APP_URL`     | `/`                  | URL the return link points to                        |
+| `MAILWEB_ATTACHMENTS_DISK`   | `null`               | Storage disk for attachments (e.g. `s3`, `local`)    |
+| `MAILWEB_ATTACHMENTS_PATH`   | `mailweb/attachments` | Path within the disk where attachments are stored    |
 
 ## Attachments
 
