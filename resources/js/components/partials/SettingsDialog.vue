@@ -118,7 +118,7 @@ const deleteAllEmails = async (): Promise<void> => {
                     </Button>
                 </div>
             </div>
-            <DialogFooter class="gap-2 pt-2 sm:gap-0">
+            <DialogFooter class="pt-2">
                 <Button variant="outline" @click="$emit('update:showSettingsDialog', false)" class="text-sm">Cancel</Button>
                 <Button @click="saveSettings" class="text-sm">Save</Button>
             </DialogFooter>
@@ -139,7 +139,7 @@ const deleteAllEmails = async (): Promise<void> => {
             <div class="py-3">
                 <p class="text-muted-foreground text-sm leading-relaxed">Are you sure? This will permanently delete all captured emails.</p>
             </div>
-            <DialogFooter class="gap-2 sm:gap-0">
+            <DialogFooter>
                 <Button variant="outline" @click="showDeleteAllDialog = false" class="text-sm">Cancel</Button>
                 <Button variant="destructive" @click="deleteAllEmails()" :disabled="isDeleting" class="text-sm">
                     <span v-if="isDeleting">Deleting...</span>

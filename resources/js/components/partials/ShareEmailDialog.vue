@@ -236,7 +236,7 @@ const selectAllText = () => {
                 </div>
             </div>
 
-            <DialogFooter class="mt-auto gap-2 sm:gap-0">
+            <DialogFooter class="mt-auto">
                 <Button variant="outline" @click="closeDialog" class="text-sm">Close</Button>
                 <Button as="a" v-if="email.share_enabled && shareUrl" variant="default" :href="shareUrl" target="_blank" class="text-sm">
                     <ExternalLink class="mr-1.5 h-3.5 w-3.5" />

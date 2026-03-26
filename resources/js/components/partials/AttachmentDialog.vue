@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { EmailAttachment } from '@/types/email';
+import type { EmailAttachment } from '@/types/email';
 import { Download, FileX, Loader2 } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
 import AttachmentIcon from '../ui/AttachmentIcon.vue';

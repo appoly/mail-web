@@ -26,7 +26,7 @@ const totalEmails = ref<number>(0);
 const lastPage = ref<number>(1);
 const userSettings = ref({
     paginationAmount: 25,
-    dateFormat: 'timestamp',
+    dateFormat: 'days-ago',
 });
 
 // Filters (client-side)

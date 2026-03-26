@@ -32,7 +32,7 @@ const confirmDelete = () => {
             <div class="py-3">
                 <p class="text-muted-foreground text-sm leading-relaxed">Are you sure you want to delete this email? This action cannot be undone.</p>
             </div>
-            <DialogFooter class="gap-2 sm:gap-0">
+            <DialogFooter>
                 <Button variant="outline" @click="closeDialog" class="text-sm">Cancel</Button>
                 <Button variant="destructive" @click="confirmDelete" class="text-sm">Delete</Button>
             </DialogFooter>
