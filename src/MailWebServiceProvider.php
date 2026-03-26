@@ -9,6 +9,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Support\Htmlable;
 use Appoly\MailWeb\Providers\MessageServiceProvider;
 use Appoly\MailWeb\Console\Commands\PruneMailwebMails;
+use Appoly\MailWeb\Http\Models\MailwebEmail;
+use Appoly\MailWeb\Observers\MailwebEmailObserver;
 
 class MailWebServiceProvider extends ServiceProvider
 {
@@ -20,6 +22,7 @@ class MailWebServiceProvider extends ServiceProvider
         $this->commands([
             PruneMailwebMails::class,
         ]);
+        MailwebEmail::observe(MailWebEmailObserver::class);
 
         $this->app->singleton('MailWeb', function () {
             return new MailWeb;
