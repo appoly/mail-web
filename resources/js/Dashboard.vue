@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Email } from '@/types/email';
 import axios from 'axios';
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import { Menu } from 'lucide-vue-next';
+import { Inbox, Mail, Menu } from 'lucide-vue-next';
 import { computed, onMounted, provide, ref, watch } from 'vue';
 import toast, { Toaster } from 'vue3-hot-toast';
 
@@ -20,14 +20,23 @@ const sidebarOpen = ref<boolean>(false);
 const isMobile = ref<boolean>(false);
 const isLoading = ref<boolean>(false);
 const isLoadingMore = ref<boolean>(false);
-const error = ref<Error | null>(null);
+const error = ref<string | null>(null);
 const currentPage = ref<number>(1);
 const totalEmails = ref<number>(0);
 const lastPage = ref<number>(1);
 const userSettings = ref({
     paginationAmount: 25,
-    dateFormat: 'timestamp',
+    dateFormat: 'days-ago',
 });
+
+// Filters (client-side)
+const filters = ref<Record<string, any>>({
+    hasAttachments: false,
+    unread: false,
+});
+
+// Track if we're searching (for UI feedback)
+const isSearching = ref(false);
 
 // Create a ref to track pagination events
 const paginationTriggered = ref(false);
@@ -35,14 +44,17 @@ const paginationTriggered = ref(false);
 // Create a ref to track polling state for components to access
 const isPollingActive = ref(false);
 
-const fetchEmails = (resetList = true): void => {
+const fetchEmails = (resetList = true): Promise<void> => {
     if (resetList) {
         isLoading.value = true;
         currentPage.value = 1;
-        // Reset pagination trigger when doing a fresh fetch
         paginationTriggered.value = false;
     } else {
         isLoadingMore.value = true;
+    }
+
+    if (searchQuery.value) {
+        isSearching.value = true;
     }
 
     const params = {
@@ -51,7 +63,7 @@ const fetchEmails = (resetList = true): void => {
         search: searchQuery.value || undefined,
     };
 
-    axios
+    return axios
         .get('/mailweb/emails', { params })
         .then((response) => {
             if (resetList) {
@@ -63,19 +75,19 @@ const fetchEmails = (resetList = true): void => {
             lastPage.value = response.data.last_page;
             isLoading.value = false;
             isLoadingMore.value = false;
+            isSearching.value = false;
         })
         .catch((err) => {
             error.value = err.message;
             isLoading.value = false;
             isLoadingMore.value = false;
+            isSearching.value = false;
         });
 };
 
 const loadMoreEmails = (): void => {
     if (currentPage.value < lastPage.value && !isLoadingMore.value) {
-        // Signal that pagination has been triggered
         paginationTriggered.value = true;
-
         currentPage.value++;
         fetchEmails(false);
     }
@@ -104,21 +116,32 @@ provide('formatDate', formatDate);
 provide('paginationTriggered', paginationTriggered);
 provide('isPollingActive', isPollingActive);
 
-// We'll use server-side filtering instead of client-side
-const filteredEmails = computed<Email[]>(() => emails.value);
+// Client-side filtering
+const filteredEmails = computed<Email[]>(() => {
+    let result = emails.value;
 
-// Watch for search query changes to trigger new search
+    if (filters.value.hasAttachments) {
+        result = result.filter((e) => e.attachments_count && e.attachments_count > 0);
+    }
+
+    if (filters.value.unread) {
+        result = result.filter((e) => !e.read);
+    }
+
+    return result;
+});
+
+const isFiltered = computed(() => filters.value.hasAttachments || filters.value.unread);
+
+// Watch for search query changes to trigger new search (debounced)
+let searchDebounceTimeout: ReturnType<typeof setTimeout> | null = null;
 watch(
     searchQuery,
-    (newValue, oldValue) => {
-        if (newValue !== oldValue) {
-            // Debounce search to avoid too many requests
-            const debounceTimeout = setTimeout(() => {
-                fetchEmails(true);
-            }, 300);
-
-            return () => clearTimeout(debounceTimeout);
-        }
+    () => {
+        if (searchDebounceTimeout) clearTimeout(searchDebounceTimeout);
+        searchDebounceTimeout = setTimeout(() => {
+            fetchEmails(true);
+        }, 300);
     },
     { immediate: false },
 );
@@ -164,6 +187,11 @@ const updateSettings = (newSettings: any): void => {
     userSettings.value = { ...userSettings.value, ...newSettings };
 };
 
+// Update filters
+const updateFilters = (newFilters: Record<string, any>): void => {
+    filters.value = { ...filters.value, ...newFilters };
+};
+
 const checkMobile = (): void => {
     isMobile.value = window.innerWidth < 1024;
 };
@@ -186,13 +214,17 @@ onMounted((): void => {
 
 <template>
     <div class="flex h-screen flex-col overflow-hidden lg:flex-row">
-        <div v-if="isMobile" class="flex items-center border-b p-4">
-            <Button variant="ghost" size="icon" @click="sidebarOpen = true" class="mr-2">
+        <!-- Mobile Header -->
+        <div v-if="isMobile" class="flex items-center border-b px-4 py-3">
+            <Button variant="ghost" size="icon" @click="sidebarOpen = true" class="mr-3">
                 <Menu class="h-5 w-5" />
                 <span class="sr-only">Toggle menu</span>
             </Button>
-            <div class="flex items-center">
-                <h1 class="text-xl font-bold">Mailweb</h1>
+            <div class="flex items-center gap-2">
+                <div class="bg-primary flex h-7 w-7 items-center justify-center rounded-md">
+                    <Mail class="h-3.5 w-3.5 text-white" />
+                </div>
+                <h1 class="text-lg font-semibold tracking-tight">Mailweb</h1>
             </div>
         </div>
 
@@ -200,11 +232,13 @@ onMounted((): void => {
             v-model:searchQuery="searchQuery"
             v-model:isOpen="sidebarOpen"
             :isMobile="isMobile"
-            :filters="{}"
+            :filters="filters"
+            :isLoading="isLoading"
             @update:settings="updateSettings"
+            @update:filters="updateFilters"
         />
 
-        <div class="flex h-[calc(100vh-57px)] flex-1 flex-col overflow-hidden lg:h-screen">
+        <div class="flex h-[calc(100vh-53px)] flex-1 flex-col overflow-hidden lg:h-screen">
             <div class="flex flex-1 flex-col overflow-hidden lg:flex-row">
                 <template v-if="isMobile">
                     <SlidingPanel>
@@ -217,6 +251,9 @@ onMounted((): void => {
                             :isMobile="isMobile"
                             :totalEmails="totalEmails"
                             :hasMoreEmails="currentPage < lastPage"
+                            :isSearching="isSearching"
+                            :searchQuery="searchQuery"
+                            :isFiltered="isFiltered"
                             @loadMore="loadMoreEmails"
                         />
                         <template #preview>
@@ -228,10 +265,13 @@ onMounted((): void => {
                                     @delete-email="handleDeleteEmail"
                                 />
                             </div>
-                            <div v-else class="bg-muted/30 flex h-full items-center justify-center p-6 text-center">
-                                <div>
-                                    <h3 class="text-xl font-medium">No email selected</h3>
-                                    <p class="text-muted-foreground">Select an email from the list to preview it</p>
+                            <div v-else class="flex h-full items-center justify-center p-8 text-center">
+                                <div class="animate-fade-in-up">
+                                    <div class="bg-muted mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl">
+                                        <Inbox class="text-muted-foreground h-8 w-8" />
+                                    </div>
+                                    <h3 class="text-lg font-semibold tracking-tight">No email selected</h3>
+                                    <p class="text-muted-foreground mt-1 text-sm">Tap an email to preview it here</p>
                                 </div>
                             </div>
                         </template>
@@ -247,6 +287,8 @@ onMounted((): void => {
                         :isMobile="isMobile"
                         :totalEmails="totalEmails"
                         :hasMoreEmails="currentPage < lastPage"
+                        :isSearching="isSearching"
+                        :searchQuery="searchQuery"
                         @loadMore="loadMoreEmails"
                     />
                     <template v-if="selectedEmail">
@@ -260,10 +302,13 @@ onMounted((): void => {
                         </div>
                     </template>
                     <template v-else>
-                        <div class="bg-muted/30 flex flex-1 items-center justify-center p-6 text-center">
-                            <div>
-                                <h3 class="text-xl font-medium">No email selected</h3>
-                                <p class="text-muted-foreground">Select an email from the list to preview it</p>
+                        <div class="flex flex-1 items-center justify-center p-8 text-center">
+                            <div class="animate-fade-in-up">
+                                <div class="bg-muted mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-xl">
+                                    <Inbox class="text-muted-foreground h-10 w-10" />
+                                </div>
+                                <h3 class="text-xl font-semibold tracking-tight">No email selected</h3>
+                                <p class="text-muted-foreground mt-1.5 text-sm">Choose an email from the list to preview its contents</p>
                             </div>
                         </div>
                     </template>

@@ -2,12 +2,12 @@
 
 namespace Appoly\MailWeb\Tests;
 
-use Illuminate\Database\Eloquent\Factory;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Database\Eloquent\Factory;
 
 class MailWebTestCase extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

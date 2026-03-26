@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// Is it pointless, yes. Is it cool, also yes!
 import { Button } from '@/components/ui/button';
 import { Send } from 'lucide-vue-next';
 import { ref } from 'vue';
@@ -18,14 +17,20 @@ const handleClick = () => {
         emit('click');
         setTimeout(() => {
             isAnimating.value = false;
-        }, 1000); // Total duration: 0.5s fly off + 0.5s fly back
+        }, 1000);
     }
 };
 </script>
 
 <template>
-    <Button variant="ghost" size="icon" :disabled="disabled" @click="handleClick">
-        <Send :class="['h-4 w-4', { 'animate-fly-sequence': isAnimating, 'animate-pulse': disabled && !isAnimating }]" />
+    <Button
+        variant="ghost"
+        size="icon"
+        :disabled="disabled"
+        @click="handleClick"
+        class="h-8 w-8"
+    >
+        <Send :class="['h-3.5 w-3.5', { 'animate-fly-sequence': isAnimating, 'animate-pulse': disabled && !isAnimating }]" />
     </Button>
 </template>
 
@@ -41,10 +46,8 @@ const handleClick = () => {
         transform: translate(0, 0);
         opacity: 1;
     }
-
     100% {
         transform: translate(10px, -10px);
-        /* Fly to top-right */
         opacity: 0;
     }
 }
@@ -52,13 +55,10 @@ const handleClick = () => {
 @keyframes flyBack {
     0% {
         transform: translate(-10px, 10px);
-        /* Start from bottom-left */
         opacity: 0;
     }
-
     100% {
         transform: translate(0, 0);
-        /* Return to original position */
         opacity: 1;
     }
 }
