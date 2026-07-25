@@ -100,17 +100,14 @@ const updateIframe = (): void => {
         if (iframeRef.value && props.email.body_html) {
             const iframeDoc = iframeRef.value.contentDocument || iframeRef.value.contentWindow?.document;
             if (iframeDoc) {
-                const parser = new DOMParser();
-                const emailDoc = parser.parseFromString(props.email.body_html, 'text/html');
+                iframeDoc.open();
+                iframeDoc.write(props.email.body_html);
+                iframeDoc.close();
 
-                emailDoc.querySelectorAll('a').forEach((link) => {
+                iframeDoc.querySelectorAll('a').forEach((link) => {
                     link.setAttribute('target', '_blank');
                     link.setAttribute('rel', 'noopener noreferrer');
                 });
-
-                iframeDoc.open();
-                iframeDoc.write(emailDoc.documentElement.outerHTML);
-                iframeDoc.close();
             }
         }
     });
