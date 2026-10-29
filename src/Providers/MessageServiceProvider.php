@@ -2,15 +2,25 @@
 
 namespace Appoly\MailWeb\Providers;
 
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\Mail\Events\MessageSending;
 use Appoly\MailWeb\Http\Listeners\MailWebListener;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 
-class MessageServiceProvider extends EventServiceProvider
+/**
+ * Attaches the capture listener to every outgoing message.
+ *
+ * This deliberately extends the plain ServiceProvider rather than
+ * Illuminate\Foundation\Support\Providers\EventServiceProvider. Every
+ * subclass of the foundation event provider also attaches Laravel's
+ * SendEmailVerificationNotification listener to the Registered event,
+ * so extending it made host applications send two verification emails
+ * for every registration.
+ */
+class MessageServiceProvider extends ServiceProvider
 {
-    protected $listen = [
-        MessageSending::class => [
-            MailWebListener::class,
-        ],
-    ];
+    public function boot(): void
+    {
+        Event::listen(MessageSending::class, MailWebListener::class);
+    }
 }
